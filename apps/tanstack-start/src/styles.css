@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@cataster/tailwind-config/theme";
+@import "@cataster/ui/styles/globals.css";
 
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
@@ -26,9 +26,7 @@
     --font-geist-sans: "Geist Variable";
     --font-geist-mono: "Geist Mono Variable";
   }
-  * {
-    @apply border-border;
-  }
+
   body {
     letter-spacing: var(--tracking-normal);
   }

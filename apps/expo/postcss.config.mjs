@@ -1,1 +1,1 @@
-export { default } from "@cataster/tailwind-config/postcss-config";
+export { default } from "@cataster/ui/postcss-config";

@@ -4,4 +4,4 @@
 
 @import "nativewind/theme";
 
-@import "@cataster/tailwind-config/theme";
+@import "@cataster/ui/globals.css";

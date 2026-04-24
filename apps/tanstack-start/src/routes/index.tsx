@@ -1,17 +1,4 @@
-import type { RouterOutputs } from "@cataster/api";
 import { Suspense } from "react";
-import { CreatePostSchema } from "@cataster/db/schema";
-import { cn } from "@cataster/ui";
-import { Button } from "@cataster/ui/button";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@cataster/ui/field";
-import { Input } from "@cataster/ui/input";
-import { toast } from "@cataster/ui/toast";
 import { useForm } from "@tanstack/react-form";
 import {
   useMutation,
@@ -19,15 +6,24 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+import type { RouterOutputs } from "@cataster/api";
+import { Button } from "@cataster/ui/components/base/button";
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@cataster/ui/components/base/field";
+import { Input } from "@cataster/ui/components/base/input";
+import { toast } from "@cataster/ui/components/base/sonner";
+import { cn } from "@cataster/ui/lib/utils";
 
 import { AuthShowcase } from "~/component/auth-showcase";
-import { useTRPC } from "~/lib/trpc";
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => {
-    const { trpc, queryClient } = context;
-    void queryClient.prefetchQuery(trpc.post.all.queryOptions());
-  },
   component: RouteComponent,
 });
 
@@ -38,9 +34,9 @@ function RouteComponent() {
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-primary">T3</span> Turbo
         </h1>
-        <AuthShowcase />
+        {/* <AuthShowcase /> */}
 
-        <CreatePostForm />
+        {/* <CreatePostForm /> */}
         <div className="w-full max-w-2xl overflow-y-scroll">
           <Suspense
             fallback={
@@ -51,7 +47,7 @@ function RouteComponent() {
               </div>
             }
           >
-            <PostList />
+            {/* <PostList /> */}
           </Suspense>
         </div>
       </div>
@@ -85,7 +81,10 @@ function CreatePostForm() {
       title: "",
     },
     validators: {
-      onSubmit: CreatePostSchema,
+      onSubmit: z.object({
+        title: z.string().min(1),
+        content: z.string().min(1),
+      }),
     },
     onSubmit: (data) => createPost.mutate(data.value),
   });

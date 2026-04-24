@@ -1,10 +1,7 @@
 /// <reference types="vite/client" />
-import type { AppRouter } from "@cataster/api";
 import type { QueryClient } from "@tanstack/react-query";
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import type * as React from "react";
-import { ThemeProvider, ThemeToggle } from "@cataster/ui/theme";
-import { Toaster } from "@cataster/ui/toast";
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -13,6 +10,11 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import type { AppRouter } from "@cataster/api";
+import { Toaster } from "@cataster/ui/components/base/sonner";
+
+import { ModeToggle } from "~/component/mode-toggle";
+import { ThemeProvider } from "~/component/theme-provider";
 import appCss from "~/styles.css?url";
 
 export const Route = createRootRouteWithContext<{
@@ -35,7 +37,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="system" storageKey="theme">
       <html lang="en" suppressHydrationWarning>
         <head>
           <HeadContent />
@@ -43,7 +45,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <body className="bg-background text-foreground min-h-screen font-sans antialiased">
           {children}
           <div className="absolute right-4 bottom-12">
-            <ThemeToggle />
+            <ModeToggle />
           </div>
           <Toaster />
           <TanStackRouterDevtools position="bottom-right" />
