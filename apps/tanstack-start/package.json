@@ -15,7 +15,6 @@
   "dependencies": {
     "@cataster/api": "workspace:*",
     "@cataster/auth": "workspace:*",
-    "@cataster/db": "workspace:*",
     "@cataster/ui": "workspace:*",
     "@fontsource-variable/geist": "^5.2.8",
     "@fontsource-variable/geist-mono": "^5.2.7",

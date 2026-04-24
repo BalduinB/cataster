@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@cataster/auth": "workspace:*",
-    "@cataster/db": "workspace:*",
     "@cataster/validators": "workspace:*",
     "@trpc/server": "catalog:",
     "superjson": "2.2.3",

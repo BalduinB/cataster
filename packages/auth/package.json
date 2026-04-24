@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
-    "@cataster/db": "workspace:*",
     "@t3-oss/env-core": "^0.13.8",
     "better-auth": "catalog:",
     "zod": "catalog:"
