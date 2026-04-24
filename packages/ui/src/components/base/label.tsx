@@ -1,20 +1,20 @@
-"use client";
+"use client"
 
-import { cn } from "@cataster/ui";
-import { Label as LabelPrimitive } from "radix-ui";
+import * as React from "react"
 
-export function Label({
-  className,
-  ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+import { cn } from "@cataster/ui/lib/utils"
+
+function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (
-    <LabelPrimitive.Root
+    <label
       data-slot="label"
       className={cn(
         "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className,
+        className
       )}
       {...props}
     />
-  );
+  )
 }
+
+export { Label }
