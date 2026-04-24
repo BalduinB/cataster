@@ -1,0 +1,7 @@
+{
+  "name": "@cataster/tsconfig",
+  "private": true,
+  "files": [
+    "*.json"
+  ]
+}
