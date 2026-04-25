@@ -1,0 +1,23 @@
+{
+  /* TypeScript project config for the Confect source tree.
+   *
+   * `tsc -p confect` typechecks both the user-authored `confect/**` files and
+   * the codegen output (`confect/_generated/**` and `convex/_generated/**`),
+   * which is why the latter is `include`d explicitly even though it lives
+   * outside this directory.
+   */
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true,
+    "target": "ESNext",
+    "lib": ["ES2021", "dom"],
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["./**/*", "../convex/_generated/**/*", "../test/**/*"]
+}

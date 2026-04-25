@@ -1,2 +1,11 @@
 .env.local
 .env
+
+# Convex codegen target. Confect owns this directory; everything is generated
+# except the two files that Convex itself requires to be hand-written.
+convex/*
+!convex/tsconfig.json
+!convex/convex.config.ts
+
+# Confect codegen output (specs/services/refs/registered functions).
+confect/_generated/
