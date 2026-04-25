@@ -10,7 +10,6 @@
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
-    "auth:generate": "pnpm -F @cataster/auth generate",
     "dev": "turbo watch dev --continue",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
@@ -19,9 +18,7 @@
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
     "typecheck": "turbo run typecheck",
-    "ui-add": "turbo run ui-add",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ui-add": "turbo run ui-add"
   },
   "devDependencies": {
     "@cataster/prettier-config": "workspace:*",

@@ -8,10 +8,5 @@ if (!clerkJwtIssuerDomain)
   );
 
 export default {
-  providers: [
-    {
-      domain: clerkJwtIssuerDomain,
-      applicationID: "convex",
-    },
-  ],
+  providers: [{ domain: clerkJwtIssuerDomain, applicationID: "convex" }],
 } satisfies AuthConfig;

@@ -1,19 +1,28 @@
 {
   "name": "@cataster/backend",
+  "private": true,
   "version": "1.0.0",
-  "description": "",
+  "type": "module",
+  "exports": {
+    "./convex/_generated/api": {
+      "types": "./convex/_generated/api.d.ts",
+      "default": "./convex/_generated/api.js"
+    },
+    "./convex/_generated/dataModel": {
+      "types": "./convex/_generated/dataModel.d.ts"
+    }
+  },
   "scripts": {
     "dev": "convex dev",
     "setup": "convex dev --until-success",
     "typecheck": "tsc --noEmit -p convex"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
-    "convex": "^1.35.1",
-    "openai": "^6.34.0"
+    "convex": "catalog:"
   },
   "devDependencies": {
-    "typescript": "6.0.3"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }

@@ -2,11 +2,9 @@ import { createEnv } from "@t3-oss/env-core";
 import { vercel } from "@t3-oss/env-core/presets-zod";
 import { z } from "zod/v4";
 
-import { authEnv } from "@cataster/auth/env";
-
 export const env = createEnv({
   clientPrefix: "VITE_",
-  extends: [authEnv(), vercel()],
+  extends: [vercel()],
   shared: {
     NODE_ENV: z
       .enum(["development", "production", "test"])
@@ -17,20 +15,25 @@ export const env = createEnv({
    * This way you can ensure the app isn't built with invalid env vars.
    */
   server: {
-    POSTGRES_URL: z.url(),
+    CLERK_SECRET_KEY: z.string().min(1),
   },
 
   /**
    * Specify your client-side environment variables schema here.
-   * For them to be exposed to the client, prefix them with `NEXT_PUBLIC_`.
+   * For them to be exposed to the client, prefix them with `VITE_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    VITE_CONVEX_URL: z.url(),
+    VITE_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
    */
-  runtimeEnv: process.env,
+  runtimeEnv: {
+    ...process.env,
+    VITE_CONVEX_URL: import.meta.env.VITE_CONVEX_URL,
+    VITE_CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+  },
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });

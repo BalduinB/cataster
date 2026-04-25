@@ -8,8 +8,7 @@
  * @module
  */
 
-import type * as notes from "../notes.js";
-import type * as openai from "../openai.js";
+import type * as posts from "../posts.js";
 import type * as utils from "../utils.js";
 
 import type {
@@ -19,8 +18,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  notes: typeof notes;
-  openai: typeof openai;
+  posts: typeof posts;
   utils: typeof utils;
 }>;
 

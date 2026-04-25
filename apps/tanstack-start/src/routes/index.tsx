@@ -1,30 +1,25 @@
 import { Suspense } from "react";
-import { useForm } from "@tanstack/react-form";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { Show, SignInButton, UserButton } from "@clerk/tanstack-react-start";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import type { RouterOutputs } from "@cataster/api";
+import type { Doc } from "@cataster/backend/convex/_generated/dataModel";
+import { api } from "@cataster/backend/convex/_generated/api";
 import { Button } from "@cataster/ui/components/base/button";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@cataster/ui/components/base/field";
-import { Input } from "@cataster/ui/components/base/input";
+import { FieldGroup } from "@cataster/ui/components/base/field";
 import { toast } from "@cataster/ui/components/base/sonner";
+import { useAppForm } from "@cataster/ui/components/form/hooks";
 import { cn } from "@cataster/ui/lib/utils";
 
-import { AuthShowcase } from "~/component/auth-showcase";
+const postsQuery = convexQuery(api.posts.getPosts, {});
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(postsQuery);
+  },
 });
 
 function RouteComponent() {
@@ -34,9 +29,13 @@ function RouteComponent() {
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-primary">T3</span> Turbo
         </h1>
-        {/* <AuthShowcase /> */}
 
-        {/* <CreatePostForm /> */}
+        <AuthShowcase />
+
+        <Show when={"signed-in"}>
+          <CreatePostForm />
+        </Show>
+
         <div className="w-full max-w-2xl overflow-y-scroll">
           <Suspense
             fallback={
@@ -47,7 +46,7 @@ function RouteComponent() {
               </div>
             }
           >
-            {/* <PostList /> */}
+            <PostList />
           </Suspense>
         </div>
       </div>
@@ -55,27 +54,31 @@ function RouteComponent() {
   );
 }
 
-function CreatePostForm() {
-  const trpc = useTRPC();
-
-  const queryClient = useQueryClient();
-  const createPost = useMutation(
-    trpc.post.create.mutationOptions({
-      onSuccess: async () => {
-        form.reset();
-        await queryClient.invalidateQueries(trpc.post.pathFilter());
-      },
-      onError: (err) => {
-        toast.error(
-          err.data?.code === "UNAUTHORIZED"
-            ? "You must be logged in to post"
-            : "Failed to create post",
-        );
-      },
-    }),
+function AuthShowcase() {
+  return (
+    <>
+      <Show when={"signed-out"}>
+        <SignInButton mode="modal">
+          <Button size="lg">Sign in</Button>
+        </SignInButton>
+      </Show>
+      <Show when={"signed-in"}>
+        <UserButton />
+      </Show>
+    </>
   );
+}
 
-  const form = useForm({
+function CreatePostForm() {
+  const createPost = useMutation({
+    mutationFn: useConvexMutation(api.posts.createPost),
+    onSuccess: () => form.reset(),
+    onError: (err) => {
+      toast.error(err.message || "Failed to create post");
+    },
+  });
+
+  const form = useAppForm({
     defaultValues: {
       content: "",
       title: "",
@@ -86,7 +89,7 @@ function CreatePostForm() {
         content: z.string().min(1),
       }),
     },
-    onSubmit: (data) => createPost.mutate(data.value),
+    onSubmit: async (data) => await createPost.mutateAsync(data.value),
   });
 
   return (
@@ -98,63 +101,24 @@ function CreatePostForm() {
       }}
     >
       <FieldGroup>
-        <form.Field
+        <form.AppField
           name="title"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldContent>
-                  <FieldLabel htmlFor={field.name}>Bug Title</FieldLabel>
-                </FieldContent>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="Title"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
+          children={(field) => <field.Input label="Bug Title" />}
         />
-        <form.Field
+        <form.AppField
           name="content"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldContent>
-                  <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                </FieldContent>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="Content"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
+          children={(field) => <field.Textarea label="Content" />}
         />
+        <form.AppForm>
+          <form.SubmitButton>Absenden</form.SubmitButton>
+        </form.AppForm>
       </FieldGroup>
-      <Button type="submit">Create</Button>
     </form>
   );
 }
 
 function PostList() {
-  const trpc = useTRPC();
-  const { data: posts } = useSuspenseQuery(trpc.post.all.queryOptions());
+  const { data: posts } = useSuspenseQuery(postsQuery);
 
   if (posts.length === 0) {
     return (
@@ -172,30 +136,20 @@ function PostList() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      {posts.map((p) => {
-        return <PostCard key={p.id} post={p} />;
-      })}
+      {posts.map((p) => (
+        <PostCard key={p._id} post={p} />
+      ))}
     </div>
   );
 }
 
-function PostCard(props: { post: RouterOutputs["post"]["all"][number] }) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-  const deletePost = useMutation(
-    trpc.post.delete.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(trpc.post.pathFilter());
-      },
-      onError: (err) => {
-        toast.error(
-          err.data?.code === "UNAUTHORIZED"
-            ? "You must be logged in to delete a post"
-            : "Failed to delete post",
-        );
-      },
-    }),
-  );
+function PostCard(props: { post: Doc<"posts"> }) {
+  const deletePost = useMutation({
+    mutationFn: useConvexMutation(api.posts.deletePost),
+    onError: (err) => {
+      toast.error(err.message || "Failed to delete post");
+    },
+  });
 
   return (
     <div className="bg-muted flex flex-row rounded-lg p-4">
@@ -203,15 +157,17 @@ function PostCard(props: { post: RouterOutputs["post"]["all"][number] }) {
         <h2 className="text-primary text-2xl font-bold">{props.post.title}</h2>
         <p className="mt-2 text-sm">{props.post.content}</p>
       </div>
-      <div>
+      <Show when={"signed-in"}>
         <Button
           variant="ghost"
+          isLoading={deletePost.isPending}
           className="text-primary cursor-pointer text-sm font-bold uppercase hover:bg-transparent hover:text-white"
-          onClick={() => deletePost.mutate(props.post.id)}
+          onClick={() => deletePost.mutate({ postId: props.post._id })}
+          disabled={deletePost.isPending}
         >
           Delete
         </Button>
-      </div>
+      </Show>
     </div>
   );
 }

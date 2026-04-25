@@ -1,16 +1,14 @@
-export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
-  const deployment = deploymentName();
-  if (!deployment) return `Missing ${envVarName} in environment variables.`;
-  return (
-    `\n  Missing ${envVarName} in environment variables.\n\n` +
-    `  Get it from ${whereToGet} .\n  Paste it on the Convex dashboard:\n` +
-    `  https://dashboard.convex.dev/d/${deployment}/settings?var=${envVarName}`
-  );
+import type { Auth } from "convex/server";
+
+export async function getUserId({ auth }: { auth: Auth }) {
+  return (await auth.getUserIdentity())?.subject ?? null;
 }
 
-export function deploymentName() {
-  const url = process.env.CONVEX_CLOUD_URL;
-  if (!url) return undefined;
-  const regex = new RegExp("https://(.+).convex.cloud");
-  return regex.exec(url)?.[1];
+export async function requireUserId({ auth }: { auth: Auth }) {
+  const userId = await getUserId({ auth });
+  if (userId) return userId;
+
+  throw new Error(
+    "Authenticated user was required, but no Clerk subject was found",
+  );
 }
