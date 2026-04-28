@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Console, Effect, Logger } from "effect";
 
 import { UnauthorizedError } from "@cataster/validators";
 
@@ -18,5 +18,6 @@ export const requireUser = Effect.gen(function* () {
         Effect.catchTag("NoUserIdentityFoundError", () =>
             Effect.fail(new UnauthorizedError({ message: "Not signed in" })),
         ),
+        Effect.tap((e) => Console.log(e.orgId)),
     );
 });
