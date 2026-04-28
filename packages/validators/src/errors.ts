@@ -16,30 +16,30 @@ import { Schema } from "effect";
  */
 
 export class UnauthorizedError extends Schema.TaggedError<UnauthorizedError>()(
-  "Unauthorized",
-  { message: Schema.String },
+    "Unauthorized",
+    { message: Schema.String },
 ) {}
 
 export class ForbiddenError extends Schema.TaggedError<ForbiddenError>()(
-  "Forbidden",
-  { message: Schema.String },
+    "Forbidden",
+    { message: Schema.String },
 ) {}
 
 export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
-  "NotFound",
-  { message: Schema.String },
+    "NotFound",
+    { message: Schema.String },
 ) {}
 
 export class ConflictError extends Schema.TaggedError<ConflictError>()(
-  "Conflict",
-  { message: Schema.String },
+    "Conflict",
+    { message: Schema.String },
 ) {}
 
 export const WireErrorUnion = Schema.Union(
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
+    UnauthorizedError,
+    ForbiddenError,
+    NotFoundError,
+    ConflictError,
 );
 
 export type WireError = Schema.Schema.Type<typeof WireErrorUnion>;

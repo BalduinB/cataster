@@ -1,23 +1,23 @@
 {
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "base-luma",
-  "rsc": false,
-  "tsx": true,
-  "tailwind": {
-    "config": "",
-    "css": "src/styles/globals.css",
-    "baseColor": "neutral",
-    "cssVariables": true
-  },
-  "iconLibrary": "tabler",
-  "aliases": {
-    "components": "@cataster/ui/components/base",
-    "utils": "@cataster/ui/lib/utils",
-    "hooks": "@cataster/ui/hooks",
-    "lib": "@cataster/ui/lib",
-    "ui": "@cataster/ui/components"
-  },
-  "rtl": false,
-  "menuColor": "inverted-translucent",
-  "menuAccent": "subtle"
+    "$schema": "https://ui.shadcn.com/schema.json",
+    "style": "base-luma",
+    "rsc": false,
+    "tsx": true,
+    "tailwind": {
+        "config": "",
+        "css": "src/styles/globals.css",
+        "baseColor": "neutral",
+        "cssVariables": true
+    },
+    "iconLibrary": "tabler",
+    "aliases": {
+        "components": "@cataster/ui/components/base",
+        "utils": "@cataster/ui/lib/utils",
+        "hooks": "@cataster/ui/hooks",
+        "lib": "@cataster/ui/lib",
+        "ui": "@cataster/ui/components"
+    },
+    "rtl": false,
+    "menuColor": "inverted-translucent",
+    "menuAccent": "subtle"
 }

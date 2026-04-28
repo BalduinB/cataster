@@ -26,50 +26,56 @@ import { WireErrorUnion } from "@cataster/validators";
 const decodeWireError = Schema.decodeUnknownEither(WireErrorUnion);
 
 export function confectQuery<R extends Ref.AnyPublicQuery>(
-  ref: R,
-  args: Ref.Args<R>,
+    ref: R,
+    args: Ref.Args<R>,
 ) {
-  // Store the function *name* (not the FunctionReference object) in the
-  // queryKey. Convex FunctionReferences carry their identity on a Symbol-keyed
-  // property, which is silently dropped by `JSON.stringify` during SSR
-  // dehydration. After hydration the queryKey would otherwise contain `{}`,
-  // and `ConvexQueryClient.subscribeInner` would call `watchQuery({})` →
-  // `getFunctionAddress` would throw "[object Object] is not a
-  // functionReference". A string survives serialization and is accepted by
-  // both `watchQuery` and the Convex hashFn.
-  const funcName = Ref.getConvexFunctionName(ref);
-  const encodedArgs = Ref.encodeArgsSync(ref, args) as Record<string, unknown>;
+    // Store the function *name* (not the FunctionReference object) in the
+    // queryKey. Convex FunctionReferences carry their identity on a Symbol-keyed
+    // property, which is silently dropped by `JSON.stringify` during SSR
+    // dehydration. After hydration the queryKey would otherwise contain `{}`,
+    // and `ConvexQueryClient.subscribeInner` would call `watchQuery({})` →
+    // `getFunctionAddress` would throw "[object Object] is not a
+    // functionReference". A string survives serialization and is accepted by
+    // both `watchQuery` and the Convex hashFn.
+    const funcName = Ref.getConvexFunctionName(ref);
+    const encodedArgs = Ref.encodeArgsSync(ref, args) as Record<
+        string,
+        unknown
+    >;
 
-  return {
-    queryKey: ["convexQuery", funcName, encodedArgs] as const,
-    select: (raw: unknown): Ref.Returns<R> =>
-      // `decodeReturnsSync`'s declared return is `Ref.Returns<R>`, but inside
-      // a generic body that erases to `any`. The cast is safe because the
-      // schema decoder validates at runtime.
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      Ref.decodeReturnsSync(ref, raw),
-    staleTime: Infinity,
-  };
+    return {
+        queryKey: ["convexQuery", funcName, encodedArgs] as const,
+        select: (raw: unknown): Ref.Returns<R> =>
+            // `decodeReturnsSync`'s declared return is `Ref.Returns<R>`, but inside
+            // a generic body that erases to `any`. The cast is safe because the
+            // schema decoder validates at runtime.
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            Ref.decodeReturnsSync(ref, raw),
+        staleTime: Infinity,
+    };
 }
 
 export function useConfectMutationFn<R extends Ref.AnyPublicMutation>(
-  ref: R,
+    ref: R,
 ): (args: Ref.Args<R>) => Promise<Ref.Returns<R>> {
-  const funcRef = Ref.getFunctionReference(ref);
+    const funcRef = Ref.getFunctionReference(ref);
 
-  const inner = useConvexMutation(funcRef);
+    const inner = useConvexMutation(funcRef);
 
-  return async (args) => {
-    const encoded = Ref.encodeArgsSync(ref, args) as Record<string, unknown>;
+    return async (args) => {
+        const encoded = Ref.encodeArgsSync(ref, args) as Record<
+            string,
+            unknown
+        >;
 
-    const raw = await (
-      inner as (a: Record<string, unknown>) => Promise<unknown>
-    )(encoded);
+        const raw = await (
+            inner as (a: Record<string, unknown>) => Promise<unknown>
+        )(encoded);
 
-    // See note in `confectQuery` on why the unsafe-return is acceptable here.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return Ref.decodeReturnsSync(ref, raw);
-  };
+        // See note in `confectQuery` on why the unsafe-return is acceptable here.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return Ref.decodeReturnsSync(ref, raw);
+    };
 }
 
 /**
@@ -81,29 +87,32 @@ export function useConfectMutationFn<R extends Ref.AnyPublicMutation>(
  * return decoding the same way the mutation flavour does.
  */
 export function useConfectActionFn<R extends Ref.AnyPublicAction>(
-  ref: R,
+    ref: R,
 ): (args: Ref.Args<R>) => Promise<Ref.Returns<R>> {
-  const funcRef = Ref.getFunctionReference(ref);
+    const funcRef = Ref.getFunctionReference(ref);
 
-  const inner = useAction(funcRef);
+    const inner = useAction(funcRef);
 
-  return async (args) => {
-    const encoded = Ref.encodeArgsSync(ref, args) as Record<string, unknown>;
+    return async (args) => {
+        const encoded = Ref.encodeArgsSync(ref, args) as Record<
+            string,
+            unknown
+        >;
 
-    const raw = await (
-      inner as (a: Record<string, unknown>) => Promise<unknown>
-    )(encoded);
+        const raw = await (
+            inner as (a: Record<string, unknown>) => Promise<unknown>
+        )(encoded);
 
-    // See note in `confectQuery` on why the unsafe-return is acceptable here.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return Ref.decodeReturnsSync(ref, raw);
-  };
+        // See note in `confectQuery` on why the unsafe-return is acceptable here.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return Ref.decodeReturnsSync(ref, raw);
+    };
 }
 
 export function decodeConfectError(error: unknown): WireError | null {
-  if (!(error instanceof ConvexError)) return null;
+    if (!(error instanceof ConvexError)) return null;
 
-  const result = decodeWireError(error.data);
+    const result = decodeWireError(error.data);
 
-  return Either.isRight(result) ? result.right : null;
+    return Either.isRight(result) ? result.right : null;
 }

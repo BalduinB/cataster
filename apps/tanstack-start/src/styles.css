@@ -11,23 +11,23 @@
 @custom-variant auto (&:where(.auto, .auto *));
 
 @utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
-  @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
+    margin-inline: auto;
+    padding-inline: 2rem;
+    @media (width >= --theme(--breakpoint-sm)) {
+        max-width: none;
+    }
+    @media (width >= 1400px) {
+        max-width: 1400px;
+    }
 }
 
 @layer base {
-  :root {
-    --font-geist-sans: "Geist Variable";
-    --font-geist-mono: "Geist Mono Variable";
-  }
+    :root {
+        --font-geist-sans: "Geist Variable";
+        --font-geist-mono: "Geist Mono Variable";
+    }
 
-  body {
-    letter-spacing: var(--tracking-normal);
-  }
+    body {
+        letter-spacing: var(--tracking-normal);
+    }
 }

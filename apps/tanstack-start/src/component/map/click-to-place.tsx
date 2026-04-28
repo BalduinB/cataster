@@ -1,8 +1,8 @@
 import { useMapEvents } from "react-leaflet";
 
 interface ClickToPlaceProps {
-  onPlace: (lat: number, lng: number) => void;
-  enabled?: boolean;
+    onPlace: (lat: number, lng: number) => void;
+    enabled?: boolean;
 }
 
 /**
@@ -10,11 +10,11 @@ interface ClickToPlaceProps {
  * the LatLng to the parent. Renders nothing.
  */
 export function ClickToPlace({ onPlace, enabled = true }: ClickToPlaceProps) {
-  useMapEvents({
-    click: (e) => {
-      if (!enabled) return;
-      onPlace(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
+    useMapEvents({
+        click: (e) => {
+            if (!enabled) return;
+            onPlace(e.latlng.lat, e.latlng.lng);
+        },
+    });
+    return null;
 }

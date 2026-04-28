@@ -1,13 +1,13 @@
 {
-  "extends": "@cataster/tsconfig/base.json",
-  "compilerOptions": {
-    "lib": ["ES2022", "dom", "dom.iterable"],
-    "jsx": "preserve",
-    "paths": {
-      "~/*": ["./src/*"],
-      "@cataster/ui/*": ["../../packages/ui/src/*"]
-    }
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+    "extends": "@cataster/tsconfig/base.json",
+    "compilerOptions": {
+        "lib": ["ES2022", "dom", "dom.iterable"],
+        "jsx": "preserve",
+        "paths": {
+            "~/*": ["./src/*"],
+            "@cataster/ui/*": ["../../packages/ui/src/*"]
+        }
+    },
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules"]
 }

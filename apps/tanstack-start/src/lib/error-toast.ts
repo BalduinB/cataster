@@ -11,10 +11,10 @@ import { decodeConfectError } from "./confect";
  * raw text to the UI.
  */
 export function toastConfectError(fallback: string, error: unknown) {
-  const decoded = decodeConfectError(error);
-  if (decoded) {
-    toast.error(decoded.message);
-    return;
-  }
-  toast.error(fallback);
+    const decoded = decodeConfectError(error);
+    if (decoded) {
+        toast.error(decoded.message);
+        return;
+    }
+    toast.error(fallback);
 }
