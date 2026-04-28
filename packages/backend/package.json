@@ -14,7 +14,8 @@
     "./confect/_generated/refs": {
       "types": "./confect/_generated/refs.d.ts",
       "default": "./confect/_generated/refs.js"
-    }
+    },
+    "./types": "./types.ts"
   },
   "scripts": {
     "dev": "concurrently -n confect,convex -c blue,green \"pnpm dev:confect\" \"pnpm dev:convex\"",
@@ -32,10 +33,14 @@
     "@cataster/validators": "workspace:*",
     "@confect/core": "catalog:",
     "@confect/server": "catalog:",
+    "@convex-dev/geospatial": "^0.2.1",
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@turf/boolean-point-in-polygon": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
     "convex": "catalog:",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "rrule": "^2.8.1"
   },
   "devDependencies": {
     "@confect/cli": "catalog:",

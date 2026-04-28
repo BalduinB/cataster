@@ -9,50 +9,168 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteRouteImport } from './routes/app/route'
+import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as wwwIndexRouteImport } from './routes/(www)/index'
+import { Route as AppLocationsIndexRouteImport } from './routes/app/locations/index'
+import { Route as AppLocationsIdIndexRouteImport } from './routes/app/locations/$id/index'
+import { Route as AppLocationsIdCreateTreeRouteImport } from './routes/app/locations/$id/create-tree'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
+  path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const wwwIndexRoute = wwwIndexRouteImport.update({
+  id: '/(www)/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppLocationsIndexRoute = AppLocationsIndexRouteImport.update({
+  id: '/locations/',
+  path: '/locations/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppLocationsIdIndexRoute = AppLocationsIdIndexRouteImport.update({
+  id: '/locations/$id/',
+  path: '/locations/$id/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppLocationsIdCreateTreeRoute =
+  AppLocationsIdCreateTreeRouteImport.update({
+    id: '/locations/$id/create-tree',
+    path: '/locations/$id/create-tree',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/': typeof wwwIndexRoute
+  '/app/': typeof AppIndexRoute
+  '/app/locations': typeof AppLocationsIndexRoute
+  '/app/locations/$id/create-tree': typeof AppLocationsIdCreateTreeRoute
+  '/app/locations/$id': typeof AppLocationsIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof wwwIndexRoute
+  '/app': typeof AppIndexRoute
+  '/app/locations': typeof AppLocationsIndexRoute
+  '/app/locations/$id/create-tree': typeof AppLocationsIdCreateTreeRoute
+  '/app/locations/$id': typeof AppLocationsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/(www)/': typeof wwwIndexRoute
+  '/app/': typeof AppIndexRoute
+  '/app/locations/': typeof AppLocationsIndexRoute
+  '/app/locations/$id/create-tree': typeof AppLocationsIdCreateTreeRoute
+  '/app/locations/$id/': typeof AppLocationsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/app'
+    | '/'
+    | '/app/'
+    | '/app/locations'
+    | '/app/locations/$id/create-tree'
+    | '/app/locations/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/app'
+    | '/app/locations'
+    | '/app/locations/$id/create-tree'
+    | '/app/locations/$id'
+  id:
+    | '__root__'
+    | '/app'
+    | '/(www)/'
+    | '/app/'
+    | '/app/locations/'
+    | '/app/locations/$id/create-tree'
+    | '/app/locations/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
+  wwwIndexRoute: typeof wwwIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/(www)/': {
+      id: '/(www)/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof wwwIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/locations/': {
+      id: '/app/locations/'
+      path: '/locations'
+      fullPath: '/app/locations'
+      preLoaderRoute: typeof AppLocationsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/locations/$id/': {
+      id: '/app/locations/$id/'
+      path: '/locations/$id'
+      fullPath: '/app/locations/$id'
+      preLoaderRoute: typeof AppLocationsIdIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/locations/$id/create-tree': {
+      id: '/app/locations/$id/create-tree'
+      path: '/locations/$id/create-tree'
+      fullPath: '/app/locations/$id/create-tree'
+      preLoaderRoute: typeof AppLocationsIdCreateTreeRouteImport
+      parentRoute: typeof AppRouteRoute
     }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppLocationsIndexRoute: typeof AppLocationsIndexRoute
+  AppLocationsIdCreateTreeRoute: typeof AppLocationsIdCreateTreeRoute
+  AppLocationsIdIndexRoute: typeof AppLocationsIdIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppLocationsIndexRoute: AppLocationsIndexRoute,
+  AppLocationsIdCreateTreeRoute: AppLocationsIdCreateTreeRoute,
+  AppLocationsIdIndexRoute: AppLocationsIdIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
+  wwwIndexRoute: wwwIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

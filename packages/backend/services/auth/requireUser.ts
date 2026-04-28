@@ -1,7 +1,7 @@
 import { UnauthorizedError } from "@cataster/validators";
 import { Effect } from "effect";
 
-import { Auth } from "../_generated/services";
+import { Auth } from "../../confect/_generated/services";
 
 /**
  * Resolves the current request's `UserIdentity`, or fails with the shared

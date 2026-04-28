@@ -16,6 +16,7 @@
 
 import { Ref } from "@confect/core";
 import { useConvexMutation } from "@convex-dev/react-query";
+import { useAction } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Either, Schema } from "effect";
 
@@ -57,6 +58,34 @@ export function useConfectMutationFn<R extends Ref.AnyPublicMutation>(
   const funcRef = Ref.getFunctionReference(ref);
 
   const inner = useConvexMutation(funcRef);
+
+  return async (args) => {
+    const encoded = Ref.encodeArgsSync(ref, args) as Record<string, unknown>;
+
+    const raw = await (
+      inner as (a: Record<string, unknown>) => Promise<unknown>
+    )(encoded);
+
+    // See note in `confectQuery` on why the unsafe-return is acceptable here.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return Ref.decodeReturnsSync(ref, raw);
+  };
+}
+
+/**
+ * Mirror of `useConfectMutationFn` for `publicAction` refs (e.g. OSM lookups).
+ *
+ * Convex actions don't get a TanStack Query subscription, so we use the
+ * imperative `useAction` hook from `convex/react` and shape its caller into
+ * a `mutationFn`-compatible function. The wrapper handles arg encoding and
+ * return decoding the same way the mutation flavour does.
+ */
+export function useConfectActionFn<R extends Ref.AnyPublicAction>(
+  ref: R,
+): (args: Ref.Args<R>) => Promise<Ref.Returns<R>> {
+  const funcRef = Ref.getFunctionReference(ref);
+
+  const inner = useAction(funcRef);
 
   return async (args) => {
     const encoded = Ref.encodeArgsSync(ref, args) as Record<string, unknown>;

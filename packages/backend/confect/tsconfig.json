@@ -19,5 +19,10 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["./**/*", "../convex/_generated/**/*", "../test/**/*"]
+  "include": [
+    "./**/*",
+    "../convex/_generated/**/*",
+    "../services/**/*",
+    "../test/**/*"
+  ]
 }

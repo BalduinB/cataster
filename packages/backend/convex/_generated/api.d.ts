@@ -8,7 +8,12 @@
  * @module
  */
 
+import type * as crons from "../crons.js";
 import type * as health from "../health.js";
+import type * as locations from "../locations.js";
+import type * as osm from "../osm.js";
+import type * as species from "../species.js";
+import type * as trees from "../trees.js";
 
 import type {
   ApiFromModules,
@@ -17,7 +22,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  crons: typeof crons;
   health: typeof health;
+  locations: typeof locations;
+  osm: typeof osm;
+  species: typeof species;
+  trees: typeof trees;
 }>;
 
 /**
@@ -46,4 +56,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  geospatial: import("@convex-dev/geospatial/_generated/component.js").ComponentApi<"geospatial">;
+};
