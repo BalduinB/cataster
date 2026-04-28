@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IconCrosshair } from "@tabler/icons-react";
+import { IconCrosshair, IconTree } from "@tabler/icons-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Marker } from "react-leaflet";
@@ -18,6 +18,14 @@ import { TreeForm } from "~/component/trees/tree-form";
 import { confectQuery } from "~/lib/confect";
 
 export const Route = createFileRoute("/app/locations/$id/create-tree")({
+    staticData: {
+        breadcrumb: "Baum anlegen",
+        nav: {
+            title: "Baum anlegen",
+            icon: IconTree,
+            parent: "/app/locations",
+        },
+    },
     component: CreateTreeRoute,
     pendingComponent: CreateTreePending,
     loader: async ({ context, params }) => {

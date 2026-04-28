@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as wwwIndexRouteImport } from './routes/(www)/index'
+import { Route as AppLocationsRouteRouteImport } from './routes/app/locations/route'
 import { Route as AppLocationsIndexRouteImport } from './routes/app/locations/index'
+import { Route as AppLocationsIdRouteRouteImport } from './routes/app/locations/$id/route'
 import { Route as AppLocationsIdIndexRouteImport } from './routes/app/locations/$id/index'
 import { Route as AppLocationsIdCreateTreeRouteImport } from './routes/app/locations/$id/create-tree'
 
@@ -31,30 +33,42 @@ const wwwIndexRoute = wwwIndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppLocationsIndexRoute = AppLocationsIndexRouteImport.update({
-  id: '/locations/',
-  path: '/locations/',
+const AppLocationsRouteRoute = AppLocationsRouteRouteImport.update({
+  id: '/locations',
+  path: '/locations',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppLocationsIndexRoute = AppLocationsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppLocationsRouteRoute,
+} as any)
+const AppLocationsIdRouteRoute = AppLocationsIdRouteRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppLocationsRouteRoute,
+} as any)
 const AppLocationsIdIndexRoute = AppLocationsIdIndexRouteImport.update({
-  id: '/locations/$id/',
-  path: '/locations/$id/',
-  getParentRoute: () => AppRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppLocationsIdRouteRoute,
 } as any)
 const AppLocationsIdCreateTreeRoute =
   AppLocationsIdCreateTreeRouteImport.update({
-    id: '/locations/$id/create-tree',
-    path: '/locations/$id/create-tree',
-    getParentRoute: () => AppRouteRoute,
+    id: '/create-tree',
+    path: '/create-tree',
+    getParentRoute: () => AppLocationsIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/app': typeof AppRouteRouteWithChildren
+  '/app/locations': typeof AppLocationsRouteRouteWithChildren
   '/': typeof wwwIndexRoute
   '/app/': typeof AppIndexRoute
-  '/app/locations': typeof AppLocationsIndexRoute
+  '/app/locations/$id': typeof AppLocationsIdRouteRouteWithChildren
+  '/app/locations/': typeof AppLocationsIndexRoute
   '/app/locations/$id/create-tree': typeof AppLocationsIdCreateTreeRoute
-  '/app/locations/$id': typeof AppLocationsIdIndexRoute
+  '/app/locations/$id/': typeof AppLocationsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof wwwIndexRoute
@@ -66,8 +80,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/app': typeof AppRouteRouteWithChildren
+  '/app/locations': typeof AppLocationsRouteRouteWithChildren
   '/(www)/': typeof wwwIndexRoute
   '/app/': typeof AppIndexRoute
+  '/app/locations/$id': typeof AppLocationsIdRouteRouteWithChildren
   '/app/locations/': typeof AppLocationsIndexRoute
   '/app/locations/$id/create-tree': typeof AppLocationsIdCreateTreeRoute
   '/app/locations/$id/': typeof AppLocationsIdIndexRoute
@@ -76,11 +92,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/app'
+    | '/app/locations'
     | '/'
     | '/app/'
-    | '/app/locations'
-    | '/app/locations/$id/create-tree'
     | '/app/locations/$id'
+    | '/app/locations/'
+    | '/app/locations/$id/create-tree'
+    | '/app/locations/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -91,8 +109,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/app'
+    | '/app/locations'
     | '/(www)/'
     | '/app/'
+    | '/app/locations/$id'
     | '/app/locations/'
     | '/app/locations/$id/create-tree'
     | '/app/locations/$id/'
@@ -126,42 +146,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof wwwIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/locations/': {
-      id: '/app/locations/'
+    '/app/locations': {
+      id: '/app/locations'
       path: '/locations'
       fullPath: '/app/locations'
-      preLoaderRoute: typeof AppLocationsIndexRouteImport
+      preLoaderRoute: typeof AppLocationsRouteRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/app/locations/': {
+      id: '/app/locations/'
+      path: '/'
+      fullPath: '/app/locations/'
+      preLoaderRoute: typeof AppLocationsIndexRouteImport
+      parentRoute: typeof AppLocationsRouteRoute
+    }
+    '/app/locations/$id': {
+      id: '/app/locations/$id'
+      path: '/$id'
+      fullPath: '/app/locations/$id'
+      preLoaderRoute: typeof AppLocationsIdRouteRouteImport
+      parentRoute: typeof AppLocationsRouteRoute
     }
     '/app/locations/$id/': {
       id: '/app/locations/$id/'
-      path: '/locations/$id'
-      fullPath: '/app/locations/$id'
+      path: '/'
+      fullPath: '/app/locations/$id/'
       preLoaderRoute: typeof AppLocationsIdIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppLocationsIdRouteRoute
     }
     '/app/locations/$id/create-tree': {
       id: '/app/locations/$id/create-tree'
-      path: '/locations/$id/create-tree'
+      path: '/create-tree'
       fullPath: '/app/locations/$id/create-tree'
       preLoaderRoute: typeof AppLocationsIdCreateTreeRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppLocationsIdRouteRoute
     }
   }
 }
 
-interface AppRouteRouteChildren {
-  AppIndexRoute: typeof AppIndexRoute
-  AppLocationsIndexRoute: typeof AppLocationsIndexRoute
+interface AppLocationsIdRouteRouteChildren {
   AppLocationsIdCreateTreeRoute: typeof AppLocationsIdCreateTreeRoute
   AppLocationsIdIndexRoute: typeof AppLocationsIdIndexRoute
 }
 
-const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppIndexRoute: AppIndexRoute,
-  AppLocationsIndexRoute: AppLocationsIndexRoute,
+const AppLocationsIdRouteRouteChildren: AppLocationsIdRouteRouteChildren = {
   AppLocationsIdCreateTreeRoute: AppLocationsIdCreateTreeRoute,
   AppLocationsIdIndexRoute: AppLocationsIdIndexRoute,
+}
+
+const AppLocationsIdRouteRouteWithChildren =
+  AppLocationsIdRouteRoute._addFileChildren(AppLocationsIdRouteRouteChildren)
+
+interface AppLocationsRouteRouteChildren {
+  AppLocationsIdRouteRoute: typeof AppLocationsIdRouteRouteWithChildren
+  AppLocationsIndexRoute: typeof AppLocationsIndexRoute
+}
+
+const AppLocationsRouteRouteChildren: AppLocationsRouteRouteChildren = {
+  AppLocationsIdRouteRoute: AppLocationsIdRouteRouteWithChildren,
+  AppLocationsIndexRoute: AppLocationsIndexRoute,
+}
+
+const AppLocationsRouteRouteWithChildren =
+  AppLocationsRouteRoute._addFileChildren(AppLocationsRouteRouteChildren)
+
+interface AppRouteRouteChildren {
+  AppLocationsRouteRoute: typeof AppLocationsRouteRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppLocationsRouteRoute: AppLocationsRouteRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

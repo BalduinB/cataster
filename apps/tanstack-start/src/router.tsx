@@ -1,7 +1,9 @@
 /// <reference types="vite/client" />
+import type * as React from "react";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 import { QueryClient } from "@tanstack/react-query";
 import {
+    AnyRouteMatch,
     createRouter as createTanStackRouter,
     Link,
 } from "@tanstack/react-router";
@@ -70,9 +72,53 @@ function NotFound() {
         </div>
     );
 }
+/**
+ * A breadcrumb entry contributed by a route via `staticData.breadcrumb`.
+ *
+ * Either a literal string for static labels, or a React component rendered
+ * with the active match — useful when the label depends on params or cached
+ * loader data (e.g. resolving an id to a name).
+ */
+export type BreadcrumbStaticData =
+    | string
+    | React.ComponentType<{ match: AnyRouteMatch }>;
+
+/**
+ * Sidebar groups a route can be sorted into. The display labels live in
+ * `app-sidebar.tsx` (`groupLabelMap`) so renaming a group is a single edit.
+ */
+export type NavGroup = "general" | "data";
+
+/**
+ * Placeholder substituted into dynamic params (e.g. `$id`) when a route is
+ * linked to before a real value is chosen — the matching layout intercepts
+ * this and renders a picker instead of the detail content.
+ */
+export const PARAM_PLACEHOLDER = "~";
+
+/**
+ * A sidebar entry contributed by a route via `staticData.nav`. Routes without
+ * this field are simply omitted from the sidebar.
+ *
+ * Two shapes:
+ * - **Top-level** (`group`): renders as a primary sidebar entry under the
+ *   matching group label.
+ * - **Sub-nav** (`parent`): nested under the top-level item whose `fullPath`
+ *   matches `parent`, surfaced via a hover-revealed dropdown. Dynamic params
+ *   in the sub-nav's path are filled with `PARAM_PLACEHOLDER` so the link is
+ *   navigable without context.
+ */
+export type NavStaticData = {
+    title: string;
+    icon?: React.ComponentType<{ className?: string }>;
+} & ({ group?: NavGroup; parent?: never } | { parent: string; group?: never });
 
 declare module "@tanstack/react-router" {
     interface Register {
         router: ReturnType<typeof getRouter>;
+    }
+    interface StaticDataRouteOption {
+        breadcrumb?: BreadcrumbStaticData;
+        nav?: NavStaticData;
     }
 }
