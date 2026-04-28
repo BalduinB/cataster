@@ -7,8 +7,8 @@ import { species } from "./species.spec";
 import { trees } from "./trees.spec";
 
 export default Spec.make()
-  .add(health)
-  .add(locations)
-  .add(species)
-  .add(trees)
-  .add(osm);
+    .add(health)
+    .add(locations)
+    .add(species)
+    .add(trees)
+    .add(osm);

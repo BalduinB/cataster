@@ -1,6 +1,7 @@
-import { NotFoundError } from "@cataster/validators";
 import { FunctionImpl, GroupImpl } from "@confect/server";
 import { Effect, Layer } from "effect";
+
+import { NotFoundError } from "@cataster/validators";
 
 import {
   computeNextControlAt,
@@ -9,7 +10,7 @@ import {
   GeospatialService,
   LocationService,
   normalizeOptionalString,
-  requireUser,
+  requireAbility,
   ServicesLive,
   SpeciesService,
   TreeService,
@@ -26,9 +27,12 @@ const listByLocation = FunctionImpl.make(
   "listByLocation",
   ({ locationId }) =>
     Effect.gen(function* () {
-      yield* requireUser;
-      const trees = yield* TreeService.listByLocation(locationId);
+      const { orgId } = yield* requireAbility("read", "Tree");
+      // Verifies the location belongs to this org; returns NotFound for foreign rows.
+      yield* LocationService.getById(orgId, locationId);
+      const trees = yield* TreeService.listByLocation(orgId, locationId);
       const speciesById = yield* SpeciesService.loadByIds(
+        orgId,
         trees.map((t) => t.speciesId),
       );
       return { trees, speciesById };
@@ -37,24 +41,27 @@ const listByLocation = FunctionImpl.make(
 
 const get = FunctionImpl.make(api, "trees", "get", ({ id }) =>
   Effect.gen(function* () {
-    yield* requireUser;
+    const { orgId } = yield* requireAbility("read", "Tree");
     const db = yield* DatabaseReader;
-    return yield* db
+    const doc = yield* db
       .table("trees")
       .get(id)
       .pipe(
         Effect.catchTag("GetByIdFailure", () => Effect.succeed(null)),
         dieOnInternal,
       );
+    // Foreign-org tree → null (don't leak existence across tenants).
+    if (doc === null || doc.orgId !== orgId) return null;
+    return doc;
   }).pipe(Effect.provide(ServicesLive), surfaceErrors),
 );
 
 const create = FunctionImpl.make(api, "trees", "create", (args) =>
   Effect.gen(function* () {
-    yield* requireUser;
+    const { orgId } = yield* requireAbility("create", "Tree");
     const db = yield* DatabaseWriter;
 
-    yield* SpeciesService.getById(args.speciesId);
+    yield* SpeciesService.getForOrg(orgId, args.speciesId);
     yield* validateTreeMeasurements(args);
 
     const plateNumber = normalizeOptionalString(args.plateNumber);
@@ -67,8 +74,12 @@ const create = FunctionImpl.make(api, "trees", "create", (args) =>
       baseDate: Date.now(),
     });
 
-    yield* TreeService.assertPlateNumberUnique(args.locationId, plateNumber);
-    yield* LocationService.assertContainsPoint(args.locationId, {
+    yield* TreeService.assertPlateNumberUnique(
+      orgId,
+      args.locationId,
+      plateNumber,
+    );
+    yield* LocationService.assertContainsPoint(orgId, args.locationId, {
       lat: args.latitude,
       lng: args.longitude,
     });
@@ -82,6 +93,7 @@ const create = FunctionImpl.make(api, "trees", "create", (args) =>
 
     const treeId = yield* dieOnInternal(
       db.table("trees").insert({
+        orgId,
         locationId: args.locationId,
         plateNumber,
         speciesId: args.speciesId,
@@ -111,7 +123,7 @@ const create = FunctionImpl.make(api, "trees", "create", (args) =>
 
 const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
   Effect.gen(function* () {
-    yield* requireUser;
+    const { orgId } = yield* requireAbility("update", "Tree");
     const reader = yield* DatabaseReader;
     const writer = yield* DatabaseWriter;
 
@@ -124,6 +136,11 @@ const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
         ),
         dieOnInternal,
       );
+    if (existing.orgId !== orgId) {
+      return yield* Effect.fail(
+        new NotFoundError({ message: "Baum nicht gefunden" }),
+      );
+    }
 
     const speciesId = data.speciesId ?? existing.speciesId;
     const plateNumber =
@@ -157,18 +174,24 @@ const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
     const latitude = data.latitude ?? existing.latitude;
     const longitude = data.longitude ?? existing.longitude;
 
-    yield* SpeciesService.getById(speciesId);
+    yield* SpeciesService.getForOrg(orgId, speciesId);
     yield* TreeService.assertPlateNumberUnique(
+      orgId,
       existing.locationId,
       plateNumber,
       existing._id,
     );
-    yield* validateTreeMeasurements({ circumference, height, crownDiameter, vitality });
+    yield* validateTreeMeasurements({
+      circumference,
+      height,
+      crownDiameter,
+      vitality,
+    });
 
     const positionChanged =
       data.latitude !== undefined || data.longitude !== undefined;
     if (positionChanged) {
-      yield* LocationService.assertContainsPoint(existing.locationId, {
+      yield* LocationService.assertContainsPoint(orgId, existing.locationId, {
         lat: latitude,
         lng: longitude,
       });
@@ -210,8 +233,24 @@ const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
 
 const remove = FunctionImpl.make(api, "trees", "remove", ({ id }) =>
   Effect.gen(function* () {
-    yield* requireUser;
+    const { orgId } = yield* requireAbility("delete", "Tree");
+    const reader = yield* DatabaseReader;
     const writer = yield* DatabaseWriter;
+
+    const existing = yield* reader
+      .table("trees")
+      .get(id)
+      .pipe(
+        Effect.catchTag("GetByIdFailure", () =>
+          Effect.fail(new NotFoundError({ message: "Baum nicht gefunden" })),
+        ),
+        dieOnInternal,
+      );
+    if (existing.orgId !== orgId) {
+      return yield* Effect.fail(
+        new NotFoundError({ message: "Baum nicht gefunden" }),
+      );
+    }
 
     yield* GeospatialService.remove(id);
     yield* writer.table("trees").delete(id);
@@ -241,9 +280,9 @@ const recomputeNextControlDates = FunctionImpl.make(
               baseDate: tree._creationTime,
               now,
             }).pipe(
-              // RRules that are persisted in DB are assumed valid; if one
-              // ever isn't, surface as a defect rather than fail the whole
-              // cron run on a single bad row.
+              // RRules persisted in DB are assumed valid; if one ever isn't,
+              // surface as a defect rather than fail the whole cron run on a
+              // single bad row.
               Effect.catchTag("Conflict", (e) => Effect.die(e)),
             );
 

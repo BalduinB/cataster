@@ -15,7 +15,8 @@
 
 import { Layer } from "effect";
 
-export { requireUser } from "./auth/requireUser";
+export { OrgId, requireUser, type UserContext } from "./auth/requireUser";
+export { requireAbility } from "./auth/requireAbility";
 export { dieOnInternal } from "./internal";
 
 export {
@@ -49,6 +50,8 @@ export {
 export {
   SpeciesService,
   SpeciesServiceLive,
+  type HiddenSpeciesDoc,
+  type HiddenSpeciesId,
   type SpeciesDoc,
   type SpeciesId,
 } from "./domain/SpeciesService";

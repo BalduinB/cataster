@@ -20,6 +20,7 @@ import { Toaster } from "@cataster/ui/components/base/sonner";
 import { ModeToggle } from "~/component/mode-toggle";
 import { ThemeProvider } from "~/component/theme-provider";
 import { env } from "~/env";
+import { AbilityProvider } from "~/lib/abilities";
 import appCss from "~/styles.css?url";
 
 const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
@@ -58,9 +59,11 @@ function RootComponent() {
             routerDebug
         >
             <ConvexProviderWithClerk client={convexClient} useAuth={useAuth}>
-                <RootDocument>
-                    <Outlet />
-                </RootDocument>
+                <AbilityProvider>
+                    <RootDocument>
+                        <Outlet />
+                    </RootDocument>
+                </AbilityProvider>
             </ConvexProviderWithClerk>
         </ClerkProvider>
     );

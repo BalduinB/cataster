@@ -44,6 +44,7 @@ import { useIsMobile } from "@cataster/ui/hooks/use-mobile";
 
 import type { NavGroup, NavStaticData } from "~/router";
 import { PARAM_PLACEHOLDER } from "~/router";
+import { OrgSwitcher } from "./org-switcher";
 
 /**
  * Display labels for sidebar groups. Single source of truth for renaming
@@ -114,20 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton
-                            size="lg"
-                            render={<Link to="/app" />}
-                        >
-                            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex size-8 items-center justify-center rounded-md">
-                                <IconTree className="size-4" />
-                            </div>
-                            <div className="flex flex-col gap-0.5 leading-none">
-                                <span className="font-medium">
-                                    Documentation
-                                </span>
-                                <span className="">v1.0.0</span>
-                            </div>
-                        </SidebarMenuButton>
+                        <OrgSwitcher />
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>

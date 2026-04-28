@@ -9,10 +9,10 @@ import { species } from "./species.impl";
 import { trees } from "./trees.impl";
 
 export default Impl.make(api).pipe(
-  Layer.provide(health),
-  Layer.provide(locations),
-  Layer.provide(species),
-  Layer.provide(trees),
-  Layer.provide(osm),
-  Impl.finalize,
+    Layer.provide(health),
+    Layer.provide(locations),
+    Layer.provide(species),
+    Layer.provide(trees),
+    Layer.provide(osm),
+    Impl.finalize,
 );

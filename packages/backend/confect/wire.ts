@@ -1,6 +1,8 @@
-import { type WireError, WireErrorUnion } from "@cataster/validators";
 import { ConvexError } from "convex/values";
-import { Effect, Schema } from "effect";
+import { Console, Effect, Schema } from "effect";
+
+import type { WireError } from "@cataster/validators";
+import { WireErrorUnion } from "@cataster/validators";
 
 /**
  * Translates the shared client-facing error vocabulary
@@ -18,12 +20,15 @@ import { Effect, Schema } from "effect";
  * "I forgot to handle this".
  */
 export const surfaceErrors = <A, E extends WireError, R>(
-  effect: Effect.Effect<A, E, R>,
+    effect: Effect.Effect<A, E, R>,
 ): Effect.Effect<A, never, R> =>
-  effect.pipe(
-    Effect.catchAll((error) =>
-      Effect.die(
-        new ConvexError(Schema.encodeSync(WireErrorUnion)(error as WireError)),
-      ),
-    ),
-  );
+    effect.pipe(
+        Effect.tapErrorCause((cause) => Console.log(cause)),
+        Effect.catchAll((error) =>
+            Effect.die(
+                new ConvexError(
+                    Schema.encodeSync(WireErrorUnion)(error as WireError),
+                ),
+            ),
+        ),
+    );

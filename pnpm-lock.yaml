@@ -123,6 +123,9 @@ importers:
 
   apps/tanstack-start:
     dependencies:
+      '@cataster/abilities':
+        specifier: workspace:*
+        version: link:../../packages/abilities
       '@cataster/backend':
         specifier: workspace:*
         version: link:../../packages/backend
@@ -272,6 +275,9 @@ importers:
 
   packages/backend:
     dependencies:
+      '@cataster/abilities':
+        specifier: workspace:*
+        version: link:../abilities
       '@cataster/validators':
         specifier: workspace:*
         version: link:../validators
