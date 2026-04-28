@@ -1,16 +1,36 @@
 import * as React from "react";
-import { IconDots, IconTree } from "@tabler/icons-react";
+import { OrganizationSwitcher, useUser } from "@clerk/tanstack-react-start";
+import {
+    IconBadge,
+    IconBell,
+    IconChevronCompactLeft,
+    IconChevronCompactRight,
+    IconCreditCard,
+    IconDots,
+    IconLogout,
+    IconSparkles,
+    IconTree,
+} from "@tabler/icons-react";
 import { Link, useMatchRoute, useRouter } from "@tanstack/react-router";
 
 import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@cataster/ui/components/base/avatar";
+import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@cataster/ui/components/base/dropdown-menu";
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -20,6 +40,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@cataster/ui/components/base/sidebar";
+import { useIsMobile } from "@cataster/ui/hooks/use-mobile";
 
 import type { NavGroup, NavStaticData } from "~/router";
 import { PARAM_PLACEHOLDER } from "~/router";
@@ -97,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             size="lg"
                             render={<Link to="/app" />}
                         >
-                            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex size-8 items-center justify-center rounded-md">
                                 <IconTree className="size-4" />
                             </div>
                             <div className="flex flex-col gap-0.5 leading-none">
@@ -156,6 +177,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     );
                 })}
             </SidebarContent>
+            <SidebarFooter>
+                <NavUser />
+            </SidebarFooter>
         </Sidebar>
     );
 }
@@ -207,5 +231,102 @@ function NavMenuItem({
                 </DropdownMenu>
             ) : null}
         </SidebarMenuItem>
+    );
+}
+
+function NavUser() {
+    const isMobile = useIsMobile();
+    const { user } = useUser();
+    return (
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        render={
+                            <SidebarMenuButton
+                                size="lg"
+                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            >
+                                <Avatar>
+                                    <AvatarImage alt="User" />
+                                    <AvatarFallback>
+                                        {user?.firstName?.charAt(0)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                    <span className="truncate font-medium">
+                                        {user?.firstName} {user?.lastName}
+                                    </span>
+                                    <span className="truncate text-xs">
+                                        {user?.emailAddresses[0]?.emailAddress}
+                                    </span>
+                                </div>
+                                <IconChevronCompactRight />
+                            </SidebarMenuButton>
+                        }
+                    />
+                    <DropdownMenuContent
+                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                        side={isMobile ? "bottom" : "right"}
+                        align="end"
+                        sideOffset={4}
+                    >
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel className="p-0 font-normal">
+                                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                    <Avatar>
+                                        <AvatarImage
+                                            src={user?.imageUrl}
+                                            alt={user?.firstName ?? ""}
+                                        />
+                                        <AvatarFallback>
+                                            {user?.firstName?.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-medium">
+                                            {user?.firstName} {user?.lastName}
+                                        </span>
+                                        <span className="truncate text-xs">
+                                            {
+                                                user?.emailAddresses[0]
+                                                    ?.emailAddress
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+                            </DropdownMenuLabel>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                <IconSparkles />
+                                Upgrade to Pro
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                <IconBadge />
+                                Account
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <IconCreditCard />
+                                Billing
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <IconBell />
+                                Notifications
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            <IconLogout />
+                            Log out
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </SidebarMenuItem>
+        </SidebarMenu>
     );
 }

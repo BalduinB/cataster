@@ -7,8 +7,8 @@ import {
     SidebarTrigger,
 } from "@cataster/ui/components/base/sidebar";
 
+import { AppBreadcrumbs } from "~/component/app-breadcrumb";
 import { AppSidebar } from "~/component/app-sidebar";
-import { AppBreadcrumbs } from "~/component/breadcrumb";
 
 export const Route = createFileRoute("/app")({
     component: RouteComponent,

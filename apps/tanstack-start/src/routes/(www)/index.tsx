@@ -28,7 +28,10 @@ function RouteComponent() {
 
                 <HealthIndicator />
 
-                <Link to="/" className={buttonVariants({ variant: "outline" })}>
+                <Link
+                    to="/app/locations"
+                    className={buttonVariants({ variant: "outline" })}
+                >
                     Standorte ansehen
                 </Link>
             </div>
