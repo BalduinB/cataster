@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { useMutation as useConfectMutation } from "@confect/react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -18,7 +19,7 @@ import { SpeciesCombobox } from "./species-combobox";
 export const DEFAULT_CONTROL_TIMEZONE = "Europe/Berlin";
 
 const TreeSchema = z.object({
-    plateNumber: z.string(),
+    plateNumber: z.string().nullable(),
     speciesId: z.string().min(1, "Baumart ist erforderlich"),
     circumference: z
         .string()
@@ -75,7 +76,7 @@ export function TreeForm({
 }: TreeFormProps) {
     const createTree = useConfectMutationFn(refs.public.trees.create);
     const updateTree = useConfectMutationFn(refs.public.trees.update);
-
+    const addTree = useConfectMutation(refs.public.trees.create);
     const isEditing = mode === "edit" && !!tree;
 
     const submit = useMutation({
@@ -83,7 +84,7 @@ export function TreeForm({
             if (isEditing && tree) {
                 await updateTree({
                     id: tree._id,
-                    plateNumber: value.plateNumber.trim() || null,
+                    plateNumber: value.plateNumber?.trim() || null,
                     speciesId: value.speciesId as SpeciesId,
                     circumference: Number(value.circumference),
                     height: Number(value.height),
@@ -97,18 +98,19 @@ export function TreeForm({
                 return "edit" as const;
             }
             if (mode === "create" && treePosition) {
-                await createTree({
+                await addTree({
                     locationId,
-                    plateNumber: value.plateNumber.trim() || undefined,
+                    plateNumber: value.plateNumber?.trim() || null,
                     speciesId: value.speciesId as SpeciesId,
                     circumference: Number(value.circumference),
                     height: Number(value.height),
                     crownDiameter: Number(value.crownDiameter),
                     vitality: Number(value.vitality),
-                    notes: value.notes.trim() || undefined,
+                    notes: value.notes.trim() || null,
                     controlIntervalRRule:
-                        value.controlIntervalRRule.trim() || undefined,
+                        value.controlIntervalRRule.trim() || null,
                     controlTimezone: value.controlTimezone,
+                    additionalControlAt: null,
                     latitude: treePosition.lat,
                     longitude: treePosition.lng,
                 });
@@ -129,7 +131,7 @@ export function TreeForm({
 
     const form = useAppForm({
         defaultValues: {
-            plateNumber: tree?.plateNumber ?? "",
+            plateNumber: tree?.plateNumber ?? null,
             speciesId: tree?.speciesId ? String(tree.speciesId) : "",
             circumference: tree ? String(tree.circumference) : "",
             height: tree ? String(tree.height) : "",

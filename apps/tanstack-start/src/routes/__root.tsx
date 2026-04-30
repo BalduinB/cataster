@@ -78,9 +78,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 </head>
                 <body className="bg-background text-foreground min-h-screen font-sans antialiased">
                     {children}
-                    <div className="absolute right-4 bottom-12">
-                        <ModeToggle />
-                    </div>
+
+                    <ModeToggle className="fixed top-4 right-4 z-50" />
+
                     <Toaster />
                     <TanStackRouterDevtools position="bottom-right" />
                     <Scripts />

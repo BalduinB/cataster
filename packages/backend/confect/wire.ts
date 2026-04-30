@@ -21,14 +21,12 @@ import { WireErrorUnion } from "@cataster/validators";
  */
 export const surfaceErrors = <A, E extends WireError, R>(
     effect: Effect.Effect<A, E, R>,
-): Effect.Effect<A, never, R> =>
+) =>
     effect.pipe(
         Effect.tapErrorCause((cause) => Console.log(cause)),
         Effect.catchAll((error) =>
             Effect.die(
-                new ConvexError(
-                    Schema.encodeSync(WireErrorUnion)(error as WireError),
-                ),
+                new ConvexError(Schema.encodeSync(WireErrorUnion)(error)),
             ),
         ),
     );
