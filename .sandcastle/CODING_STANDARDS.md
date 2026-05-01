@@ -4,55 +4,40 @@
      The reviewer agent loads it during code review via @.sandcastle/CODING_STANDARDS.md
      so these standards are enforced during review without costing tokens during implementation. -->
 
-These standards are derived from the existing tooling (`tooling/eslint`,
-`tooling/prettier`, `tooling/typescript`), the Confect/Effect backend in
-`packages/backend`, and the TanStack Start app in `apps/tanstack-start`.
+These standards are derived from the Confect/Effect backend in
+`packages/backend` and the TanStack Start app in `apps/tanstack-start`.
 
-## Style
+> Formatting and lint rules (Prettier, ESLint, `tsc`) are enforced
+> automatically by `pnpm format:fix`, `pnpm lint:fix`, and `pnpm typecheck`.
+> They are intentionally **not** repeated here — review focuses on things
+> tooling can't catch.
 
-- Formatter: Prettier via `@cataster/prettier-config`. Run `pnpm format:fix`.
-    - `tabWidth: 4`, no overrides — apply to TS, TSX, JS, JSON, MD.
-    - Imports are sorted by `@ianvs/prettier-plugin-sort-imports`. Order:
-        1. React / React Native
-        2. Next / Expo
-        3. Third-party modules
-        4. `@cataster/*` workspace packages (types first via `<TYPES>^@cataster`)
-        5. Relative / `~/` aliases (types first)
-    - Tailwind classes are sorted by `prettier-plugin-tailwindcss`. `cn` and
-      `cva` are recognized class-name functions — wrap conditional class strings
-      in those instead of inlining ternaries.
-- Naming:
-    - `camelCase` for variables, functions, and file-local helpers.
-    - `PascalCase` for React components, classes, Effect `Tag`s, and types.
-    - `kebab-case` for file names in `apps/tanstack-start` (`location-header.tsx`),
-      matching the existing convention.
-    - Confect feature files are split as `<feature>.spec.ts` / `<feature>.impl.ts`.
-- Exports: prefer **named** exports. Default exports are reserved for
-  framework entry points (route components via `createFileRoute`, generated
-  Convex modules, the Prettier config).
-- Imports:
-    - Use `import type` for type-only imports (enforced by ESLint
-      `@typescript-eslint/consistent-type-imports` and
-      `import/consistent-type-specifier-style: prefer-top-level`).
-    - Never import `process.env` directly. Use the validated `~/env` module
-      (`tooling/eslint/base.ts → restrictEnvAccess`).
-    - In the web app, use the `~/` alias for app-internal imports; cross-package
-      imports always go through `@cataster/<pkg>` entry points (no deep paths
-      except the Confect generated `@cataster/backend/confect/_generated/refs`).
-- TypeScript:
-    - Strict mode is on, plus `noUncheckedIndexedAccess` and `checkJs`. Treat
-      array/record access as possibly `undefined` and narrow before use.
-    - `@typescript-eslint/no-non-null-assertion` is `error`. Don't use `!`;
-      narrow with a guard, `Schema.decode*`, or an explicit error.
-    - `@typescript-eslint/no-unnecessary-condition` is `error`. Don't add
-      redundant `if (x)` checks against types that are already non-nullable —
-      fix the type instead.
-    - Unused vars/args must be prefixed with `_` to silence the lint.
-- React:
-    - React 19 with the new JSX runtime — never `import React from "react"`.
-    - Hooks rules from `eslint-plugin-react-hooks` (`recommended-latest`).
-    - UI strings in the `tanstack-start` app are German (see
-      `location-header.tsx`); keep that convention for new user-visible text.
+## Conventions
+
+- **File naming.**
+    - `apps/tanstack-start` uses `kebab-case.tsx` (e.g. `location-header.tsx`).
+    - Confect features are split into `<feature>.spec.ts` (wire shape) and
+      `<feature>.impl.ts` (handlers). Don't merge them.
+- **Exports.** Prefer named exports. Default exports are reserved for
+  framework entry points (TanStack `createFileRoute` route modules,
+  generated Convex modules, the Prettier config).
+- **Imports across the boundary.** Cross-package imports must go through
+  the `@cataster/<pkg>` entry point — never reach into `src/` or `dist/`.
+  The one allowed deep path is the Confect codegen output
+  `@cataster/backend/confect/_generated/refs`. Inside the web app, use the
+  `~/` alias for app-internal modules.
+- **Env access.** Read configuration through the validated `~/env` module,
+  never `process.env` directly. (Lint will reject the latter, but reviewers
+  should also reject *adding new unvalidated env vars* in the first place.)
+- **Type discipline.**
+    - No `!` non-null assertions and no redundant `if (x)` checks against
+      already-non-nullable types — fix the type or narrow explicitly.
+    - With `noUncheckedIndexedAccess` on, treat every `array[i]` /
+      `record[key]` access as possibly `undefined` and narrow before use
+      instead of asserting.
+- **UI copy is German.** All user-visible strings in `apps/tanstack-start`
+  are German (see `location-header.tsx`). Keep that for new copy; don't
+  mix English UI strings in.
 
 ## Testing
 

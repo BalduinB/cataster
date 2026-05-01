@@ -34,7 +34,6 @@ import { FormBase } from "@cataster/ui/components/form/components/base";
 import { confectQuery, useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 
-type Species = SpeciesDoc;
 interface SpeciesComboboxProps {
     disabled?: boolean;
     invalid?: boolean;
