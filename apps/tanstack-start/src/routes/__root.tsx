@@ -35,6 +35,13 @@ export const Route = createRootRouteWithContext<{
     convexQueryClient: ConvexQueryClient;
 }>()({
     head: () => ({
+        meta: [
+            { charSet: "utf-8" },
+            {
+                name: "viewport",
+                content: "width=device-width, initial-scale=1",
+            },
+        ],
         links: [{ rel: "stylesheet", href: appCss }],
     }),
     beforeLoad: async (ctx) => {
@@ -84,8 +91,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     <Toaster />
                     <TanStackRouterDevtools position="bottom-right" />
                     <Scripts />
+                    <TailwindBreakpointsHint />
                 </body>
             </html>
         </ThemeProvider>
+    );
+}
+
+function TailwindBreakpointsHint() {
+    return (
+        <div className="bg-background/50 fixed bottom-4 left-4 z-50 rounded-md p-2 backdrop-blur-sm">
+            <div className="text-foreground text-sm">
+                <span className="inline sm:hidden">xs</span>
+                <span className="hidden sm:inline md:hidden">sm</span>
+                <span className="hidden md:inline lg:hidden">md</span>
+                <span className="hidden lg:inline xl:hidden">lg</span>
+                <span className="hidden xl:inline 2xl:hidden">xl</span>
+                <span className="hidden 2xl:inline">2xl</span>
+            </div>
+        </div>
     );
 }

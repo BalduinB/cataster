@@ -1,24 +1,21 @@
-import { type GenericId } from "convex/values";
-import { Effect, Layer, Record, Schema } from "effect";
+import { Effect, Layer, Record } from "effect";
 
-import { ConflictError, NotFoundError } from "@cataster/validators";
+import { ConflictError, NotFoundError, type OrgId } from "@cataster/validators";
 
+import type {
+  HiddenSpeciesDoc,
+  HiddenSpeciesId,
+  SpeciesDoc,
+  SpeciesId,
+} from "../../types";
 import {
   DatabaseReader,
   DatabaseWriter,
 } from "../../confect/_generated/services";
-import {
-  hiddenSpecies as hiddenSpeciesTable,
-  species as speciesTable,
-} from "../../confect/schema";
-import { type OrgId } from "../auth/requireUser";
 import { dieOnInternal } from "../internal";
 import { DEFAULT_SPECIES } from "./defaultSpecies";
 
-export type SpeciesDoc = Schema.Schema.Type<typeof speciesTable.Doc>;
-export type HiddenSpeciesDoc = Schema.Schema.Type<typeof hiddenSpeciesTable.Doc>;
-export type SpeciesId = GenericId<"species">;
-export type HiddenSpeciesId = GenericId<"hiddenSpecies">;
+export type { HiddenSpeciesDoc, HiddenSpeciesId, SpeciesDoc, SpeciesId };
 
 type UpsertOrgInput = {
   readonly orgId: OrgId;

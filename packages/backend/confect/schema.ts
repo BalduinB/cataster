@@ -2,22 +2,7 @@ import { GenericId } from "@confect/core";
 import { DatabaseSchema, Table } from "@confect/server";
 import { Schema } from "effect";
 
-const LatLng = Schema.Struct({
-    lat: Schema.Number,
-    lng: Schema.Number,
-});
-
-/**
- * Multi-tenant scoping field. `orgId` is the Clerk organization id (e.g.
- * `org_2x...`) and identifies which tenant owns a row. Required on every
- * tenant-scoped table; nullable only on `species` where `null` means "system
- * catalog" (visible to all orgs, manageable only via `seedDefaults`).
- *
- * The string is unbranded *in the schema* (Convex needs the raw value) but
- * the application layer reads/writes through the `OrgId` brand defined in
- * `services/auth/requireUser.ts` so accidental cross-wiring is caught.
- */
-const OrgId = Schema.String.pipe(Schema.brand("OrgId"));
+import { LatLng, OrgId } from "@cataster/validators";
 
 export const locations = Table.make(
     "locations",

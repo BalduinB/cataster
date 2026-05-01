@@ -1,16 +1,12 @@
-import { type GenericId } from "convex/values";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Layer } from "effect";
 
-import { ConflictError } from "@cataster/validators";
+import { ConflictError, type OrgId } from "@cataster/validators";
 
+import type { LocationId, TreeDoc, TreeId } from "../../types";
 import { DatabaseReader } from "../../confect/_generated/services";
-import { trees as treesTable } from "../../confect/schema";
-import { type OrgId } from "../auth/requireUser";
 import { dieOnInternal } from "../internal";
 
-export type TreeDoc = Schema.Schema.Type<typeof treesTable.Doc>;
-export type TreeId = GenericId<"trees">;
-export type LocationId = GenericId<"locations">;
+export type { LocationId, TreeDoc, TreeId };
 
 /**
  * Domain service for the `trees` aggregate. Tenant-scoped: every read takes

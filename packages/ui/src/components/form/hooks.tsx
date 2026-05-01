@@ -11,7 +11,7 @@ import { FormTextarea } from "./components/textarea";
 const { fieldContext, formContext, useFieldContext, useFormContext } =
     createFormHookContexts();
 
-export const { useAppForm } = createFormHook({
+export const { useAppForm, withFieldGroup, withForm } = createFormHook({
     fieldComponents: {
         Input: FormInput,
         InputGroup: FormInputGroup,

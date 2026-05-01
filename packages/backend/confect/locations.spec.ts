@@ -1,12 +1,9 @@
 import { FunctionSpec, GenericId, GroupSpec } from "@confect/core";
 import { Schema } from "effect";
 
-import { locations as locationsTable } from "./schema";
+import { LocationCreateArgs, LocationRenameArgs } from "@cataster/validators";
 
-const LatLng = Schema.Struct({
-  lat: Schema.Number,
-  lng: Schema.Number,
-});
+import { locations as locationsTable } from "./schema";
 
 const list = FunctionSpec.publicQuery({
   name: "list",
@@ -22,22 +19,13 @@ const get = FunctionSpec.publicQuery({
 
 const create = FunctionSpec.publicMutation({
   name: "create",
-  args: Schema.Struct({
-    name: Schema.String,
-    osmId: Schema.Number,
-    osmType: Schema.String,
-    polygon: Schema.Array(Schema.Array(LatLng)),
-    centroid: LatLng,
-  }),
+  args: LocationCreateArgs,
   returns: GenericId.GenericId("locations"),
 });
 
 const update = FunctionSpec.publicMutation({
   name: "update",
-  args: Schema.Struct({
-    id: GenericId.GenericId("locations"),
-    name: Schema.String,
-  }),
+  args: LocationRenameArgs,
   returns: Schema.Null,
 });
 

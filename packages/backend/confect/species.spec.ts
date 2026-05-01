@@ -1,6 +1,8 @@
 import { FunctionSpec, GenericId, GroupSpec } from "@confect/core";
 import { Schema } from "effect";
 
+import { SpeciesCreateArgs } from "@cataster/validators";
+
 import { species as speciesTable } from "./schema";
 
 const listActive = FunctionSpec.publicQuery({
@@ -11,10 +13,7 @@ const listActive = FunctionSpec.publicQuery({
 
 const create = FunctionSpec.publicMutation({
   name: "create",
-  args: Schema.Struct({
-    deName: Schema.String,
-    botanicalName: Schema.String,
-  }),
+  args: SpeciesCreateArgs,
   returns: GenericId.GenericId("species"),
 });
 

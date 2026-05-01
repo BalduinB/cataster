@@ -9,7 +9,7 @@ export const TREE_VITALITY = {
 export type TreeVitality = keyof typeof TREE_VITALITY;
 
 export const TREE_VITALITY_OPTIONS = Object.entries(TREE_VITALITY).map(
-    ([value, label]) => ({ value, label }),
+    ([value, label]) => ({ value: Number(value), label }),
 );
 
 export const TREE_VITALITY_COLORS: Record<TreeVitality, string> = {

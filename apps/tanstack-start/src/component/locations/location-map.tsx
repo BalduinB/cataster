@@ -11,7 +11,7 @@ import { Card } from "@cataster/ui/components/base/card";
 import { LocationPolygon } from "~/component/map/location-polygon";
 import { MapView } from "~/component/map/map-view";
 import { TreeMarker } from "~/component/map/tree-marker";
-import { TreeFormDialog } from "~/component/trees/tree-form-dialog";
+import { TreeEditFormDialog } from "~/component/trees/tree-form-dialog";
 
 interface LocationMapViewProps {
     location: LocationDoc;
@@ -45,13 +45,13 @@ export function LocationMapView({
                     ))}
                 </MapView>
             </Card>
-
-            <TreeFormDialog
-                open={!!selectedTree}
-                onOpenChange={(open) => !open && setSelectedTree(null)}
-                locationId={location._id}
-                tree={selectedTree}
-            />
+            {selectedTree && (
+                <TreeEditFormDialog
+                    open={!!selectedTree}
+                    onOpenChange={(open) => !open && setSelectedTree(null)}
+                    tree={selectedTree}
+                />
+            )}
         </>
     );
 }

@@ -1,5 +1,5 @@
 {
-    "extends": "@cataster/tsconfig/compiled-package.json",
+    "extends": "@cataster/tsconfig/base.json",
     "include": ["src"],
     "exclude": ["node_modules"]
 }

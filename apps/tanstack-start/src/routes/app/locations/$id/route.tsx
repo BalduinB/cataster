@@ -1,10 +1,12 @@
 import type { AnyRouteMatch } from "@tanstack/react-router";
-import { IconMapPinSearch } from "@tabler/icons-react";
+import { IconMapPinSearch, IconRefresh } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Schema } from "effect";
 
-import type { LocationId } from "@cataster/backend/types";
 import refs from "@cataster/backend/confect/_generated/refs";
+import { Button } from "@cataster/ui/components/base/button";
+import { LocationId } from "@cataster/validators";
 
 import { LocationPicker } from "~/component/locations/picker";
 import { confectQuery } from "~/lib/confect";
@@ -13,6 +15,23 @@ import { PARAM_PLACEHOLDER } from "~/router";
 export const Route = createFileRoute("/app/locations/$id")({
     staticData: {
         breadcrumb: LocationBreadcrumb,
+    },
+    params: {
+        parse: (raw) =>
+            Schema.validateSync(Schema.Struct({ id: LocationId }))(raw),
+    },
+    errorComponent: ({ error, reset }) => (
+        <div>
+            <p>Error: {error.message}</p>
+            <Button onClick={reset} variant="secondary">
+                <IconRefresh data-icon="inline-start" />
+                Erneut versuchen
+            </Button>
+        </div>
+    ),
+    onError: (error) => {
+        if (error?.routerCode === "PARSE_PARAMS")
+            throw redirect({ to: "/app/locations" });
     },
     component: LocationsLayout,
 });

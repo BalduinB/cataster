@@ -1,20 +1,21 @@
-import { type GenericId } from "convex/values";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Layer } from "effect";
 
-import { ConflictError, NotFoundError } from "@cataster/validators";
+import {
+    ConflictError,
+    type LatLng,
+    NotFoundError,
+    type OrgId,
+} from "@cataster/validators";
 
-import type { LatLng } from "../geospatial/GSLib";
+import type { LocationDoc, LocationId } from "../../types";
 import {
     DatabaseReader,
     DatabaseWriter,
 } from "../../confect/_generated/services";
-import { locations as locationsTable } from "../../confect/schema";
-import { type OrgId } from "../auth/requireUser";
 import { isPointInLocationPolygon } from "../geospatial/GSLib";
 import { dieOnInternal } from "../internal";
 
-export type LocationDoc = Schema.Schema.Type<typeof locationsTable.Doc>;
-export type LocationId = GenericId<"locations">;
+export type { LocationDoc, LocationId };
 
 type CreateInput = {
     readonly orgId: OrgId;

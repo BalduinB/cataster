@@ -11,6 +11,7 @@
 import type { Schema } from "effect";
 
 import {
+  hiddenSpecies as hiddenSpeciesTable,
   locations as locationsTable,
   species as speciesTable,
   trees as treesTable,
@@ -18,10 +19,12 @@ import {
 
 export type LocationDoc = Schema.Schema.Type<typeof locationsTable.Doc>;
 export type SpeciesDoc = Schema.Schema.Type<typeof speciesTable.Doc>;
+export type HiddenSpeciesDoc = Schema.Schema.Type<typeof hiddenSpeciesTable.Doc>;
 export type TreeDoc = Schema.Schema.Type<typeof treesTable.Doc>;
 
 export type LocationId = LocationDoc["_id"];
 export type SpeciesId = SpeciesDoc["_id"];
+export type HiddenSpeciesId = HiddenSpeciesDoc["_id"];
 export type TreeId = TreeDoc["_id"];
 
-export type LatLng = { readonly lat: number; readonly lng: number };
+export type { LatLng } from "@cataster/validators";

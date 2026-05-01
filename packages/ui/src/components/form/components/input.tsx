@@ -14,7 +14,7 @@ export function FormInput({
     formBaseClassName,
     ...props
 }: FormControlProps & React.ComponentProps<typeof Input>) {
-    const field = useFieldContext<string>();
+    const field = useFieldContext<string | number>();
     const isInvalid = isFieldInvalid(field.state.meta);
     return (
         <FormBase
@@ -27,7 +27,13 @@ export function FormInput({
                 id={field.name}
                 name={field.name}
                 value={field.state.value ?? ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) =>
+                    field.handleChange(
+                        props.type === "number"
+                            ? Number(e.target.value)
+                            : e.target.value,
+                    )
+                }
                 onBlur={field.handleBlur}
                 aria-invalid={isInvalid}
             />

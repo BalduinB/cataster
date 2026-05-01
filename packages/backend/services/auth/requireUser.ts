@@ -1,18 +1,10 @@
 import { Effect, Schema } from "effect";
 
-import { UnauthorizedError } from "@cataster/validators";
+import { OrgId, UnauthorizedError } from "@cataster/validators";
 
 import { Auth } from "../../confect/_generated/services";
 
-/**
- * Branded `OrgId` — Clerk organization identifier (e.g. `org_2x...`).
- *
- * The brand prevents accidental mixing of arbitrary strings with org ids
- * across the codebase. Construct via the schema decoder when parsing
- * identity claims; downstream code receives the branded type unchanged.
- */
-export const OrgId = Schema.String.pipe(Schema.brand("OrgId"));
-export type OrgId = Schema.Schema.Type<typeof OrgId>;
+export { OrgId };
 
 /**
  * Resolved authenticated user context for a single request.

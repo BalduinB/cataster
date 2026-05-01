@@ -47,7 +47,7 @@ import {
     TREE_VITALITY,
     TREE_VITALITY_COLORS,
 } from "~/lib/tree-constants";
-import { TreeFormDialog } from "./tree-form-dialog";
+import { TreeEditFormDialog } from "./tree-form-dialog";
 
 interface TreePanelProps {
     trees: ReadonlyArray<TreeDoc>;
@@ -152,12 +152,11 @@ function TreeItem({ tree, species }: { tree: TreeDoc; species?: SpeciesDoc }) {
                     onClick={() => setEditOpen(true)}
                     aria-label="Baum bearbeiten"
                 >
-                    <IconPencil className="size-3.5" />
+                    <IconPencil />
                 </Button>
-                <TreeFormDialog
+                <TreeEditFormDialog
                     open={editOpen}
                     onOpenChange={setEditOpen}
-                    locationId={tree.locationId}
                     tree={tree}
                 />
 
@@ -172,7 +171,7 @@ function TreeItem({ tree, species }: { tree: TreeDoc; species?: SpeciesDoc }) {
                             />
                         }
                     >
-                        <IconTrash className="size-3.5" />
+                        <IconTrash />
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>

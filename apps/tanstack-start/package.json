@@ -34,12 +34,14 @@
         "convex": "catalog:",
         "effect": "catalog:",
         "leaflet": "^1.9.4",
+        "motion": "^12.38.0",
         "nitro": "3.0.1-alpha.1",
         "react": "catalog:react19",
         "react-dom": "catalog:react19",
         "react-leaflet": "^5.0.0",
         "sonner": "^2.0.7",
-        "zod": "catalog:"
+        "zod": "catalog:",
+        "zustand": "^5.0.12"
     },
     "devDependencies": {
         "@cataster/eslint-config": "workspace:*",

@@ -1,6 +1,8 @@
 import { FunctionSpec, GenericId, GroupSpec } from "@confect/core";
 import { Schema } from "effect";
 
+import { TreeCreateArgs, TreeUpdateArgs } from "@cataster/validators";
+
 import { species as speciesTable, trees as treesTable } from "./schema";
 
 const listByLocation = FunctionSpec.publicQuery({
@@ -23,52 +25,13 @@ const get = FunctionSpec.publicQuery({
 
 const create = FunctionSpec.publicMutation({
     name: "create",
-    args: Schema.Struct({
-        locationId: GenericId.GenericId("locations"),
-        plateNumber: Schema.NullOr(Schema.String),
-        speciesId: GenericId.GenericId("species"),
-        circumference: Schema.Number,
-        height: Schema.Number,
-        crownDiameter: Schema.Number,
-        vitality: Schema.Number,
-        notes: Schema.NullOr(Schema.String),
-        controlIntervalRRule: Schema.NullOr(Schema.String),
-        controlTimezone: Schema.String,
-        additionalControlAt: Schema.NullOr(Schema.Number),
-        latitude: Schema.Number,
-        longitude: Schema.Number,
-    }),
+    args: TreeCreateArgs,
     returns: GenericId.GenericId("trees"),
 });
 
 const update = FunctionSpec.publicMutation({
     name: "update",
-    args: Schema.Struct({
-        id: GenericId.GenericId("trees"),
-        plateNumber: Schema.optionalWith(Schema.NullOr(Schema.String), {
-            exact: true,
-        }),
-        speciesId: Schema.optionalWith(GenericId.GenericId("species"), {
-            exact: true,
-        }),
-        circumference: Schema.optionalWith(Schema.Number, { exact: true }),
-        height: Schema.optionalWith(Schema.Number, { exact: true }),
-        crownDiameter: Schema.optionalWith(Schema.Number, { exact: true }),
-        vitality: Schema.optionalWith(Schema.Number, { exact: true }),
-        notes: Schema.optionalWith(Schema.NullOr(Schema.String), {
-            exact: true,
-        }),
-        controlIntervalRRule: Schema.optionalWith(
-            Schema.NullOr(Schema.String),
-            { exact: true },
-        ),
-        controlTimezone: Schema.optionalWith(Schema.String, { exact: true }),
-        additionalControlAt: Schema.optionalWith(Schema.NullOr(Schema.Number), {
-            exact: true,
-        }),
-        latitude: Schema.optionalWith(Schema.Number, { exact: true }),
-        longitude: Schema.optionalWith(Schema.Number, { exact: true }),
-    }),
+    args: TreeUpdateArgs,
     returns: Schema.Null,
 });
 

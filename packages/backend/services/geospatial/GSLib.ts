@@ -1,6 +1,8 @@
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import { multiPolygon, point, polygon } from "@turf/helpers";
 
+import type { LatLng } from "@cataster/validators";
+
 /**
  * Pure geospatial helpers.
  *
@@ -8,7 +10,7 @@ import { multiPolygon, point, polygon } from "@turf/helpers";
  * composed inline by services and called from tests without setting up a
  * runtime. The Effect-shaped wrapper lives in `GeospatialService`.
  */
-export type LatLng = { readonly lat: number; readonly lng: number };
+export type { LatLng } from "@cataster/validators";
 export type LocationPolygon = ReadonlyArray<ReadonlyArray<LatLng>>;
 
 function toRingCoordinates(
