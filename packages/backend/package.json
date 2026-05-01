@@ -1,58 +1,59 @@
 {
-  "name": "@cataster/backend",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "exports": {
-    "./convex/_generated/api": {
-      "types": "./convex/_generated/api.d.ts",
-      "default": "./convex/_generated/api.js"
+    "name": "@cataster/backend",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "exports": {
+        "./convex/_generated/api": {
+            "types": "./convex/_generated/api.d.ts",
+            "default": "./convex/_generated/api.js"
+        },
+        "./convex/_generated/dataModel": {
+            "types": "./convex/_generated/dataModel.d.ts"
+        },
+        "./confect/_generated/refs": {
+            "types": "./confect/_generated/refs.d.ts",
+            "default": "./confect/_generated/refs.js"
+        },
+        "./types": "./types.ts"
     },
-    "./convex/_generated/dataModel": {
-      "types": "./convex/_generated/dataModel.d.ts"
+    "scripts": {
+        "dev": "concurrently -n confect,convex -c blue,green \"pnpm dev:confect\" \"pnpm dev:convex\"",
+        "dev:confect": "confect dev",
+        "dev:convex": "convex dev",
+        "setup": "confect codegen && convex dev --until-success",
+        "postinstall": "confect codegen",
+        "prebuild": "confect codegen",
+        "pretypecheck": "confect codegen",
+        "typecheck": "tsc --noEmit -p confect",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
-    "./confect/_generated/refs": {
-      "types": "./confect/_generated/refs.d.ts",
-      "default": "./confect/_generated/refs.js"
+    "license": "ISC",
+    "dependencies": {
+        "@cataster/abilities": "workspace:*",
+        "@cataster/validators": "workspace:*",
+        "@confect/core": "catalog:",
+        "@confect/server": "catalog:",
+        "@convex-dev/geospatial": "^0.2.1",
+        "@effect/platform": "catalog:",
+        "@effect/platform-node": "catalog:",
+        "@turf/boolean-point-in-polygon": "^7.3.4",
+        "@turf/helpers": "^7.3.4",
+        "convex": "catalog:",
+        "date-fns": "^4.1.0",
+        "effect": "catalog:",
+        "rrule": "^2.8.1"
     },
-    "./types": "./types.ts"
-  },
-  "scripts": {
-    "dev": "concurrently -n confect,convex -c blue,green \"pnpm dev:confect\" \"pnpm dev:convex\"",
-    "dev:confect": "confect dev",
-    "dev:convex": "convex dev",
-    "setup": "confect codegen && convex dev --until-success",
-    "prebuild": "confect codegen",
-    "pretypecheck": "confect codegen",
-    "typecheck": "tsc --noEmit -p confect",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "license": "ISC",
-  "dependencies": {
-    "@cataster/abilities": "workspace:*",
-    "@cataster/validators": "workspace:*",
-    "@confect/core": "catalog:",
-    "@confect/server": "catalog:",
-    "@convex-dev/geospatial": "^0.2.1",
-    "@effect/platform": "catalog:",
-    "@effect/platform-node": "catalog:",
-    "@turf/boolean-point-in-polygon": "^7.3.4",
-    "@turf/helpers": "^7.3.4",
-    "convex": "catalog:",
-    "date-fns": "^4.1.0",
-    "effect": "catalog:",
-    "rrule": "^2.8.1"
-  },
-  "devDependencies": {
-    "@confect/cli": "catalog:",
-    "@confect/test": "catalog:",
-    "@edge-runtime/vm": "^5.0.0",
-    "@effect/vitest": "catalog:",
-    "@types/node": "catalog:",
-    "concurrently": "catalog:",
-    "convex-test": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
-  }
+    "devDependencies": {
+        "@confect/cli": "catalog:",
+        "@confect/test": "catalog:",
+        "@edge-runtime/vm": "^5.0.0",
+        "@effect/vitest": "catalog:",
+        "@types/node": "catalog:",
+        "concurrently": "catalog:",
+        "convex-test": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
 }
