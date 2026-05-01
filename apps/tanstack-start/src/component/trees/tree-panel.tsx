@@ -1,6 +1,13 @@
-import { useState } from "react";
-import { IconPencil, IconTrash, IconTrees } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+import {
+    IconDots,
+    IconEye,
+    IconPencil,
+    IconTrash,
+    IconTrees,
+} from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import { toast } from "sonner";
 
 import type { SpeciesDoc, SpeciesId, TreeDoc } from "@cataster/backend/types";
@@ -25,6 +32,13 @@ import {
     CardTitle,
 } from "@cataster/ui/components/base/card";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@cataster/ui/components/base/dropdown-menu";
+import {
     Empty,
     EmptyDescription,
     EmptyHeader,
@@ -47,6 +61,7 @@ import {
     TREE_VITALITY,
     TREE_VITALITY_COLORS,
 } from "~/lib/tree-constants";
+import { useSelectedTree } from "~/store/selected-tree";
 import { TreeEditFormDialog } from "./tree-form-dialog";
 
 interface TreePanelProps {
@@ -55,6 +70,14 @@ interface TreePanelProps {
 }
 
 export function TreePanel({ trees, speciesById }: TreePanelProps) {
+    const selectedTreeId = useSelectedTree((s) => s.selectedTreeId);
+    const sortedTrees = useMemo(() => {
+        if (!selectedTreeId) return trees;
+        const idx = trees.findIndex((t) => t._id === selectedTreeId);
+        if (idx <= 0) return trees;
+        return [trees[idx]!, ...trees.slice(0, idx), ...trees.slice(idx + 1)];
+    }, [trees, selectedTreeId]);
+
     return (
         <Card className="h-fit" size="sm">
             <CardHeader>
@@ -82,12 +105,18 @@ export function TreePanel({ trees, speciesById }: TreePanelProps) {
                         </Empty>
                     ) : (
                         <div className="space-y-2 p-1">
-                            {trees.map((tree) => (
-                                <TreeItem
+                            {sortedTrees.map((tree) => (
+                                <motion.div
                                     key={tree._id}
-                                    tree={tree}
-                                    species={speciesById[tree.speciesId]}
-                                />
+                                    layout
+                                    layoutId={tree._id}
+                                >
+                                    <TreeItem
+                                        tree={tree}
+                                        species={speciesById[tree.speciesId]}
+                                        isSelected={selectedTreeId === tree._id}
+                                    />
+                                </motion.div>
                             ))}
                         </div>
                     )}
@@ -97,8 +126,17 @@ export function TreePanel({ trees, speciesById }: TreePanelProps) {
     );
 }
 
-function TreeItem({ tree, species }: { tree: TreeDoc; species?: SpeciesDoc }) {
+function TreeItem({
+    tree,
+    species,
+    isSelected,
+}: {
+    tree: TreeDoc;
+    species?: SpeciesDoc;
+    isSelected: boolean;
+}) {
     const [editOpen, setEditOpen] = useState(false);
+    const setSelectedTreeId = useSelectedTree((s) => s.setSelectedTreeId);
     const removeTree = useConfectMutationFn(refs.public.trees.remove);
 
     const remove = useMutation({
@@ -113,7 +151,11 @@ function TreeItem({ tree, species }: { tree: TreeDoc; species?: SpeciesDoc }) {
         ];
 
     return (
-        <Item size="sm" variant="muted">
+        <Item
+            size="sm"
+            variant="muted"
+            className={isSelected ? "ring-primary ring-2" : undefined}
+        >
             <ItemContent>
                 <ItemTitle>
                     {species?.deName ?? getSpeciesDisplayName(species)}{" "}
@@ -147,32 +189,50 @@ function TreeItem({ tree, species }: { tree: TreeDoc; species?: SpeciesDoc }) {
             </ItemContent>
             <ItemActions>
                 <Button
-                    variant="ghost"
+                    variant={isSelected ? "default" : "ghost"}
                     size="icon-sm"
-                    onClick={() => setEditOpen(true)}
-                    aria-label="Baum bearbeiten"
+                    onClick={() =>
+                        setSelectedTreeId(isSelected ? null : tree._id)
+                    }
+                    aria-label="Baum auf Karte hervorheben"
                 >
-                    <IconPencil />
+                    <IconEye />
                 </Button>
                 <TreeEditFormDialog
                     open={editOpen}
                     onOpenChange={setEditOpen}
                     tree={tree}
                 />
-
                 <AlertDialog>
-                    <AlertDialogTrigger
-                        render={
-                            <Button
-                                variant="destructive"
-                                size="icon-sm"
-                                isLoading={remove.isPending}
-                                aria-label="Baum löschen"
-                            />
-                        }
-                    >
-                        <IconTrash />
-                    </AlertDialogTrigger>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            render={
+                                <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    isLoading={remove.isPending}
+                                    aria-label="Baum löschen"
+                                />
+                            }
+                        >
+                            <IconDots />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                                <IconPencil />
+                                Baum bearbeiten
+                            </DropdownMenuItem>
+                            <AlertDialogTrigger
+                                render={
+                                    <DropdownMenuItem variant="destructive" />
+                                }
+                            >
+                                <IconTrash />
+                                Baum löschen
+                            </AlertDialogTrigger>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Baum löschen?</AlertDialogTitle>

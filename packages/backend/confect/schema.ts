@@ -7,7 +7,7 @@ import { LatLng, OrgId } from "@cataster/validators";
 export const locations = Table.make(
     "locations",
     Schema.Struct({
-        orgId: Schema.optional(OrgId),
+        orgId: OrgId,
         name: Schema.String,
         osmId: Schema.Number,
         osmType: Schema.String,
@@ -56,7 +56,7 @@ export const hiddenSpecies = Table.make(
 export const trees = Table.make(
     "trees",
     Schema.Struct({
-        orgId: Schema.optional(OrgId),
+        orgId: OrgId,
         locationId: GenericId.GenericId("locations"),
         plateNumber: Schema.NullOr(Schema.String),
         speciesId: GenericId.GenericId("species"),

@@ -5,6 +5,7 @@ import { Marker, Popup } from "react-leaflet";
 import type { SpeciesDoc, TreeDoc } from "@cataster/backend/types";
 import { Button } from "@cataster/ui/components/base/button";
 
+import { useSelectedTree } from "~/store/selected-tree";
 import { getSpeciesDisplayName, TREE_VITALITY } from "~/lib/tree-constants";
 
 // Built-in default icons aren't bundled in a way that survives Vite's asset
@@ -21,6 +22,18 @@ const defaultIcon = L.icon({
     shadowSize: [41, 41],
 });
 
+const highlightedIcon = L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [38, 62],
+    iconAnchor: [19, 62],
+    popupAnchor: [1, -52],
+    shadowSize: [62, 62],
+    className: "drop-shadow-[0_0_8px_rgb(34,197,94)] saturate-150",
+});
+
 export const draftIcon = defaultIcon;
 
 interface TreeMarkerProps {
@@ -30,8 +43,19 @@ interface TreeMarkerProps {
 }
 
 export function TreeMarker({ tree, species, onEditClick }: TreeMarkerProps) {
+    const selectedTreeId = useSelectedTree((s) => s.selectedTreeId);
+    const setSelectedTreeId = useSelectedTree((s) => s.setSelectedTreeId);
+    const isSelected = selectedTreeId === tree._id;
+
     return (
-        <Marker position={[tree.latitude, tree.longitude]} icon={defaultIcon}>
+        <Marker
+            position={[tree.latitude, tree.longitude]}
+            icon={isSelected ? highlightedIcon : defaultIcon}
+            zIndexOffset={isSelected ? 1000 : 0}
+            eventHandlers={{
+                click: () => setSelectedTreeId(tree._id),
+            }}
+        >
             <Popup>
                 <div className="min-w-[220px]">
                     <p className="flex items-center justify-between gap-2 font-semibold">
