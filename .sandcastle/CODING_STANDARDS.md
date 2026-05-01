@@ -28,7 +28,7 @@ These standards are derived from the Confect/Effect backend in
   `~/` alias for app-internal modules.
 - **Env access.** Read configuration through the validated `~/env` module,
   never `process.env` directly. (Lint will reject the latter, but reviewers
-  should also reject *adding new unvalidated env vars* in the first place.)
+  should also reject _adding new unvalidated env vars_ in the first place.)
 - **Type discipline.**
     - No `!` non-null assertions and no redundant `if (x)` checks against
       already-non-nullable types — fix the type or narrow explicitly.

@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import refs from "@cataster/backend/confect/_generated/refs";
 import { Button } from "@cataster/ui/components/base/button";
-import { Card, CardContent } from "@cataster/ui/components/base/card";
 import {
     Dialog,
     DialogContent,
@@ -57,7 +56,7 @@ export function CreateLocationDialog() {
 
     const search = useMutation({
         mutationFn: (query: string) => searchAreas({ query }),
-        onSuccess: (areas) => {
+        onSuccess: () => {
             setSelectedResult(null);
         },
         onError: (error) => {
@@ -155,7 +154,7 @@ export function CreateLocationDialog() {
 
                 {search.isSuccess && (
                     <div className="max-h-[300px] space-y-2 overflow-y-auto p-2">
-                        {search.data?.map((result) => (
+                        {search.data.map((result) => (
                             <Item
                                 key={`${result.osmType}-${result.osmId}`}
                                 className={

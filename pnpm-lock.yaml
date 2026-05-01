@@ -106,8 +106,8 @@ importers:
   .:
     devDependencies:
       '@ai-hero/sandcastle':
-        specifier: ^0.5.6
-        version: 0.5.6(@effect/cluster@0.56.4(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/typeclass@0.38.0(effect@3.21.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+        specifier: ^0.5.7
+        version: 0.5.7(@effect/cluster@0.56.4(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/typeclass@0.38.0(effect@3.21.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@cataster/prettier-config':
         specifier: workspace:*
         version: link:tooling/prettier
@@ -560,8 +560,8 @@ importers:
 
 packages:
 
-  '@ai-hero/sandcastle@0.5.6':
-    resolution: {integrity: sha512-HGbDRBdu2xLWChnYAyjnVb9G4AvS7joUjHrLd0+6r3jjyMmb6+EZyO/UnLPa0BdJE3MlWW8XTjPSldxICtsZHw==}
+  '@ai-hero/sandcastle@0.5.7':
+    resolution: {integrity: sha512-5ZznDx9LQCdOYooL+INx6+35tH44Lb/7+BYUmgWPuBXy5YD7pt14GgMHMWbx3NtSYot7VcBMrgj7UpAQmpRrDA==}
     hasBin: true
     peerDependencies:
       '@daytona/sdk': ^0.164.0
@@ -7295,7 +7295,7 @@ packages:
 
 snapshots:
 
-  '@ai-hero/sandcastle@0.5.6(@effect/cluster@0.56.4(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/typeclass@0.38.0(effect@3.21.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
+  '@ai-hero/sandcastle@0.5.7(@effect/cluster@0.56.4(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.95.0(effect@3.21.2))(effect@3.21.2))(@effect/typeclass@0.38.0(effect@3.21.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
     dependencies:
       '@clack/prompts': 1.3.0
       '@effect/cli': 0.74.0(@effect/platform@0.95.0(effect@3.21.2))(@effect/printer-ansi@0.48.0(@effect/typeclass@0.38.0(effect@3.21.2))(effect@3.21.2))(@effect/printer@0.48.0(@effect/typeclass@0.38.0(effect@3.21.2))(effect@3.21.2))(effect@3.21.2)
@@ -13669,8 +13669,8 @@ snapshots:
 
   tinyglobby@0.2.15:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
 
   tinygradient@1.1.5:
     dependencies:
@@ -13895,7 +13895,7 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.15.0
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
   unstorage@2.0.0-alpha.4(@planetscale/database@1.19.0)(chokidar@4.0.3)(db0@0.3.4(better-sqlite3@12.2.0)(drizzle-orm@0.44.7(@neondatabase/serverless@0.10.0)(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.13)(@types/pg@8.11.10)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(better-sqlite3@12.2.0)(gel@2.0.0)(kysely@0.28.5)(mysql2@3.11.3)(postgres@3.4.4)(prisma@5.22.0))(mysql2@3.11.3))(ofetch@2.0.0-alpha.3):
