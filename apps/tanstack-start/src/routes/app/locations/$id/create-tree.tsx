@@ -71,7 +71,7 @@ function CreateTreeRoute() {
         void navigate({ to: "/app/locations/$id", params: { id: locationId } });
 
     const requestCurrentPosition = () => {
-        if (typeof navigator === "undefined" || !navigator.geolocation) {
+        if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
             toast.error(
                 "Geolocation wird in diesem Browser nicht unterstützt.",
             );
