@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import type {ReactNode} from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Schema } from "effect";
 import { toast } from "sonner";
@@ -7,24 +7,24 @@ import type { LocationId, TreeDoc } from "@cataster/backend/types";
 import refs from "@cataster/backend/confect/_generated/refs";
 import { getEditedFields, isDirty } from "@cataster/ui/components/form/helper";
 import { useAppForm } from "@cataster/ui/components/form/hooks";
-import { SpeciesId } from "@cataster/validators";
+import type { SpeciesId } from "@cataster/validators";
 
 import { useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 import { TreeFormFields, TreeFormSchema } from "./tree-fields";
 
 export const DEFAULT_CONTROL_TIMEZONE = "Europe/Berlin";
-export type TreeFormRenderContext = {
+export interface TreeFormRenderContext {
     form: any;
     isPending: boolean;
-};
+}
 
-type TreeCreateFormProps = {
+interface TreeCreateFormProps {
     locationId: LocationId;
     treePosition: { lat: number; lng: number };
     onSuccess: () => void;
     renderFooter: (ctx: TreeFormRenderContext) => ReactNode;
-};
+}
 
 export function TreeCreateForm({
     locationId,
@@ -38,7 +38,7 @@ export function TreeCreateForm({
             addTree({
                 locationId,
                 plateNumber: value.plateNumber,
-                speciesId: value.speciesId as SpeciesId,
+                speciesId: value.speciesId,
                 circumference: value.circumference,
                 height: value.height,
                 crownDiameter: Number(value.crownDiameter),
@@ -88,11 +88,11 @@ export function TreeCreateForm({
     );
 }
 
-type TreeEditFormProps = {
+interface TreeEditFormProps {
     tree: TreeDoc;
     onSuccess: () => void;
     renderFooter: (ctx: TreeFormRenderContext) => ReactNode;
-};
+}
 export function TreeEditForm({
     tree,
     onSuccess,

@@ -54,6 +54,17 @@ export const baseConfig = defineConfig(
         ],
         rules: {
             ...turboPlugin.configs.recommended.rules,
+            // ---------
+            "@typescript-eslint/array-type": ["error", { default: "generic" }],
+            "@typescript-eslint/only-throw-error": ["off"],
+            "@typescript-eslint/no-unsafe-member-access": [
+                "error",
+                { allowOptionalChaining: true },
+            ],
+            "@typescript-eslint/no-unsafe-assignment": ["off"],
+            "@typescript-eslint/no-unsafe-argument": ["off"],
+            "@typescript-eslint/no-explicit-any": ["off"],
+            // ---------
             "@typescript-eslint/no-unused-vars": [
                 "error",
                 { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

@@ -1,10 +1,11 @@
-import { Schema } from "effect";
+import type { Schema } from "effect";
 
 import { FieldGroup, FieldSet } from "@cataster/ui/components/base/field";
 import { SelectItem } from "@cataster/ui/components/base/select";
 import { isFieldInvalid } from "@cataster/ui/components/form/components/base";
 import { withForm } from "@cataster/ui/components/form/hooks";
-import { SpeciesId, TreeCreateArgs } from "@cataster/validators";
+import type { SpeciesId} from "@cataster/validators";
+import { TreeCreateArgs } from "@cataster/validators";
 
 import { TREE_VITALITY_OPTIONS } from "~/lib/tree-constants";
 import { SpeciesCombobox } from "./species-combobox";
@@ -20,7 +21,7 @@ export const TreeFormFields = withForm({
                     <form.AppField name="speciesId">
                         {(field) => (
                             <SpeciesCombobox
-                                value={(field.state.value as SpeciesId) || ""}
+                                value={(field.state.value) || ""}
                                 onValueChange={(id) => field.handleChange(id)}
                                 invalid={isFieldInvalid(field.state.meta)}
                             />

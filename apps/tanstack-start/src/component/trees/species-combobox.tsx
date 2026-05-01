@@ -35,12 +35,12 @@ import { confectQuery, useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 
 type Species = SpeciesDoc;
-type SpeciesComboboxProps = {
+interface SpeciesComboboxProps {
     disabled?: boolean;
     invalid?: boolean;
     value: SpeciesId | "";
     onValueChange: (id: SpeciesId) => void;
-};
+}
 
 const speciesListQuery = confectQuery(refs.public.species.listActive, {});
 
@@ -77,7 +77,7 @@ export function SpeciesCombobox({
                     <ComboboxContent>
                         <ComboboxList>
                             {(
-                                species as ReadonlyArray<Species> | undefined
+                                species
                             )?.map((sp) => (
                                 <ComboboxItem
                                     key={sp._id}

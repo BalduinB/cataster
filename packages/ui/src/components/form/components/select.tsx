@@ -94,7 +94,7 @@ export function FormMultiSelect({
                     <MultiSelectValue placeholder={placeholder} />
                 </MultiSelectTrigger>
                 <MultiSelectContent
-                    search={false}
+                    search={search}
                     allowFreeText={allowFreeText}
                     freeTextPlaceholder={freeTextPlaceholder}
                 >

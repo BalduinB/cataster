@@ -28,14 +28,14 @@ import { Skeleton } from "@cataster/ui/components/base/skeleton";
 import { useConfectActionFn, useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 
-type OsmResult = {
+interface OsmResult {
     osmId: number;
     osmType: string;
     displayName: string;
     lat: number;
     lng: number;
     type: string;
-};
+}
 
 /**
  * Lets the user search OpenStreetMap for an area, pick a result, and turn it

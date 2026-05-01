@@ -5,15 +5,14 @@ import {
     FieldError,
     FieldLabel,
 } from "@cataster/ui/components/base/field";
-import { cn } from "@cataster/ui/lib/utils";
 
 import { useFieldContext } from "../hooks";
 
-export type FormControlProps = {
+export interface FormControlProps {
     label: string;
     description?: string;
     formBaseClassName?: string;
-};
+}
 type FormBaseProps = {
     children: React.ReactNode;
     orientation?: "vertical" | "horizontal";

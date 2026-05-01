@@ -57,7 +57,7 @@ const groupLabelMap: Record<NavGroup, string> = {
 };
 
 type NavLink = Omit<NavStaticData, "group" | "parent"> & { to: string };
-type TopLevelNavItem = NavLink & { children: NavLink[] };
+type TopLevelNavItem = NavLink & { children: Array<NavLink> };
 
 /**
  * Replace dynamic-param segments (e.g. `$id`) with the placeholder so that
@@ -73,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const matchRoute = useMatchRoute();
 
     const itemsByGroup = React.useMemo(() => {
-        const buckets: Record<NavGroup | "top-level", TopLevelNavItem[]> = {
+        const buckets: Record<NavGroup | "top-level", Array<TopLevelNavItem>> = {
             general: [],
             data: [],
             "top-level": [],
@@ -135,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </SidebarGroupContent>
                     </SidebarGroup>
                 ) : null}
-                {(Object.keys(groupLabelMap) as NavGroup[]).map((group) => {
+                {(Object.keys(groupLabelMap) as Array<NavGroup>).map((group) => {
                     const items = itemsByGroup[group];
                     if (items.length === 0) return null;
                     return (

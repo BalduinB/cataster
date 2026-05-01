@@ -8,7 +8,6 @@ import { FormBase, isFieldInvalid } from "./base";
 export function FormSwitch({
     label,
     description,
-    children,
     formBaseClassName,
     ...props
 }: FormControlProps & React.ComponentProps<typeof Switch>) {

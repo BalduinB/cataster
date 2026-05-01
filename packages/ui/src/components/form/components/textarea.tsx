@@ -10,7 +10,7 @@ export function FormTextarea({
     formBaseClassName,
     ...props
 }: FormControlProps & React.ComponentProps<typeof Textarea>) {
-    const field = useFieldContext<string>();
+    const field = useFieldContext<string | undefined | null>();
     const isInvalid = isFieldInvalid(field.state.meta);
     return (
         <FormBase

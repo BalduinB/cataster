@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { IconSelector } from "@tabler/icons-react";
 
 import { cn } from "@cataster/ui/lib/utils";

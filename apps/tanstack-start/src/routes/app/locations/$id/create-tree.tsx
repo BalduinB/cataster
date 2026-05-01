@@ -2,7 +2,6 @@ import { useState } from "react";
 import { IconCrosshair, IconEye, IconTree } from "@tabler/icons-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Schema } from "effect";
 import { AnimatePresence, motion } from "motion/react";
 import { Marker } from "react-leaflet";
 import { toast } from "sonner";
@@ -15,7 +14,6 @@ import {
     PopoverTrigger,
 } from "@cataster/ui/components/base/popover";
 import { Skeleton } from "@cataster/ui/components/base/skeleton";
-import { LocationId } from "@cataster/validators";
 
 import { ClickToPlace } from "~/component/map/click-to-place";
 import { LocationPolygon } from "~/component/map/location-polygon";
@@ -53,7 +51,7 @@ export const Route = createFileRoute("/app/locations/$id/create-tree")({
 function CreateTreeRoute() {
     const { id } = Route.useParams();
 
-    const locationId = id as LocationId;
+    const locationId = id;
     const navigate = useNavigate();
 
     const { data: location } = useSuspenseQuery(

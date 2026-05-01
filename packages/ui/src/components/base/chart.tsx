@@ -1,4 +1,8 @@
 import type { TooltipValueType } from "recharts";
+import type {
+    Payload,
+    ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
@@ -21,9 +25,9 @@ export type ChartConfig = Record<
     )
 >;
 
-type ChartContextProps = {
+interface ChartContextProps {
     config: ChartConfig;
-};
+}
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
@@ -114,6 +118,17 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+function keyFromDataKey(
+    dataKey: Payload<ValueType, TooltipNameType>["dataKey"],
+) {
+    if (typeof dataKey === "string") {
+        return dataKey;
+    }
+    if (typeof dataKey === "number") {
+        return dataKey.toString();
+    }
+    return undefined;
+}
 function ChartTooltipContent({
     active,
     payload,
@@ -150,7 +165,8 @@ function ChartTooltipContent({
         }
 
         const [item] = payload;
-        const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`;
+
+        const key = `${labelKey ?? keyFromDataKey(item?.dataKey) ?? item?.name ?? "value"}`;
         const itemConfig = getPayloadConfigFromPayload(config, item, key);
         const value =
             !labelKey && typeof label === "string"
@@ -198,7 +214,7 @@ function ChartTooltipContent({
                 {payload
                     .filter((item) => item.type !== "none")
                     .map((item, index) => {
-                        const key = `${nameKey ?? item.name ?? item.dataKey ?? "value"}`;
+                        const key = `${nameKey ?? item.name ?? keyFromDataKey(item.dataKey) ?? "value"}`;
                         const itemConfig = getPayloadConfigFromPayload(
                             config,
                             item,
@@ -216,7 +232,7 @@ function ChartTooltipContent({
                                 )}
                             >
                                 {formatter &&
-                                item?.value !== undefined &&
+                                item.value !== undefined &&
                                 item.name ? (
                                     formatter(
                                         item.value,
@@ -326,7 +342,7 @@ function ChartLegendContent({
             {payload
                 .filter((item) => item.type !== "none")
                 .map((item, index) => {
-                    const key = `${nameKey ?? item.dataKey ?? "value"}`;
+                    const key = `${nameKey ?? keyFromDataKey(item.dataKey) ?? "value"}`;
                     const itemConfig = getPayloadConfigFromPayload(
                         config,
                         item,

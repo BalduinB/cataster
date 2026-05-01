@@ -1,9 +1,5 @@
 import { useMemo } from "react";
-import {
-    IconAlertTriangle,
-    IconCalendarEvent,
-    IconHeartbeat,
-} from "@tabler/icons-react";
+import { IconCalendarEvent, IconHeartbeat } from "@tabler/icons-react";
 
 import type { TreeDoc } from "@cataster/backend/types";
 import {

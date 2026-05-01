@@ -14,7 +14,7 @@ export function FormInput({
     formBaseClassName,
     ...props
 }: FormControlProps & React.ComponentProps<typeof Input>) {
-    const field = useFieldContext<string | number>();
+    const field = useFieldContext<string | number | undefined | null>();
     const isInvalid = isFieldInvalid(field.state.meta);
     return (
         <FormBase
@@ -48,7 +48,7 @@ export function FormInputGroup({
     ...props
 }: FormControlProps &
     React.ComponentProps<typeof Input> & { children: React.ReactNode }) {
-    const field = useFieldContext<string>();
+    const field = useFieldContext<string | number | undefined | null>();
     const isInvalid = isFieldInvalid(field.state.meta);
     return (
         <FormBase

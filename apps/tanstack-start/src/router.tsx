@@ -2,8 +2,9 @@
 import type * as React from "react";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 import { QueryClient } from "@tanstack/react-query";
+import type {
+    AnyRouteMatch} from "@tanstack/react-router";
 import {
-    AnyRouteMatch,
     createRouter as createTanStackRouter,
     Link,
 } from "@tanstack/react-router";
