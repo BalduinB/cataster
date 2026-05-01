@@ -100,7 +100,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 function TailwindBreakpointsHint() {
     return (
-        <div className="bg-background/50 fixed bottom-4 left-4 z-50 rounded-md p-2 backdrop-blur-sm">
+        <div className="bg-background fixed bottom-4 left-4 z-50 flex size-10 items-center justify-center rounded-full border">
             <div className="text-foreground text-sm">
                 <span className="inline sm:hidden">xs</span>
                 <span className="hidden sm:inline md:hidden">sm</span>
