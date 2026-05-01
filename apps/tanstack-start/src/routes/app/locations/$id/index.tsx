@@ -51,7 +51,7 @@ function LocationDetailRoute() {
     }
 
     return (
-        <main className="container grid grow gap-8 py-8 md:grid-cols-3">
+        <main className="grid grow grid-rows-[auto_auto_1fr] gap-8 px-4 md:grid-cols-3 md:px-8">
             <LocationHeader location={location} />
             <LocationStats trees={treeData.trees} />
             <div className="col-span-full grid grid-cols-subgrid">

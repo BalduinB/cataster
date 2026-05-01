@@ -1,5 +1,5 @@
-import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 import type { MongoAbility } from "@casl/ability";
+import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 
 /**
  * Multi-tenant authorization for cataster.
@@ -40,9 +40,7 @@ export type AppAbility = MongoAbility<Permission>;
 export type Action = Permission[0];
 export type Subject = Permission[1];
 
-export function getUserPermissions(
-    user: UserContext | undefined,
-): AppAbility {
+export function getUserPermissions(user: UserContext | undefined): AppAbility {
     const { build, can: allow } = new AbilityBuilder<AppAbility>(
         createMongoAbility,
     );

@@ -5,8 +5,8 @@ import { Marker, Popup } from "react-leaflet";
 import type { SpeciesDoc, TreeDoc } from "@cataster/backend/types";
 import { Button } from "@cataster/ui/components/base/button";
 
-import { useSelectedTree } from "~/store/selected-tree";
 import { getSpeciesDisplayName, TREE_VITALITY } from "~/lib/tree-constants";
+import { useSelectedTree } from "~/store/selected-tree";
 
 // Built-in default icons aren't bundled in a way that survives Vite's asset
 // pipeline, so we point Leaflet at the unpkg-hosted assets directly. Keeps
