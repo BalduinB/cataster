@@ -79,11 +79,11 @@ export function LocationStats({ trees }: LocationStatsProps) {
         <div className="col-span-full grid grid-cols-subgrid">
             <Card size="sm" className="md:col-span-2">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                        <IconCalendarEvent className="size-5" />
+                    <CardTitle>
+                        <IconCalendarEvent />
                         Anstehende Kontrollen
                     </CardTitle>
-                    <CardDescription className="text-xs">
+                    <CardDescription>
                         Geplante Kontrollen in den nächsten 30 Tagen
                     </CardDescription>
                 </CardHeader>
@@ -109,11 +109,11 @@ export function LocationStats({ trees }: LocationStatsProps) {
             </Card>
             <Card size="sm">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                        <IconHeartbeat className="size-5" />
+                    <CardTitle>
+                        <IconHeartbeat />
                         Vitalität
                     </CardTitle>
-                    <CardDescription className="text-xs">
+                    <CardDescription>
                         {stats.total} Bäume gesamt
                     </CardDescription>
                 </CardHeader>
