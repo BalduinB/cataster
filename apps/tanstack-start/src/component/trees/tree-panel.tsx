@@ -25,17 +25,11 @@ import {
 } from "@cataster/ui/components/base/alert-dialog";
 import { Badge } from "@cataster/ui/components/base/badge";
 import { Button } from "@cataster/ui/components/base/button";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@cataster/ui/components/base/card";
+import { CardTitle } from "@cataster/ui/components/base/card";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@cataster/ui/components/base/dropdown-menu";
 import {
@@ -53,6 +47,7 @@ import {
     ItemTitle,
 } from "@cataster/ui/components/base/item";
 import { ScrollArea } from "@cataster/ui/components/base/scroll-area";
+import { formatControlDate } from "@cataster/ui/lib/tree";
 
 import { useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
@@ -79,50 +74,46 @@ export function TreePanel({ trees, speciesById }: TreePanelProps) {
     }, [trees, selectedTreeId]);
 
     return (
-        <Card className="h-fit" size="sm">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <IconTrees className="size-5" />
-                    Bäume ({trees.length})
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ScrollArea className="max-h-[400px]">
-                    {trees.length === 0 ? (
-                        <Empty className="py-6">
-                            <EmptyMedia variant="icon">
-                                <IconTrees />
-                            </EmptyMedia>
-                            <EmptyHeader>
-                                <EmptyTitle className="text-sm">
-                                    Keine Bäume
-                                </EmptyTitle>
-                                <EmptyDescription className="text-xs">
-                                    Lege den ersten Baum über &quot;Neuer
-                                    Baum&quot; an.
-                                </EmptyDescription>
-                            </EmptyHeader>
-                        </Empty>
-                    ) : (
-                        <div className="space-y-2 p-1">
-                            {sortedTrees.map((tree) => (
-                                <motion.div
-                                    key={tree._id}
-                                    layout
-                                    layoutId={tree._id}
-                                >
-                                    <TreeItem
-                                        tree={tree}
-                                        species={speciesById[tree.speciesId]}
-                                        isSelected={selectedTreeId === tree._id}
-                                    />
-                                </motion.div>
-                            ))}
-                        </div>
-                    )}
-                </ScrollArea>
-            </CardContent>
-        </Card>
+        <div className="md:col-span-2">
+            <CardTitle className="flex items-center gap-2">
+                <IconTrees className="size-5" />
+                Bäume ({trees.length})
+            </CardTitle>
+            <ScrollArea className="max-h-[640px]">
+                {trees.length === 0 ? (
+                    <Empty className="py-6">
+                        <EmptyMedia variant="icon">
+                            <IconTrees />
+                        </EmptyMedia>
+                        <EmptyHeader>
+                            <EmptyTitle className="text-sm">
+                                Keine Bäume
+                            </EmptyTitle>
+                            <EmptyDescription className="text-xs">
+                                Lege den ersten Baum über &quot;Neuer Baum&quot;
+                                an.
+                            </EmptyDescription>
+                        </EmptyHeader>
+                    </Empty>
+                ) : (
+                    <div className="space-y-2 p-1">
+                        {sortedTrees.map((tree) => (
+                            <motion.div
+                                key={tree._id}
+                                layout
+                                layoutId={tree._id}
+                            >
+                                <TreeItem
+                                    tree={tree}
+                                    species={speciesById[tree.speciesId]}
+                                    isSelected={selectedTreeId === tree._id}
+                                />
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </ScrollArea>
+        </div>
     );
 }
 
@@ -175,9 +166,7 @@ function TreeItem({
                     {tree.nextControlAt && (
                         <p className="text-muted-foreground mt-2 text-xs">
                             Nächste Kontrolle:{" "}
-                            {new Date(tree.nextControlAt).toLocaleDateString(
-                                "de-DE",
-                            )}
+                            {formatControlDate(new Date(tree.nextControlAt))}
                         </p>
                     )}
                     {tree.notes && (

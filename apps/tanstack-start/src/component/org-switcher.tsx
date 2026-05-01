@@ -9,6 +9,7 @@ import {
     IconChevronCompactRight,
     IconPlus,
 } from "@tabler/icons-react";
+import { useRouter } from "@tanstack/react-router";
 
 import {
     Avatar,
@@ -46,6 +47,7 @@ import { useIsMobile } from "@cataster/ui/hooks/use-mobile";
  * Expected to be rendered inside a `SidebarMenuItem` (see `AppSidebar`).
  */
 export function OrgSwitcher() {
+    const router = useRouter();
     const isMobile = useIsMobile();
     const { organization, isLoaded: orgLoaded } = useOrganization();
     const {
@@ -119,6 +121,7 @@ export function OrgSwitcher() {
                                 void setActive({
                                     organization: value,
                                 });
+                                router.navigate({ to: "/app" });
                             }}
                         >
                             {memberships.length === 0 ? (
@@ -131,6 +134,7 @@ export function OrgSwitcher() {
                                         <DropdownMenuRadioItem
                                             value={organization.id}
                                             key={organization.id}
+                                            closeOnClick
                                         >
                                             <Avatar className="size-6">
                                                 <AvatarImage

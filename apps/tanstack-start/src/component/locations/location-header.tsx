@@ -75,7 +75,7 @@ export function LocationHeader({ location }: LocationHeaderProps) {
     };
 
     return (
-        <div className="flex items-center justify-between">
+        <div className="col-span-full flex items-center justify-between">
             <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
                 <IconMapPin className="text-primary size-6" />
                 {location.name}

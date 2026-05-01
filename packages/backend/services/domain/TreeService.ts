@@ -1,6 +1,8 @@
-import { Effect, Layer } from "effect";
+import { differenceInDays } from "date-fns";
+import { Array, Effect, Layer, Order } from "effect";
 
-import { ConflictError, type OrgId } from "@cataster/validators";
+import type { OrgId } from "@cataster/validators";
+import { ConflictError } from "@cataster/validators";
 
 import type { LocationId, TreeDoc, TreeId } from "../../types";
 import { DatabaseReader } from "../../confect/_generated/services";
@@ -77,13 +79,22 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
     ) =>
         Effect.gen(function* () {
             const db = yield* DatabaseReader;
-            return yield* dieOnInternal(
+            const trees = yield* dieOnInternal(
                 db
                     .table("trees")
                     .index("by_orgId_and_locationId", (q) =>
                         q.eq("orgId", orgId).eq("locationId", locationId),
                     )
                     .collect(),
+            );
+
+            return Array.sortWith(
+                trees,
+                (tree) =>
+                    !tree.nextControlAt
+                        ? Infinity
+                        : differenceInDays(tree.nextControlAt, new Date()),
+                Order.number,
             );
         });
 

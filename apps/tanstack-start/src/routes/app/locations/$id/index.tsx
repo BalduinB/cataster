@@ -7,6 +7,7 @@ import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
 import { LocationHeader } from "~/component/locations/location-header";
 import { LocationMapView } from "~/component/locations/location-map";
+import { LocationStats } from "~/component/locations/location-stats";
 import { TreePanel } from "~/component/trees/tree-panel";
 import { confectQuery } from "~/lib/confect";
 
@@ -50,15 +51,16 @@ function LocationDetailRoute() {
     }
 
     return (
-        <main className="container space-y-4 py-8">
+        <main className="container grid grow gap-8 py-8 md:grid-cols-3">
             <LocationHeader location={location} />
-            <div className="grid gap-4 lg:grid-cols-[1fr_350px]">
-                <LocationMapView
-                    location={location}
+            <LocationStats trees={treeData.trees} />
+            <div className="col-span-full grid grid-cols-subgrid">
+                <TreePanel
                     trees={treeData.trees}
                     speciesById={treeData.speciesById}
                 />
-                <TreePanel
+                <LocationMapView
+                    location={location}
                     trees={treeData.trees}
                     speciesById={treeData.speciesById}
                 />

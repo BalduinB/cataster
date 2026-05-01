@@ -29,25 +29,23 @@ export function LocationMapView({
     const [selectedTree, setSelectedTree] = useState<TreeDoc | null>(null);
 
     return (
-        <>
-            <Card className="overflow-hidden p-0">
-                <MapView
-                    center={[location.centroid.lat, location.centroid.lng]}
-                    zoom={16}
-                    className="h-[500px] w-full"
-                >
-                    <LocationPolygon polygon={location.polygon} />
-                    {trees.map((tree) => (
-                        <TreeMarker
-                            key={tree._id}
-                            tree={tree}
-                            species={speciesById[tree.speciesId]}
-                            onEditClick={(t) => setSelectedTree(t)}
-                        />
-                    ))}
-                    <SelectedTreeFocus trees={trees} />
-                </MapView>
-            </Card>
+        <Card className="overflow-hidden p-0">
+            <MapView
+                center={[location.centroid.lat, location.centroid.lng]}
+                zoom={16}
+                className="h-full w-full"
+            >
+                <LocationPolygon polygon={location.polygon} />
+                {trees.map((tree) => (
+                    <TreeMarker
+                        key={tree._id}
+                        tree={tree}
+                        species={speciesById[tree.speciesId]}
+                        onEditClick={(t) => setSelectedTree(t)}
+                    />
+                ))}
+                <SelectedTreeFocus trees={trees} />
+            </MapView>
             {selectedTree && (
                 <TreeEditFormDialog
                     open={!!selectedTree}
@@ -55,7 +53,7 @@ export function LocationMapView({
                     tree={selectedTree}
                 />
             )}
-        </>
+        </Card>
     );
 }
 
@@ -67,9 +65,13 @@ function SelectedTreeFocus({ trees }: { trees: ReadonlyArray<TreeDoc> }) {
         if (!selectedTreeId) return;
         const tree = trees.find((t) => t._id === selectedTreeId);
         if (!tree) return;
-        map.flyTo([tree.latitude, tree.longitude], Math.max(map.getZoom(), 18), {
-            duration: 0.6,
-        });
+        map.flyTo(
+            [tree.latitude, tree.longitude],
+            Math.max(map.getZoom(), 18),
+            {
+                duration: 0.6,
+            },
+        );
     }, [selectedTreeId, trees, map]);
 
     return null;

@@ -40,6 +40,7 @@
     "@turf/boolean-point-in-polygon": "^7.3.4",
     "@turf/helpers": "^7.3.4",
     "convex": "catalog:",
+    "date-fns": "^4.1.0",
     "effect": "catalog:",
     "rrule": "^2.8.1"
   },
