@@ -1,4 +1,4 @@
-import type {ReactElement} from "react";
+import type { ReactElement } from "react";
 
 import type { TreeDoc } from "@cataster/backend/types";
 import { Button } from "@cataster/ui/components/base/button";

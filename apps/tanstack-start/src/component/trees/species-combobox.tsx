@@ -76,9 +76,7 @@ export function SpeciesCombobox({
                     />
                     <ComboboxContent>
                         <ComboboxList>
-                            {(
-                                species
-                            )?.map((sp) => (
+                            {species?.map((sp) => (
                                 <ComboboxItem
                                     key={sp._id}
                                     value={sp._id}

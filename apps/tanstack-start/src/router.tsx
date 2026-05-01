@@ -1,9 +1,8 @@
 /// <reference types="vite/client" />
+import type { AnyRouteMatch } from "@tanstack/react-router";
 import type * as React from "react";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 import { QueryClient } from "@tanstack/react-query";
-import type {
-    AnyRouteMatch} from "@tanstack/react-router";
 import {
     createRouter as createTanStackRouter,
     Link,

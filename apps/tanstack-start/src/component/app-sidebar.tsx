@@ -73,7 +73,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const matchRoute = useMatchRoute();
 
     const itemsByGroup = React.useMemo(() => {
-        const buckets: Record<NavGroup | "top-level", Array<TopLevelNavItem>> = {
+        const buckets: Record<
+            NavGroup | "top-level",
+            Array<TopLevelNavItem>
+        > = {
             general: [],
             data: [],
             "top-level": [],
@@ -135,35 +138,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </SidebarGroupContent>
                     </SidebarGroup>
                 ) : null}
-                {(Object.keys(groupLabelMap) as Array<NavGroup>).map((group) => {
-                    const items = itemsByGroup[group];
-                    if (items.length === 0) return null;
-                    return (
-                        <SidebarGroup key={group}>
-                            <SidebarGroupLabel>
-                                {groupLabelMap[group]}
-                            </SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    {items.map((item) => (
-                                        <NavMenuItem
-                                            key={item.to}
-                                            item={item}
-                                            isActive={
-                                                !!matchRoute({
-                                                    to: item.to as never,
-                                                    fuzzy: !item.to.endsWith(
-                                                        "/",
-                                                    ),
-                                                })
-                                            }
-                                        />
-                                    ))}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                    );
-                })}
+                {(Object.keys(groupLabelMap) as Array<NavGroup>).map(
+                    (group) => {
+                        const items = itemsByGroup[group];
+                        if (items.length === 0) return null;
+                        return (
+                            <SidebarGroup key={group}>
+                                <SidebarGroupLabel>
+                                    {groupLabelMap[group]}
+                                </SidebarGroupLabel>
+                                <SidebarGroupContent>
+                                    <SidebarMenu>
+                                        {items.map((item) => (
+                                            <NavMenuItem
+                                                key={item.to}
+                                                item={item}
+                                                isActive={
+                                                    !!matchRoute({
+                                                        to: item.to as never,
+                                                        fuzzy: !item.to.endsWith(
+                                                            "/",
+                                                        ),
+                                                    })
+                                                }
+                                            />
+                                        ))}
+                                    </SidebarMenu>
+                                </SidebarGroupContent>
+                            </SidebarGroup>
+                        );
+                    },
+                )}
             </SidebarContent>
             <SidebarFooter>
                 <NavUser />
