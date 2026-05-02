@@ -19,15 +19,33 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 # This keeps UID 1000 so that --userns=keep-id (Podman) and
 # --user 1000:1000 (Docker) map to the correct home directory owner.
 RUN usermod -d /home/agent -m -l agent node
-USER agent
 
-# Install Claude Code CLI
+# Enable pnpm via corepack (this repo is a pnpm workspace) and pre-install the
+# version pinned by package.json so corepack doesn't prompt at runtime.
+RUN corepack enable && corepack prepare pnpm@10.19.0 --activate
+
+# - COREPACK_ENABLE_DOWNLOAD_PROMPT=0: belt-and-braces, never prompt for downloads.
+# - CI=true: pnpm runs non-interactively so it can remove/recreate node_modules
+#   when copyToWorktree seeds them with darwin-only binaries from the host.
+# - PATH: pick up Claude Code CLI installed below into ~/.local/bin.
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
+    CI=true \
+    PATH="/home/agent/.local/bin:$PATH"
+
+USER agent
+WORKDIR /home/agent
+
+# Install Claude Code CLI as the agent user so it lands in /home/agent/.local.
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
-# Add Claude to PATH
-ENV PATH="/home/agent/.local/bin:$PATH"
-
-WORKDIR /home/agent
+# Make the home directory writable by any UID. Sandcastle's Docker provider
+# starts containers with --user $hostUid:$hostGid (the macOS host's UID, e.g.
+# 501), which does not match the image's `agent` user (UID 1000). Without
+# this, tools like git fail with "Permission denied" when writing to
+# $HOME (e.g. ~/.gitconfig).
+USER root
+RUN chmod -R 777 /home/agent
+USER agent
 
 # In worktree sandbox mode, Sandcastle bind-mounts the git worktree at /home/agent/workspace
 # and overrides the working directory to /home/agent/workspace at container start.

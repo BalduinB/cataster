@@ -33,9 +33,17 @@ import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 const MAX_ITERATIONS = 10;
 
 // Hooks run inside the sandbox before the agent starts each iteration.
-// npm install ensures the sandbox always has fresh dependencies.
+// pnpm install ensures the sandbox always has fresh dependencies (this repo
+// is a pnpm workspace, so `npm install` would fail on `workspace:*` deps).
 const hooks = {
-    sandbox: { onSandboxReady: [{ command: "pnpm install" }] },
+    sandbox: {
+        onSandboxReady: [
+            // 10 minutes: cold pnpm install on a fresh sandbox can be slow,
+            // especially when copyToWorktree seeded darwin-only binaries that
+            // pnpm has to discard and refetch for the linux container.
+            { command: "pnpm install", timeoutMs: 600_000 },
+        ],
+    },
 };
 
 // Copy node_modules from the host into the worktree before each sandbox
