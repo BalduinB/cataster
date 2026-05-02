@@ -80,7 +80,7 @@ export const SpeciesRepository = {
 
     patch: (
         id: SpeciesId,
-        data: Record<string, unknown>,
+        data: Partial<Omit<SpeciesDoc, "_id" | "_creationTime">>,
     ): Effect.Effect<void, never, DatabaseWriter> =>
         Effect.gen(function* () {
             const db = yield* DatabaseWriter;

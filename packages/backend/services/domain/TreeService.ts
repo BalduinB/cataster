@@ -3,7 +3,7 @@ import { Array, Effect, Layer, Order } from "effect";
 
 import { ConflictError, NotFoundError } from "@cataster/validators";
 
-import type { LocationId, TreeDoc, TreeId } from "../../types";
+import type { LocationId, SpeciesId, TreeDoc, TreeId } from "../../types";
 import {
     Auth,
     DatabaseReader,
@@ -25,7 +25,7 @@ export type { LocationId, TreeDoc, TreeId };
 
 type CreateInput = {
     readonly locationId: LocationId;
-    readonly speciesId: string;
+    readonly speciesId: SpeciesId;
     readonly plateNumber: string | null;
     readonly circumference: number;
     readonly height: number;
@@ -41,7 +41,7 @@ type CreateInput = {
 
 type UpdateInput = {
     readonly id: TreeId;
-    readonly speciesId?: string;
+    readonly speciesId?: SpeciesId;
     readonly plateNumber?: string | null;
     readonly circumference?: number;
     readonly height?: number;
@@ -202,7 +202,7 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
                 orgId,
                 locationId: input.locationId,
                 plateNumber,
-                speciesId: input.speciesId as never,
+                speciesId: input.speciesId,
                 circumference: input.circumference,
                 height: input.height,
                 crownDiameter: input.crownDiameter,
@@ -292,7 +292,7 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
 
             yield* TreeRepository.patch(id, {
                 plateNumber,
-                speciesId: speciesId as never,
+                speciesId,
                 circumference,
                 height,
                 crownDiameter,

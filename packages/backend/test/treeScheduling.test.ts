@@ -167,8 +167,7 @@ describe("treeScheduling", () => {
                     baseDate,
                     now: Date.now(),
                 });
-                assertTrue(result !== null);
-                assertTrue(result! >= Date.now());
+                assertTrue(result !== null && result >= Date.now());
             }),
         );
     });

@@ -101,14 +101,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
     const resolveForOrg = (id: SpeciesId, orgId: OrgId) =>
         Effect.gen(function* () {
             const doc = yield* SpeciesRepository.getById(id);
-            if (doc === null) {
-                return yield* Effect.fail(
-                    new NotFoundError({
-                        message: "Baumart nicht gefunden",
-                    }),
-                );
-            }
-            if (doc.orgId !== null && doc.orgId !== orgId) {
+            if (doc === null || (doc.orgId !== null && doc.orgId !== orgId)) {
                 return yield* Effect.fail(
                     new NotFoundError({
                         message: "Baumart nicht gefunden",

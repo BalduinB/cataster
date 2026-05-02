@@ -9,10 +9,10 @@ import {
 
 import type { LocationDoc, LocationId } from "../../types";
 import {
+    Auth,
     DatabaseReader,
     DatabaseWriter,
 } from "../../confect/_generated/services";
-import { Auth } from "../../confect/_generated/services";
 import { requireUser } from "../auth/requireUser";
 import { LocationRepository } from "../data/LocationRepository";
 import { TreeRepository } from "../data/TreeRepository";

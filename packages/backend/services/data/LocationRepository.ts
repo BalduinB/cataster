@@ -76,7 +76,7 @@ export const LocationRepository = {
 
     patch: (
         id: LocationId,
-        data: Record<string, unknown>,
+        data: Partial<Omit<LocationDoc, "_id" | "_creationTime">>,
     ): Effect.Effect<void, never, DatabaseWriter> =>
         Effect.gen(function* () {
             const db = yield* DatabaseWriter;
