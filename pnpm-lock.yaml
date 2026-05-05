@@ -330,6 +330,9 @@ importers:
         specifier: ^2.8.1
         version: 2.8.1
     devDependencies:
+      '@cataster/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
       '@confect/cli':
         specifier: 'catalog:'
         version: 5.0.0(cb85da8deedd677fa5bffeea3e4aa79c)

@@ -40,37 +40,37 @@ export type AppAbility = MongoAbility<Permission>;
 export type Action = Permission[0];
 export type Subject = Permission[1];
 
-export function getUserPermissions(user: UserContext | undefined): AppAbility {
+export function getUserPermissions(user: UserContext | null): AppAbility {
     const { build, can: allow } = new AbilityBuilder<AppAbility>(
         createMongoAbility,
     );
+    if (user == null) return build();
 
-    if (user != null) {
-        allow("read", "Location", { orgId: user.orgId });
-        if (user.role === "admin") {
-            allow(["create", "update", "delete"], "Location", {
-                orgId: user.orgId,
-            });
-        }
-
-        allow(["read", "create", "update", "delete"], "Tree", {
+    allow("read", "Location", { orgId: user.orgId });
+    if (user.role === "admin") {
+        allow(["create", "update", "delete"], "Location", {
             orgId: user.orgId,
         });
+    }
 
-        // Everyone reads system species (orgId = null) plus their own org's.
-        allow("read", "Species", { orgId: null });
-        allow("read", "Species", { orgId: user.orgId });
-        if (user.role === "admin") {
-            allow(["create", "update", "delete"], "Species", {
-                orgId: user.orgId,
-            });
-        }
+    allow(["read", "create", "update", "delete"], "Tree", {
+        orgId: user.orgId,
+    });
 
-        if (user.role === "admin") {
-            allow("manage", "HiddenSpecies", { orgId: user.orgId });
-            allow("manage", "Org", { id: user.orgId });
-        }
+    // Everyone reads system species (orgId = null) plus their own org's.
+    allow("read", "Species", { orgId: null });
+    allow("read", "Species", { orgId: user.orgId });
+    if (user.role === "admin") {
+        allow(["create", "update", "delete"], "Species", {
+            orgId: user.orgId,
+        });
+    }
+
+    if (user.role === "admin") {
+        allow("manage", "HiddenSpecies", { orgId: user.orgId });
+        allow("manage", "Org", { id: user.orgId });
     }
 
     return build();
 }
+export { subject } from "@casl/ability";

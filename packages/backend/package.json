@@ -46,6 +46,7 @@
         "rrule": "^2.8.1"
     },
     "devDependencies": {
+        "@cataster/tsconfig": "workspace:*",
         "@confect/cli": "catalog:",
         "@confect/test": "catalog:",
         "@edge-runtime/vm": "^5.0.0",

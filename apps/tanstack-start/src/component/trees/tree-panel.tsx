@@ -81,15 +81,13 @@ export function TreePanel({ trees, speciesById }: TreePanelProps) {
             </CardTitle>
             <ScrollArea className="max-h-[640px]">
                 {trees.length === 0 ? (
-                    <Empty className="py-6">
+                    <Empty>
                         <EmptyMedia variant="icon">
                             <IconTrees />
                         </EmptyMedia>
                         <EmptyHeader>
-                            <EmptyTitle className="text-sm">
-                                Keine Bäume
-                            </EmptyTitle>
-                            <EmptyDescription className="text-xs">
+                            <EmptyTitle>Keine Bäume</EmptyTitle>
+                            <EmptyDescription>
                                 Lege den ersten Baum über &quot;Neuer Baum&quot;
                                 an.
                             </EmptyDescription>

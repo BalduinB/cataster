@@ -1,14 +1,12 @@
 import { Effect } from "effect";
 
-import {
-    type Action,
-    getUserPermissions,
-    type Subject,
-} from "@cataster/abilities";
+import type { Action, AppAbility, Subject } from "@cataster/abilities";
+import { getUserPermissions } from "@cataster/abilities";
 import { ForbiddenError, UnauthorizedError } from "@cataster/validators";
 
+import type { UserContext } from "./requireUser";
 import { Auth } from "../../confect/_generated/services";
-import { requireUser, type UserContext } from "./requireUser";
+import { requireUser } from "./requireUser";
 
 /**
  * Asserts the current user has permission for `(action, subject)` and returns
@@ -24,13 +22,12 @@ import { requireUser, type UserContext } from "./requireUser";
  * gating; defense-in-depth is provided by both layers running.
  */
 export const requireAbility = (
-    action: Action,
-    subject: Subject,
+    ...args: Parameters<AppAbility["can"]>
 ): Effect.Effect<UserContext, UnauthorizedError | ForbiddenError, Auth> =>
     Effect.gen(function* () {
         const user = yield* requireUser;
         const ability = getUserPermissions(user);
-        if (!ability.can(action as never, subject as never)) {
+        if (!ability.can(...args)) {
             return yield* Effect.fail(
                 new ForbiddenError({
                     message: "Insufficient permissions",
