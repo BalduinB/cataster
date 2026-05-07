@@ -1,6 +1,8 @@
 {
     "extends": "@cataster/tsconfig/compiled-package.json",
-    "compilerOptions": {},
+    "compilerOptions": {
+        "lib": ["ES2022", "dom"]
+    },
     "include": ["src"],
     "exclude": ["node_modules"]
 }

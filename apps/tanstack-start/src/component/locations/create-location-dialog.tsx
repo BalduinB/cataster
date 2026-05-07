@@ -24,6 +24,7 @@ import {
 import { Label } from "@cataster/ui/components/base/label";
 import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
+import { useAbility } from "~/lib/abilities";
 import { useConfectActionFn, useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 
@@ -44,6 +45,7 @@ interface OsmResult {
  */
 export function CreateLocationDialog() {
     const [open, setOpen] = useState(false);
+    const ability = useAbility();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedResult, setSelectedResult] = useState<OsmResult | null>(
         null,
@@ -106,6 +108,8 @@ export function CreateLocationDialog() {
         if (!searchQuery.trim()) return;
         search.mutate(searchQuery);
     };
+
+    if (!ability.can("create", "Location")) return null;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

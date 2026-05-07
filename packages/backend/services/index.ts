@@ -20,8 +20,14 @@
 
 import { Layer } from "effect";
 
-export { OrgId, requireUser, type UserContext } from "./auth/requireUser";
-export { requireAbility } from "./auth/requireAbility";
+import { LocationServiceLive } from "./domain/LocationService";
+import { SpeciesServiceLive } from "./domain/SpeciesService";
+import { TreeServiceLive } from "./domain/TreeService";
+import { GeospatialServiceLive } from "./geospatial/GeospatialService";
+import { OsmServiceLive } from "./osm/OsmService";
+
+export { OrgId, requireUser, type UserContext } from "../lib/auth/requireUser";
+export { requireAbility } from "../lib/auth/requireAbility";
 export { dieOnInternal } from "./internal";
 
 export { LocationRepository } from "./data/LocationRepository";
@@ -78,12 +84,6 @@ export {
     type OsmBoundary,
     type OsmSearchResult,
 } from "./osm/OsmService";
-
-import { GeospatialServiceLive } from "./geospatial/GeospatialService";
-import { LocationServiceLive } from "./domain/LocationService";
-import { OsmServiceLive } from "./osm/OsmService";
-import { SpeciesServiceLive } from "./domain/SpeciesService";
-import { TreeServiceLive } from "./domain/TreeService";
 
 /**
  * Aggregate layer combining every service. Provided once per Confect handler

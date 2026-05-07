@@ -290,6 +290,9 @@ importers:
 
   packages/backend:
     dependencies:
+      '@casl/ability':
+        specifier: ^6.8.1
+        version: 6.8.1
       '@cataster/abilities':
         specifier: workspace:*
         version: link:../abilities
@@ -317,6 +320,9 @@ importers:
       '@turf/helpers':
         specifier: ^7.3.4
         version: 7.3.5
+      '@ucast/core':
+        specifier: ^1.10.2
+        version: 1.10.2
       convex:
         specifier: 'catalog:'
         version: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)

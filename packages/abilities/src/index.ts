@@ -21,12 +21,17 @@ export interface UserContext {
     readonly orgId: string;
     readonly role: Role;
 }
+export interface BaseSubject {
+    readonly orgId: string;
+}
 
-type LocationSubject = { readonly orgId: string } | "Location";
-type TreeSubject = { readonly orgId: string } | "Tree";
-type SpeciesSubject = { readonly orgId: string | null } | "Species";
-type HiddenSpeciesSubject = { readonly orgId: string } | "HiddenSpecies";
-type OrgSubject = { readonly id: string } | "Org";
+export type LocationSubject =
+    | (BaseSubject & { readonly _id: string })
+    | "Location";
+export type TreeSubject = BaseSubject | "Tree";
+export type SpeciesSubject = BaseSubject | "Species";
+export type HiddenSpeciesSubject = BaseSubject | "HiddenSpecies";
+export type OrgSubject = BaseSubject | "Org";
 
 export type Permission =
     | ["read" | "create" | "update" | "delete", LocationSubject]

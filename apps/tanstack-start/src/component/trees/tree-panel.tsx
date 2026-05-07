@@ -11,6 +11,7 @@ import { motion } from "motion/react";
 import { toast } from "sonner";
 
 import type { SpeciesDoc, SpeciesId, TreeDoc } from "@cataster/backend/types";
+import { subject } from "@cataster/abilities";
 import refs from "@cataster/backend/confect/_generated/refs";
 import {
     AlertDialog,
@@ -49,6 +50,7 @@ import {
 import { ScrollArea } from "@cataster/ui/components/base/scroll-area";
 import { formatControlDate } from "@cataster/ui/lib/tree";
 
+import { useAbility } from "~/lib/abilities";
 import { useConfectMutationFn } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 import {
@@ -124,15 +126,7 @@ function TreeItem({
     species?: SpeciesDoc;
     isSelected: boolean;
 }) {
-    const [editOpen, setEditOpen] = useState(false);
     const setSelectedTreeId = useSelectedTree((s) => s.setSelectedTreeId);
-    const removeTree = useConfectMutationFn(refs.public.trees.remove);
-
-    const remove = useMutation({
-        mutationFn: () => removeTree({ id: tree._id }),
-        onSuccess: () => toast.success("Baum gelöscht"),
-        onError: (error) => toastConfectError("Fehler beim Löschen", error),
-    });
 
     const vitalityColor =
         TREE_VITALITY_COLORS[
@@ -185,30 +179,51 @@ function TreeItem({
                 >
                     <IconEye />
                 </Button>
-                <TreeEditFormDialog
-                    open={editOpen}
-                    onOpenChange={setEditOpen}
-                    tree={tree}
-                />
-                <AlertDialog>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger
-                            render={
-                                <Button
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    isLoading={remove.isPending}
-                                    aria-label="Baum löschen"
-                                />
-                            }
-                        >
-                            <IconDots />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                <TreeActions tree={tree} />
+            </ItemActions>
+        </Item>
+    );
+}
+
+function TreeActions({ tree }: { tree: TreeDoc }) {
+    const [editOpen, setEditOpen] = useState(false);
+
+    const ability = useAbility();
+    const asTree = subject("Tree", { orgId: tree.orgId });
+    const canDelete = ability.can("delete", asTree);
+    const canUpdate = ability.can("update", asTree);
+    const removeTree = useConfectMutationFn(refs.public.trees.remove);
+
+    const remove = useMutation({
+        mutationFn: () => removeTree({ id: tree._id }),
+        onSuccess: () => toast.success("Baum gelöscht"),
+        onError: (error) => toastConfectError("Fehler beim Löschen", error),
+    });
+
+    return (
+        <>
+            <AlertDialog>
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        render={
+                            <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                isLoading={remove.isPending}
+                                aria-label="Baum löschen"
+                            />
+                        }
+                    >
+                        <IconDots />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        {canUpdate && (
                             <DropdownMenuItem onClick={() => setEditOpen(true)}>
                                 <IconPencil />
                                 Baum bearbeiten
                             </DropdownMenuItem>
+                        )}
+                        {canDelete && (
                             <AlertDialogTrigger
                                 render={
                                     <DropdownMenuItem variant="destructive" />
@@ -217,26 +232,30 @@ function TreeItem({
                                 <IconTrash />
                                 Baum löschen
                             </AlertDialogTrigger>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Baum löschen?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Diese Aktion kann nicht rückgängig gemacht
-                                werden.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => remove.mutate()}>
-                                Löschen
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            </ItemActions>
-        </Item>
+                <AlertDialogContent size="sm">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Baum löschen?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Diese Aktion kann nicht rückgängig gemacht werden.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => remove.mutate()}>
+                            Löschen
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <TreeEditFormDialog
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                tree={tree}
+            />
+        </>
     );
 }

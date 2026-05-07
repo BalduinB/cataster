@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { LocationId } from "@cataster/backend/types";
 import refs from "@cataster/backend/confect/_generated/refs";
 import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
@@ -15,14 +14,13 @@ export const Route = createFileRoute("/app/locations/$id/")({
     component: LocationDetailRoute,
     pendingComponent: LocationDetailPending,
     loader: async ({ context, params }) => {
-        const id = params.id as LocationId;
         await Promise.all([
             context.queryClient.ensureQueryData(
-                confectQuery(refs.public.locations.get, { id }),
+                confectQuery(refs.public.locations.get, { id: params.id }),
             ),
             context.queryClient.ensureQueryData(
                 confectQuery(refs.public.trees.listByLocation, {
-                    locationId: id,
+                    locationId: params.id,
                 }),
             ),
         ]);
@@ -31,13 +29,12 @@ export const Route = createFileRoute("/app/locations/$id/")({
 
 function LocationDetailRoute() {
     const { id } = Route.useParams();
-    const locationId = id as LocationId;
 
     const { data: location } = useSuspenseQuery(
-        confectQuery(refs.public.locations.get, { id: locationId }),
+        confectQuery(refs.public.locations.get, { id }),
     );
     const { data: treeData } = useSuspenseQuery(
-        confectQuery(refs.public.trees.listByLocation, { locationId }),
+        confectQuery(refs.public.trees.listByLocation, { locationId: id }),
     );
 
     if (!location) {

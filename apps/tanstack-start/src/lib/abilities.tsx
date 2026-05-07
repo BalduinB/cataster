@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useAuth, useOrganization } from "@clerk/tanstack-react-start";
+import { useAuth } from "@clerk/tanstack-react-start";
 
 import type {
     Action,
@@ -38,9 +38,9 @@ export function AbilityProvider({ children }: { children: React.ReactNode }) {
     const { userId, orgId, orgRole } = useAuth();
 
     const ability = React.useMemo(() => {
-        if (!userId || !orgId) return getUserPermissions(undefined);
+        if (!userId || !orgId) return getUserPermissions(null);
         const role = normalizeRole(orgRole);
-        if (!role) return getUserPermissions(undefined);
+        if (!role) return getUserPermissions(null);
         return getUserPermissions({ userId, orgId, role });
     }, [userId, orgId, orgRole]);
 

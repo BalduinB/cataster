@@ -1,11 +1,7 @@
 import { Effect, Layer } from "effect";
 
-import {
-    ConflictError,
-    type LatLng,
-    NotFoundError,
-    type OrgId,
-} from "@cataster/validators";
+import type { LatLng, OrgId } from "@cataster/validators";
+import { ConflictError, NotFoundError } from "@cataster/validators";
 
 import type { LocationDoc, LocationId } from "../../types";
 import {
@@ -13,7 +9,7 @@ import {
     DatabaseReader,
     DatabaseWriter,
 } from "../../confect/_generated/services";
-import { requireUser } from "../auth/requireUser";
+import { requireUser } from "../../lib/auth/requireUser";
 import { LocationRepository } from "../data/LocationRepository";
 import { TreeRepository } from "../data/TreeRepository";
 import { isPointInLocationPolygon } from "../geospatial/GSLib";
@@ -40,11 +36,7 @@ export class LocationService extends Effect.Tag(
         >;
         readonly getById: (
             id: LocationId,
-        ) => Effect.Effect<
-            LocationDoc,
-            NotFoundError,
-            DatabaseReader | Auth
-        >;
+        ) => Effect.Effect<LocationDoc, NotFoundError, DatabaseReader | Auth>;
         readonly assertContainsPoint: (
             id: LocationId,
             point: LatLng,
@@ -142,10 +134,7 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
             const { orgId } = yield* Effect.orDie(requireUser);
             yield* resolveById(id, orgId);
 
-            const trees = yield* TreeRepository.listByOrgAndLocation(
-                orgId,
-                id,
-            );
+            const trees = yield* TreeRepository.listByOrgAndLocation(orgId, id);
             yield* Effect.forEach(
                 trees,
                 (tree) => TreeRepository.remove(tree._id),

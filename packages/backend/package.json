@@ -31,6 +31,7 @@
     },
     "license": "ISC",
     "dependencies": {
+        "@casl/ability": "^6.8.1",
         "@cataster/abilities": "workspace:*",
         "@cataster/validators": "workspace:*",
         "@confect/core": "catalog:",
@@ -40,6 +41,7 @@
         "@effect/platform-node": "catalog:",
         "@turf/boolean-point-in-polygon": "^7.3.4",
         "@turf/helpers": "^7.3.4",
+        "@ucast/core": "^1.10.2",
         "convex": "catalog:",
         "date-fns": "^4.1.0",
         "effect": "catalog:",

@@ -10,7 +10,7 @@ import {
     DatabaseWriter,
     MutationCtx,
 } from "../../confect/_generated/services";
-import { requireUser } from "../auth/requireUser";
+import { requireUser } from "../../lib/auth/requireUser";
 import { TreeRepository } from "../data/TreeRepository";
 import { GeospatialService } from "../geospatial/GeospatialService";
 import {
@@ -60,11 +60,7 @@ export class TreeService extends Effect.Tag("@cataster/services/TreeService")<
     {
         readonly getById: (
             id: TreeId,
-        ) => Effect.Effect<
-            TreeDoc | null,
-            never,
-            DatabaseReader | Auth
-        >;
+        ) => Effect.Effect<TreeDoc | null, never, DatabaseReader | Auth>;
         readonly listByLocation: (
             locationId: LocationId,
         ) => Effect.Effect<
@@ -186,10 +182,7 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
                 baseDate: Date.now(),
             });
 
-            yield* assertPlateNumberUnique(
-                input.locationId,
-                plateNumber,
-            );
+            yield* assertPlateNumberUnique(input.locationId, plateNumber);
 
             const nextControlAt = yield* computeNextControlAt({
                 controlIntervalRRule,

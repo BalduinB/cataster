@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { IconMapPin } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 
-import type { LocationId } from "@cataster/backend/types";
 import refs from "@cataster/backend/confect/_generated/refs";
 import {
     Combobox,
@@ -90,7 +88,7 @@ export function LocationPicker() {
                                 </Item>
                             )}
                             <ComboboxList>
-                                {(location) => (
+                                {(location: Location) => (
                                     <>
                                         <ComboboxItem
                                             key={location._id}
@@ -112,10 +110,6 @@ export function LocationPicker() {
                                         />
                                     </>
                                 )}
-                                {/* 
-                                {locations?.map((location) => (
-                                    
-                                ))} */}
                             </ComboboxList>
                         </ComboboxContent>
                     </Combobox>

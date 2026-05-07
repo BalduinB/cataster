@@ -1,6 +1,7 @@
 import { Effect, Layer, Record } from "effect";
 
-import { ConflictError, NotFoundError, type OrgId } from "@cataster/validators";
+import type { OrgId } from "@cataster/validators";
+import { ConflictError, NotFoundError } from "@cataster/validators";
 
 import type {
     HiddenSpeciesDoc,
@@ -13,7 +14,7 @@ import {
     DatabaseReader,
     DatabaseWriter,
 } from "../../confect/_generated/services";
-import { requireUser } from "../auth/requireUser";
+import { requireUser } from "../../lib/auth/requireUser";
 import { SpeciesRepository } from "../data/SpeciesRepository";
 import { DEFAULT_SPECIES } from "./defaultSpecies";
 
@@ -43,11 +44,7 @@ export class SpeciesService extends Effect.Tag(
         >;
         readonly getForOrg: (
             id: SpeciesId,
-        ) => Effect.Effect<
-            SpeciesDoc,
-            NotFoundError,
-            DatabaseReader | Auth
-        >;
+        ) => Effect.Effect<SpeciesDoc, NotFoundError, DatabaseReader | Auth>;
         readonly loadByIds: (
             ids: ReadonlyArray<SpeciesId>,
         ) => Effect.Effect<
@@ -78,11 +75,7 @@ export class SpeciesService extends Effect.Tag(
         >;
         readonly unhideSystemForOrg: (
             id: SpeciesId,
-        ) => Effect.Effect<
-            void,
-            never,
-            DatabaseReader | DatabaseWriter | Auth
-        >;
+        ) => Effect.Effect<void, never, DatabaseReader | DatabaseWriter | Auth>;
         readonly seedDefaults: () => Effect.Effect<
             ReadonlyArray<SpeciesId>,
             ConflictError,
@@ -136,11 +129,10 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
 
             const updatedAt = Date.now();
 
-            const existing =
-                yield* SpeciesRepository.getByOrgAndBotanicalName(
-                    orgId,
-                    trimmedBotanicalName,
-                );
+            const existing = yield* SpeciesRepository.getByOrgAndBotanicalName(
+                orgId,
+                trimmedBotanicalName,
+            );
 
             if (existing !== null) {
                 yield* SpeciesRepository.patch(existing._id, {
@@ -167,10 +159,8 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             const { orgId } = yield* Effect.orDie(requireUser);
             const hidden = yield* collectHiddenIds(orgId);
 
-            const system =
-                yield* SpeciesRepository.listActiveByOrg(null);
-            const ownOrg =
-                yield* SpeciesRepository.listActiveByOrg(orgId);
+            const system = yield* SpeciesRepository.listActiveByOrg(null);
+            const ownOrg = yield* SpeciesRepository.listActiveByOrg(orgId);
 
             const visibleSystem = system.filter((s) => !hidden.has(s._id));
             return [...visibleSystem, ...ownOrg];
@@ -191,21 +181,16 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
                 uniqueIds,
                 (id) =>
                     SpeciesRepository.getById(id).pipe(
-                        Effect.map(
-                            (doc) => [id, doc] as const,
-                        ),
+                        Effect.map((doc) => [id, doc] as const),
                     ),
                 { concurrency: "unbounded" },
             );
 
             return Record.fromEntries(
                 docs.filter(
-                    (
-                        entry,
-                    ): entry is readonly [SpeciesId, SpeciesDoc] =>
+                    (entry): entry is readonly [SpeciesId, SpeciesDoc] =>
                         entry[1] !== null &&
-                        (entry[1].orgId === null ||
-                            entry[1].orgId === orgId),
+                        (entry[1].orgId === null || entry[1].orgId === orgId),
                 ),
             );
         });
@@ -235,9 +220,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             yield* SpeciesRepository.remove(id);
         });
 
-    const hideSystemForOrg: SpeciesService["Type"]["hideSystemForOrg"] = (
-        id,
-    ) =>
+    const hideSystemForOrg: SpeciesService["Type"]["hideSystemForOrg"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const doc = yield* resolveForOrg(id, orgId);
@@ -250,8 +233,10 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
                 );
             }
 
-            const existing =
-                yield* SpeciesRepository.getHiddenByOrgAndSpecies(orgId, id);
+            const existing = yield* SpeciesRepository.getHiddenByOrgAndSpecies(
+                orgId,
+                id,
+            );
             if (existing !== null) return existing._id;
 
             return yield* SpeciesRepository.insertHidden({
@@ -265,8 +250,10 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
     ) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
-            const existing =
-                yield* SpeciesRepository.getHiddenByOrgAndSpecies(orgId, id);
+            const existing = yield* SpeciesRepository.getHiddenByOrgAndSpecies(
+                orgId,
+                id,
+            );
             if (existing !== null) {
                 yield* SpeciesRepository.removeHidden(existing._id);
             }
