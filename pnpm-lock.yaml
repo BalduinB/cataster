@@ -7,20 +7,20 @@ settings:
 catalogs:
   default:
     '@confect/cli':
-      specifier: ^5.0.0
-      version: 5.0.0
+      specifier: ^7.0.0
+      version: 7.0.0
     '@confect/core':
-      specifier: ^5.0.0
-      version: 5.0.0
+      specifier: ^7.0.0
+      version: 7.0.0
     '@confect/react':
-      specifier: ^5.0.0
-      version: 5.0.0
+      specifier: ^7.0.0
+      version: 7.0.0
     '@confect/server':
-      specifier: ^5.0.0
-      version: 5.0.0
+      specifier: ^7.0.0
+      version: 7.0.0
     '@confect/test':
-      specifier: ^5.0.0
-      version: 5.0.0
+      specifier: ^7.0.0
+      version: 7.0.0
     '@convex-dev/react-query':
       specifier: ^0.0.0-alpha.9
       version: 0.0.0-alpha.11
@@ -146,10 +146,10 @@ importers:
         version: 1.1.5(@tanstack/react-router@1.135.2(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@tanstack/react-start@1.135.2(crossws@0.4.1(srvx@0.9.6))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(vite@7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
       '@confect/core':
         specifier: 'catalog:'
-        version: 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)
+        version: 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)
       '@confect/react':
         specifier: 'catalog:'
-        version: 5.0.0(@confect/core@5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)(react@19.1.4)
+        version: 7.0.0(@confect/core@7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)(react@19.1.4)
       '@convex-dev/react-query':
         specifier: 'catalog:'
         version: 0.0.0-alpha.11(@standard-schema/spec@1.1.0)(@tanstack/react-query@5.90.8(react@19.1.4))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(hono@4.12.15)(react@19.1.4)(typescript@5.9.3)(zod@4.1.12)
@@ -301,10 +301,10 @@ importers:
         version: link:../validators
       '@confect/core':
         specifier: 'catalog:'
-        version: 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
+        version: 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
       '@confect/server':
         specifier: 'catalog:'
-        version: 5.0.0(45149459ee28c679583fb9679389c994)
+        version: 7.0.0(4e2bc439f4c6bfe9f78dd960fd953de7)
       '@convex-dev/geospatial':
         specifier: ^0.2.1
         version: 0.2.1(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))
@@ -341,10 +341,10 @@ importers:
         version: link:../../tooling/typescript
       '@confect/cli':
         specifier: 'catalog:'
-        version: 5.0.0(cb85da8deedd677fa5bffeea3e4aa79c)
+        version: 7.0.0(497bd3b93c20820cf38e9e160026febc)
       '@confect/test':
         specifier: 'catalog:'
-        version: 5.0.0(@confect/core@5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2))(@confect/server@5.0.0(45149459ee28c679583fb9679389c994))(convex-test@0.0.38(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
+        version: 7.0.0(@confect/core@7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2))(@confect/server@7.0.0(4e2bc439f4c6bfe9f78dd960fd953de7))(convex-test@0.0.38(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
       '@edge-runtime/vm':
         specifier: ^5.0.0
         version: 5.0.0
@@ -465,7 +465,7 @@ importers:
     dependencies:
       '@confect/core':
         specifier: 'catalog:'
-        version: 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
+        version: 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
       convex:
         specifier: 'catalog:'
         version: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)
@@ -844,50 +844,50 @@ packages:
       react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
       react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
 
-  '@confect/cli@5.0.0':
-    resolution: {integrity: sha512-AvjE5ERWKAvtVKrfYJHzHvDAfMNHjnv2VSpi0fZLnEiWuBgU2MkBjftHNbCxnxfcFbU5L1KCyG62rnsqRJLAQg==}
+  '@confect/cli@7.0.0':
+    resolution: {integrity: sha512-bSOangQLixrWbZ7uhYAfR6ACJl7WcZSpeVWNU32VDlbhnQ4x03PvvRiWrWgcsRgozPy2zxKtCyB4tfbcCaNxrA==}
     engines: {node: '>=22', pnpm: '>=10'}
     hasBin: true
     peerDependencies:
-      '@confect/core': 5.0.0
-      '@confect/server': 5.0.0
+      '@confect/core': 7.0.0
+      '@confect/server': 7.0.0
       '@effect/platform': ^0.94.5
       effect: ^3.19.16
 
-  '@confect/core@5.0.0':
-    resolution: {integrity: sha512-i9So11ETIWmtwktImF5IRBABpaUbaSaF4ei9jbTOQTerkc5HLcUSVrqVnH0H1PK4Oe4V3+fKyzvHgQAaU44RyA==}
+  '@confect/core@7.0.0':
+    resolution: {integrity: sha512-xUz9jyp5ELiNeBTEetfFzSVkzD8JJGkRKg9+4bjwnzOiWOYfk3D8wQ9wTvqUt2mUhRNdlTt6g8c1o7LQ25ahEg==}
     engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
       convex: ^1.30.0
       effect: ^3.19.16
 
-  '@confect/react@5.0.0':
-    resolution: {integrity: sha512-LIHz3wHYodzKv/zeWSZRmNgrtqe9sMwIIN6oox0F7LanT4ebO2n9VtgAdFEcDXOMpzu/bF/+urqwkWME+E/8xQ==}
+  '@confect/react@7.0.0':
+    resolution: {integrity: sha512-lTT/XCkMEMBxyW/v1APNgPFKGDVAR6OOhPXUBNdFDjMqohyJ4c4cegLdLhgbnF7RIrHyysglfHRN85rsbicicg==}
     engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
-      '@confect/core': 5.0.0
+      '@confect/core': 7.0.0
       convex: ^1.30.0
       effect: ^3.19.16
       react: ^18.0.0 || ^19.0.0
 
-  '@confect/server@5.0.0':
-    resolution: {integrity: sha512-Nc/NGK89/er9Hxhc6GyO9fLGJtlEa32TzCuoZ3HKKEYPUHBXDNpVfE+SWST10D7IBfKoulg8S62oOVOM073sEg==}
+  '@confect/server@7.0.0':
+    resolution: {integrity: sha512-te/S+6yy7jCaL8olmLlbDLZCOMevRKLzEF5jsciosYfL1Mzcbdx4chboK/VBNoQ8+9rtvspbQ8YfRZPqknrPmg==}
     engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
-      '@confect/core': 5.0.0
+      '@confect/core': 7.0.0
       '@effect/platform': ^0.94.5
       '@effect/platform-node': ^0.104.1
       convex: ^1.30.0
       effect: ^3.19.16
 
-  '@confect/test@5.0.0':
-    resolution: {integrity: sha512-8YxCGg0YZen6s3sfRWz4FWAD0t/4t5j+kzHqQQLyJXFKWxodiFAr96VE/HNgZJW8S3rjRc/BWgeCgJkhP2fZlg==}
+  '@confect/test@7.0.0':
+    resolution: {integrity: sha512-bkiVjbQpRGmB/NTCsUtPwUB4fOORO/v1qiNbeBxowVFZUlVImYJJsNO3rdVlpyqMM5TIJpWAFZmVTlWLnf0OyQ==}
     engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
-      '@confect/core': 5.0.0
-      '@confect/server': 5.0.0
+      '@confect/core': 7.0.0
+      '@confect/server': 7.0.0
       convex: ^1.30.0
-      convex-test: ^0.0.38
+      convex-test: ^0.0.50
       effect: ^3.19.16
 
   '@convex-dev/auth@0.0.83':
@@ -7686,10 +7686,10 @@ snapshots:
       react-dom: 19.1.4(react@19.1.4)
       tslib: 2.8.1
 
-  '@confect/cli@5.0.0(cb85da8deedd677fa5bffeea3e4aa79c)':
+  '@confect/cli@7.0.0(497bd3b93c20820cf38e9e160026febc)':
     dependencies:
-      '@confect/core': 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
-      '@confect/server': 5.0.0(45149459ee28c679583fb9679389c994)
+      '@confect/core': 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
+      '@confect/server': 7.0.0(4e2bc439f4c6bfe9f78dd960fd953de7)
       '@effect/cli': 0.73.2(@effect/platform@0.94.5(effect@3.21.2))(@effect/printer-ansi@0.47.0(@effect/typeclass@0.38.0(effect@3.21.2))(effect@3.21.2))(@effect/printer@0.47.0(@effect/typeclass@0.38.0(effect@3.21.2))(effect@3.21.2))(effect@3.21.2)
       '@effect/platform': 0.94.5(effect@3.21.2)
       '@effect/platform-node': 0.104.1(@effect/cluster@0.56.4(@effect/platform@0.94.5(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(bufferutil@4.0.8)(effect@3.21.2)(utf-8-validate@6.0.4)
@@ -7707,35 +7707,35 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@confect/core@5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)':
+  '@confect/core@7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)':
     dependencies:
       convex: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4)
       effect: 3.21.2
 
-  '@confect/core@5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)':
+  '@confect/core@7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)':
     dependencies:
       convex: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)
       effect: 3.21.2
 
-  '@confect/react@5.0.0(@confect/core@5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)(react@19.1.4)':
+  '@confect/react@7.0.0(@confect/core@7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)(react@19.1.4)':
     dependencies:
-      '@confect/core': 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)
+      '@confect/core': 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(effect@3.21.2)
       convex: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@clerk/react@6.4.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4)
       effect: 3.21.2
       react: 19.1.4
 
-  '@confect/server@5.0.0(45149459ee28c679583fb9679389c994)':
+  '@confect/server@7.0.0(4e2bc439f4c6bfe9f78dd960fd953de7)':
     dependencies:
-      '@confect/core': 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
+      '@confect/core': 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
       '@effect/platform': 0.94.5(effect@3.21.2)
       '@effect/platform-node': 0.104.1(@effect/cluster@0.56.4(@effect/platform@0.94.5(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(@effect/platform@0.94.5(effect@3.21.2))(effect@3.21.2))(bufferutil@4.0.8)(effect@3.21.2)(utf-8-validate@6.0.4)
       convex: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)
       effect: 3.21.2
 
-  '@confect/test@5.0.0(@confect/core@5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2))(@confect/server@5.0.0(45149459ee28c679583fb9679389c994))(convex-test@0.0.38(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)':
+  '@confect/test@7.0.0(@confect/core@7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2))(@confect/server@7.0.0(4e2bc439f4c6bfe9f78dd960fd953de7))(convex-test@0.0.38(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)))(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)':
     dependencies:
-      '@confect/core': 5.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
-      '@confect/server': 5.0.0(45149459ee28c679583fb9679389c994)
+      '@confect/core': 7.0.0(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))(effect@3.21.2)
+      '@confect/server': 7.0.0(4e2bc439f4c6bfe9f78dd960fd953de7)
       convex: 1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4)
       convex-test: 0.0.38(convex@1.36.1(@clerk/clerk-react@5.61.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@clerk/react@6.4.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(bufferutil@4.0.8)(react@19.2.5)(utf-8-validate@6.0.4))
       effect: 3.21.2

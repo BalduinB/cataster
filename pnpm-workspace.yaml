@@ -1,56 +1,56 @@
 packages:
-  - apps/tanstack-start
-  - packages/*
-  - tooling/*
+    - apps/tanstack-start
+    - packages/*
+    - tooling/*
 
 catalog:
-  '@confect/cli': ^5.0.0
-  '@confect/core': ^5.0.0
-  '@confect/react': ^5.0.0
-  '@confect/server': ^5.0.0
-  '@confect/test': ^5.0.0
-  '@convex-dev/react-query': ^0.0.0-alpha.9
-  '@effect/platform': ^0.94.5
-  '@effect/platform-node': ^0.104.1
-  '@effect/vitest': ^0.29.0
-  '@eslint/js': ^9.38.0
-  '@tailwindcss/postcss': ^4.1.16
-  '@tailwindcss/vite': ^4.1.16
-  '@tanstack/react-form': 1.23.8
-  '@tanstack/react-query': ^5.90.8
-  '@types/node': ^22.18.12
-  '@vitejs/plugin-react': 5.1.0
-  concurrently: ^9.2.1
-  convex: ^1.36.1
-  convex-test: 0.0.38
-  effect: ^3.21.2
-  eslint: ^9.38.0
-  prettier: ^3.6.2
-  tailwindcss: ^4.1.16
-  typescript: ^5.9.3
-  vite: 7.1.12
-  vitest: ^3.2.4
-  zod: ^4.1.12
+    "@confect/cli": ^7.0.0
+    "@confect/core": ^7.0.0
+    "@confect/react": ^7.0.0
+    "@confect/server": ^7.0.0
+    "@confect/test": ^7.0.0
+    "@convex-dev/react-query": ^0.0.0-alpha.9
+    "@effect/platform": ^0.94.5
+    "@effect/platform-node": ^0.104.1
+    "@effect/vitest": ^0.29.0
+    "@eslint/js": ^9.38.0
+    "@tailwindcss/postcss": ^4.1.16
+    "@tailwindcss/vite": ^4.1.16
+    "@tanstack/react-form": 1.23.8
+    "@tanstack/react-query": ^5.90.8
+    "@types/node": ^22.18.12
+    "@vitejs/plugin-react": 5.1.0
+    concurrently: ^9.2.1
+    convex: ^1.36.1
+    convex-test: 0.0.38
+    effect: ^3.21.2
+    eslint: ^9.38.0
+    prettier: ^3.6.2
+    tailwindcss: ^4.1.16
+    typescript: ^5.9.3
+    vite: 7.1.12
+    vitest: ^3.2.4
+    zod: ^4.1.12
 
 catalogs:
-  react19:
-    '@types/react': ~19.1.0
-    '@types/react-dom': ~19.1.0
-    react: 19.1.4
-    react-dom: 19.1.4
+    react19:
+        "@types/react": ~19.1.0
+        "@types/react-dom": ~19.1.0
+        react: 19.1.4
+        react-dom: 19.1.4
 
 linkWorkspacePackages: true
 
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
-  - esbuild
+    - "@tailwindcss/oxide"
+    - esbuild
 
 overrides:
-  '@tanstack/query-core': 5.90.16
-  '@types/minimatch': 5.1.2
-  lightningcss: 1.30.1
-  vite: 7.1.12
+    "@tanstack/query-core": 5.90.16
+    "@types/minimatch": 5.1.2
+    lightningcss: 1.30.1
+    vite: 7.1.12
 
 publicHoistPattern:
-  - '@ianvs/prettier-plugin-sort-imports'
-  - prettier-plugin-tailwindcss
+    - "@ianvs/prettier-plugin-sort-imports"
+    - prettier-plugin-tailwindcss

@@ -20,6 +20,7 @@
 
 import { Layer } from "effect";
 
+import { LoggerLive } from "../lib/obs/logging";
 import { LocationServiceLive } from "./domain/LocationService";
 import { SpeciesServiceLive } from "./domain/SpeciesService";
 import { TreeServiceLive } from "./domain/TreeService";
@@ -95,4 +96,7 @@ export const ServicesLive = Layer.mergeAll(
     TreeServiceLive,
     GeospatialServiceLive,
     OsmServiceLive,
+    LoggerLive,
 );
+
+export { wideEvent } from "../lib/obs/logging";
