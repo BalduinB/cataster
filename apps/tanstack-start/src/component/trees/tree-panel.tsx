@@ -6,7 +6,6 @@ import {
     IconTrash,
     IconTrees,
 } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 
@@ -51,7 +50,7 @@ import { ScrollArea } from "@cataster/ui/components/base/scroll-area";
 import { formatControlDate } from "@cataster/ui/lib/tree";
 
 import { useAbility } from "~/lib/abilities";
-import { useConfectMutationFn } from "~/lib/confect";
+import { useConfectMutation } from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 import {
     getSpeciesDisplayName,
@@ -192,10 +191,7 @@ function TreeActions({ tree }: { tree: TreeDoc }) {
     const asTree = subject("Tree", { orgId: tree.orgId });
     const canDelete = ability.can("delete", asTree);
     const canUpdate = ability.can("update", asTree);
-    const removeTree = useConfectMutationFn(refs.public.trees.remove);
-
-    const remove = useMutation({
-        mutationFn: () => removeTree({ id: tree._id }),
+    const remove = useConfectMutation(refs.public.trees.remove, {
         onSuccess: () => toast.success("Baum gelöscht"),
         onError: (error) => toastConfectError("Fehler beim Löschen", error),
     });
@@ -245,7 +241,9 @@ function TreeActions({ tree }: { tree: TreeDoc }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => remove.mutate()}>
+                        <AlertDialogAction
+                            onClick={() => remove.mutate({ id: tree._id })}
+                        >
                             Löschen
                         </AlertDialogAction>
                     </AlertDialogFooter>

@@ -25,7 +25,11 @@ import { Label } from "@cataster/ui/components/base/label";
 import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
 import { useAbility } from "~/lib/abilities";
-import { useConfectActionFn, useConfectMutationFn } from "~/lib/confect";
+import {
+    useConfectAction,
+    useConfectActionFn,
+    useConfectMutationFn,
+} from "~/lib/confect";
 import { toastConfectError } from "~/lib/error-toast";
 
 interface OsmResult {
@@ -52,12 +56,10 @@ export function CreateLocationDialog() {
     );
     const [name, setName] = useState("");
 
-    const searchAreas = useConfectActionFn(refs.public.osm.searchAreas);
     const fetchBoundary = useConfectActionFn(refs.public.osm.fetchBoundary);
     const createLocation = useConfectMutationFn(refs.public.locations.create);
 
-    const search = useMutation({
-        mutationFn: (query: string) => searchAreas({ query }),
+    const search = useConfectAction(refs.public.osm.searchAreas, {
         onSuccess: () => {
             setSelectedResult(null);
         },
@@ -106,7 +108,7 @@ export function CreateLocationDialog() {
 
     const handleSearch = () => {
         if (!searchQuery.trim()) return;
-        search.mutate(searchQuery);
+        search.mutate({ query: searchQuery });
     };
 
     if (!ability.can("create", "Location")) return null;

@@ -37,7 +37,7 @@ const isInternalError = <E>(e: E): e is Extract<E, InternalError> =>
 
 /**
  * Turn Confect's never-should-happen errors into unrecoverable defects so
- * the handler error channel only contains domain (`WireError`) failures.
+ * the handler error channel only contains declared client-facing failures.
  */
 export const dieOnInternal = <A, E, R>(
   self: Effect.Effect<A, E, R>,

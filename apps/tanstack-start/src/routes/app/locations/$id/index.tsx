@@ -37,16 +37,6 @@ function LocationDetailRoute() {
         confectQuery(refs.public.trees.listByLocation, { locationId: id }),
     );
 
-    if (!location) {
-        return (
-            <main className="container py-8">
-                <p className="text-muted-foreground">
-                    Standort nicht gefunden.
-                </p>
-            </main>
-        );
-    }
-
     return (
         <main className="grid grow grid-rows-[auto_auto_1fr] gap-8 px-4 md:grid-cols-3 md:px-8">
             <LocationHeader location={location} />

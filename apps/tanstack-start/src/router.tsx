@@ -25,7 +25,7 @@ export function getRouter() {
     });
     const convexQueryClient = new ConvexQueryClient(convex);
 
-    const queryClient: QueryClient = new QueryClient({
+    const queryClient = new QueryClient({
         defaultOptions: {
             queries: {
                 queryKeyHashFn: convexQueryClient.hashFn(),

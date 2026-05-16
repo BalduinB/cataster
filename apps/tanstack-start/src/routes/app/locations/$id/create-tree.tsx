@@ -99,16 +99,6 @@ function CreateTreeRoute() {
         );
     };
 
-    if (!location) {
-        return (
-            <main className="container py-8">
-                <p className="text-muted-foreground">
-                    Standort nicht gefunden.
-                </p>
-            </main>
-        );
-    }
-
     const { trees, speciesById } = treeData;
 
     return (

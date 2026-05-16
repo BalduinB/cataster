@@ -33,9 +33,8 @@ export const LoggerLive =
  * `Effect.annotateLogsScoped(...)` anywhere in the call tree, plus a
  * `<name>` log span recording the elapsed time.
  *
- * Compose **before** `surfaceErrors`: we still want the typed error here so
- * the wide event can record it, and `surfaceErrors` then converts whatever
- * remains into a `ConvexError` at the very edge.
+ * Compose on handlers that declare typed Confect errors: failures stay in the
+ * Effect error channel for logging, then Confect encodes them at the boundary.
  *
  * `Effect.scoped` is included so handlers can use `annotateLogsScoped`
  * without each one having to remember to open a scope.

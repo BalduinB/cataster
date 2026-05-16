@@ -1,6 +1,8 @@
 import { FunctionImpl, GroupImpl } from "@confect/server";
 import { Effect, Layer } from "effect";
 
+import { NotFoundError } from "@cataster/validators";
+
 import {
     computeNextControlAt,
     LocationService,
@@ -11,7 +13,6 @@ import {
     TreeService,
 } from "../services";
 import api from "./_generated/api";
-import { surfaceErrors } from "./wire";
 
 const listByLocation = FunctionImpl.make(
     api,
@@ -26,14 +27,20 @@ const listByLocation = FunctionImpl.make(
                 trees.map((t) => t.speciesId),
             );
             return { trees, speciesById };
-        }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const get = FunctionImpl.make(api, "trees", "get", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("read", "Tree");
-        return yield* TreeService.getById(id);
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        const tree = yield* TreeService.getById(id);
+        if (!tree) {
+            return yield* Effect.fail(
+                new NotFoundError({ message: "Baum nicht gefunden" }),
+            );
+        }
+        return tree;
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
 const create = FunctionImpl.make(api, "trees", "create", (args) =>
@@ -45,7 +52,7 @@ const create = FunctionImpl.make(api, "trees", "create", (args) =>
             lng: args.longitude,
         });
         return yield* TreeService.create(args);
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
 const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
@@ -67,7 +74,7 @@ const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
         }
         yield* TreeService.update({ id, ...data });
         return null;
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
 const remove = FunctionImpl.make(api, "trees", "remove", ({ id }) =>
@@ -75,7 +82,7 @@ const remove = FunctionImpl.make(api, "trees", "remove", ({ id }) =>
         yield* requireAbility("delete", "Tree");
         yield* TreeService.remove(id);
         return null;
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
 const recomputeNextControlDates = FunctionImpl.make(
@@ -97,9 +104,7 @@ const recomputeNextControlDates = FunctionImpl.make(
                             additionalControlAt: tree.additionalControlAt,
                             baseDate: tree._creationTime,
                             now,
-                        }).pipe(
-                            Effect.catchTag("Conflict", (e) => Effect.die(e)),
-                        );
+                        });
 
                         if (nextControlAt !== tree.nextControlAt) {
                             yield* TreeRepository.patch(tree._id, {
@@ -112,7 +117,7 @@ const recomputeNextControlDates = FunctionImpl.make(
             );
 
             return null;
-        }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 export const trees = GroupImpl.make(api, "trees").pipe(

@@ -3,13 +3,12 @@ import { Effect, Layer } from "effect";
 
 import { requireAbility, ServicesLive, SpeciesService } from "../services";
 import api from "./_generated/api";
-import { surfaceErrors } from "./wire";
 
 const listActive = FunctionImpl.make(api, "species", "listActive", () =>
     Effect.gen(function* () {
         yield* requireAbility("read", "Species");
         return yield* SpeciesService.listForOrg();
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
 const create = FunctionImpl.make(
@@ -25,7 +24,7 @@ const create = FunctionImpl.make(
                 botanicalName,
                 sortOrder: existing.length,
             });
-        }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const remove = FunctionImpl.make(api, "species", "remove", ({ id }) =>
@@ -33,7 +32,7 @@ const remove = FunctionImpl.make(api, "species", "remove", ({ id }) =>
         yield* requireAbility("delete", "Species");
         yield* SpeciesService.removeForOrg(id);
         return null;
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
 const hideSystem = FunctionImpl.make(
@@ -45,7 +44,7 @@ const hideSystem = FunctionImpl.make(
             yield* requireAbility("manage", "HiddenSpecies");
             yield* SpeciesService.hideSystemForOrg(id);
             return null;
-        }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const unhideSystem = FunctionImpl.make(
@@ -57,14 +56,11 @@ const unhideSystem = FunctionImpl.make(
             yield* requireAbility("manage", "HiddenSpecies");
             yield* SpeciesService.unhideSystemForOrg(id);
             return null;
-        }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const seedDefaults = FunctionImpl.make(api, "species", "seedDefaults", () =>
-    SpeciesService.seedDefaults().pipe(
-        Effect.provide(ServicesLive),
-        surfaceErrors,
-    ),
+    SpeciesService.seedDefaults().pipe(Effect.provide(ServicesLive)),
 );
 
 export const species = GroupImpl.make(api, "species").pipe(

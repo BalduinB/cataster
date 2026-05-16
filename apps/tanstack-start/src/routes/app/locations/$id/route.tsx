@@ -10,6 +10,7 @@ import { LocationId } from "@cataster/validators";
 
 import { LocationPicker } from "~/component/locations/picker";
 import { confectQuery } from "~/lib/confect";
+import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
 import { PARAM_PLACEHOLDER } from "~/router";
 
 export const Route = createFileRoute("/app/locations/$id")({
@@ -20,21 +21,35 @@ export const Route = createFileRoute("/app/locations/$id")({
         parse: (raw) =>
             Schema.validateSync(Schema.Struct({ id: LocationId }))(raw),
     },
-    errorComponent: ({ error, reset }) => (
-        <div>
-            <p>Error: {error.message}</p>
-            <Button onClick={reset} variant="secondary">
-                <IconRefresh data-icon="inline-start" />
-                Erneut versuchen
-            </Button>
-        </div>
-    ),
+    errorComponent: LocationRouteError,
     onError: (error) => {
         if (error?.routerCode === "PARSE_PARAMS")
             throw redirect({ to: "/app/locations" });
     },
     component: LocationsLayout,
 });
+
+function LocationRouteError({
+    error,
+    reset,
+}: {
+    error: Error;
+    reset: () => void;
+}) {
+    const wire = getWireError(error);
+
+    return (
+        <div className="container space-y-4 py-8">
+            <p className="text-muted-foreground">
+                {wire ? wireErrorMessage(wire) : error.message}
+            </p>
+            <Button onClick={reset} variant="secondary">
+                <IconRefresh data-icon="inline-start" />
+                Erneut versuchen
+            </Button>
+        </div>
+    );
+}
 
 function LocationsLayout() {
     const { id } = Route.useParams();
