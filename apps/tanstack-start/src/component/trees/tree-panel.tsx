@@ -51,7 +51,6 @@ import { formatControlDate } from "@cataster/ui/lib/tree";
 
 import { useAbility } from "~/lib/abilities";
 import { useConfectMutation } from "~/lib/confect";
-import { toastConfectError } from "~/lib/error-toast";
 import {
     getSpeciesDisplayName,
     TREE_VITALITY,
@@ -192,8 +191,9 @@ function TreeActions({ tree }: { tree: TreeDoc }) {
     const canDelete = ability.can("delete", asTree);
     const canUpdate = ability.can("update", asTree);
     const remove = useConfectMutation(refs.public.trees.remove, {
-        onSuccess: () => toast.success("Baum gelöscht"),
-        onError: (error) => toastConfectError("Fehler beim Löschen", error),
+        onSuccess: () => {
+            toast.success("Baum gelöscht");
+        },
     });
 
     return (

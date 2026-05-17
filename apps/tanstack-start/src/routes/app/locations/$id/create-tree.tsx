@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { QueryResult, useQuery } from "@confect/react";
 import { IconCrosshair, IconEye, IconTree } from "@tabler/icons-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { Marker } from "react-leaflet";
@@ -20,7 +21,7 @@ import { LocationPolygon } from "~/component/map/location-polygon";
 import { MapView } from "~/component/map/map-view";
 import { draftIcon, TreeMarker } from "~/component/map/tree-marker";
 import { TreeCreateForm } from "~/component/trees/tree-form";
-import { confectQuery } from "~/lib/confect";
+import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
 
 export const Route = createFileRoute("/app/locations/$id/create-tree")({
     staticData: {
@@ -33,19 +34,6 @@ export const Route = createFileRoute("/app/locations/$id/create-tree")({
     },
     component: CreateTreeRoute,
     pendingComponent: CreateTreePending,
-
-    loader: async ({ context, params: { id } }) => {
-        await Promise.all([
-            context.queryClient.ensureQueryData(
-                confectQuery(refs.public.locations.get, { id }),
-            ),
-            context.queryClient.ensureQueryData(
-                confectQuery(refs.public.trees.listByLocation, {
-                    locationId: id,
-                }),
-            ),
-        ]);
-    },
 });
 
 function CreateTreeRoute() {
@@ -54,59 +42,79 @@ function CreateTreeRoute() {
     const locationId = id;
     const navigate = useNavigate();
 
-    const { data: location } = useSuspenseQuery(
-        confectQuery(refs.public.locations.get, { id: locationId }),
-    );
-    const { data: treeData } = useSuspenseQuery(
-        confectQuery(refs.public.trees.listByLocation, { locationId }),
-    );
-
+    const location = useQuery(refs.public.locations.get, { id: locationId });
+    const treeData = useQuery(refs.public.trees.listByLocation, { locationId });
     const [position, setPosition] = useState<{
         lat: number;
         lng: number;
     } | null>(null);
-    const [gpsLoading, setGpsLoading] = useState(false);
 
+    const getCurrentPosition = useMutation({
+        mutationFn: () =>
+            new Promise<GeolocationPosition>((resolve, reject) => {
+                if (
+                    typeof navigator === "undefined" ||
+                    !("geolocation" in navigator)
+                ) {
+                    reject(new Error("Geolocation is not supported"));
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0,
+                });
+            }),
+        onSuccess: ({ coords }) => {
+            setPosition({
+                lat: coords.latitude,
+                lng: coords.longitude,
+            });
+            toast.success(
+                "Position übernommen – bei Bedarf per Klick auf der Karte anpassen.",
+            );
+        },
+        onError: (error) => {
+            if (
+                error instanceof Error &&
+                error.message === "Geolocation is not supported"
+            ) {
+                toast.error(
+                    "Geolocation wird in diesem Browser nicht unterstützt.",
+                );
+                return;
+            }
+
+            toast.error(
+                "Standort konnte nicht ermittelt werden. Bitte Berechtigung prüfen oder manuell klicken.",
+            );
+        },
+    });
     const goBack = () =>
         void navigate({ to: "/app/locations/$id", params: { id: locationId } });
 
-    const requestCurrentPosition = () => {
-        if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-            toast.error(
-                "Geolocation wird in diesem Browser nicht unterstützt.",
-            );
-            return;
-        }
-        setGpsLoading(true);
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setGpsLoading(false);
-                setPosition({
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude,
-                });
-                toast.success(
-                    "Position übernommen – bei Bedarf per Klick auf der Karte anpassen.",
-                );
-            },
-            () => {
-                setGpsLoading(false);
-                toast.error(
-                    "Standort konnte nicht ermittelt werden. Bitte Berechtigung prüfen oder manuell klicken.",
-                );
-            },
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
-        );
-    };
+    if (QueryResult.isLoading(location) || QueryResult.isLoading(treeData)) {
+        return <CreateTreePending />;
+    }
 
-    const { trees, speciesById } = treeData;
+    if (QueryResult.isFailure(location)) {
+        return <CreateTreeError error={location.error} />;
+    }
+
+    if (QueryResult.isFailure(treeData)) {
+        return <CreateTreeError error={treeData.error} />;
+    }
+
+    const selectedLocation = location.value;
+    const { trees, speciesById } = treeData.value;
 
     return (
         <main className="container space-y-4 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        {location.name}
+                        {selectedLocation.name}
                     </h1>
                     <p className="text-muted-foreground text-sm">
                         Neuen Baum anlegen
@@ -158,7 +166,9 @@ function CreateTreeRoute() {
                                                 className="h-56 w-full"
                                             >
                                                 <LocationPolygon
-                                                    polygon={location.polygon}
+                                                    polygon={
+                                                        selectedLocation.polygon
+                                                    }
                                                 />
 
                                                 <Marker
@@ -231,13 +241,15 @@ function CreateTreeRoute() {
                         <div className="relative overflow-hidden rounded-lg border">
                             <MapView
                                 center={[
-                                    location.centroid.lat,
-                                    location.centroid.lng,
+                                    selectedLocation.centroid.lat,
+                                    selectedLocation.centroid.lng,
                                 ]}
                                 zoom={16}
                                 className="h-[420px] w-full"
                             >
-                                <LocationPolygon polygon={location.polygon} />
+                                <LocationPolygon
+                                    polygon={selectedLocation.polygon}
+                                />
                                 {trees.map((tree) => (
                                     <TreeMarker
                                         key={tree._id}
@@ -255,8 +267,8 @@ function CreateTreeRoute() {
                                 type="button"
                                 variant="secondary"
                                 size="icon"
-                                onClick={requestCurrentPosition}
-                                isLoading={gpsLoading}
+                                onClick={() => getCurrentPosition.mutate()}
+                                isLoading={getCurrentPosition.isPending}
                                 aria-label="Aktuellen Standort verwenden"
                                 className="absolute top-2 right-2 rounded-lg"
                             >
@@ -275,6 +287,20 @@ function CreateTreePending() {
         <main className="container space-y-4 py-8">
             <Skeleton className="h-10 w-72" />
             <Skeleton className="h-[420px] w-full" />
+        </main>
+    );
+}
+
+function CreateTreeError({ error }: { error: unknown }) {
+    const wire = getWireError(error);
+
+    return (
+        <main className="container space-y-4 py-8">
+            <p className="text-destructive">
+                {wire
+                    ? wireErrorMessage(wire)
+                    : "Baumformular konnte nicht geladen werden."}
+            </p>
         </main>
     );
 }

@@ -33,7 +33,6 @@ import {
 import { Input } from "@cataster/ui/components/base/input";
 
 import { useConfectMutation } from "~/lib/confect";
-import { toastConfectError } from "~/lib/error-toast";
 
 interface LocationHeaderProps {
     location: LocationDoc;
@@ -49,8 +48,6 @@ export function LocationHeader({ location }: LocationHeaderProps) {
             toast.success("Standort aktualisiert");
             setEditOpen(false);
         },
-        onError: (error) =>
-            toastConfectError("Fehler beim Aktualisieren", error),
     });
 
     const remove = useConfectMutation(refs.public.locations.remove, {
@@ -58,7 +55,6 @@ export function LocationHeader({ location }: LocationHeaderProps) {
             toast.success("Standort gelöscht");
             void navigate({ to: "/app/locations" });
         },
-        onError: (error) => toastConfectError("Fehler beim Löschen", error),
     });
 
     const handleUpdate = () => {

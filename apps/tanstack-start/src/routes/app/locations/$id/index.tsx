@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { QueryResult, useQuery } from "@confect/react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import refs from "@cataster/backend/confect/_generated/refs";
@@ -8,48 +8,46 @@ import { LocationHeader } from "~/component/locations/location-header";
 import { LocationMapView } from "~/component/locations/location-map";
 import { LocationStats } from "~/component/locations/location-stats";
 import { TreePanel } from "~/component/trees/tree-panel";
-import { confectQuery } from "~/lib/confect";
+import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
 
 export const Route = createFileRoute("/app/locations/$id/")({
     component: LocationDetailRoute,
     pendingComponent: LocationDetailPending,
-    loader: async ({ context, params }) => {
-        await Promise.all([
-            context.queryClient.ensureQueryData(
-                confectQuery(refs.public.locations.get, { id: params.id }),
-            ),
-            context.queryClient.ensureQueryData(
-                confectQuery(refs.public.trees.listByLocation, {
-                    locationId: params.id,
-                }),
-            ),
-        ]);
-    },
 });
 
 function LocationDetailRoute() {
     const { id } = Route.useParams();
 
-    const { data: location } = useSuspenseQuery(
-        confectQuery(refs.public.locations.get, { id }),
-    );
-    const { data: treeData } = useSuspenseQuery(
-        confectQuery(refs.public.trees.listByLocation, { locationId: id }),
-    );
+    const location = useQuery(refs.public.locations.get, { id });
+    const treeData = useQuery(refs.public.trees.listByLocation, {
+        locationId: id,
+    });
+
+    if (QueryResult.isLoading(location) || QueryResult.isLoading(treeData)) {
+        return <LocationDetailPending />;
+    }
+
+    if (QueryResult.isFailure(location)) {
+        return <LocationDetailError error={location.error} />;
+    }
+
+    if (QueryResult.isFailure(treeData)) {
+        return <LocationDetailError error={treeData.error} />;
+    }
 
     return (
         <main className="grid grow grid-rows-[auto_auto_1fr] gap-8 px-4 md:grid-cols-3 md:px-8">
-            <LocationHeader location={location} />
-            <LocationStats trees={treeData.trees} />
+            <LocationHeader location={location.value} />
+            <LocationStats trees={treeData.value.trees} />
             <div className="col-span-full grid grid-cols-subgrid">
                 <TreePanel
-                    trees={treeData.trees}
-                    speciesById={treeData.speciesById}
+                    trees={treeData.value.trees}
+                    speciesById={treeData.value.speciesById}
                 />
                 <LocationMapView
-                    location={location}
-                    trees={treeData.trees}
-                    speciesById={treeData.speciesById}
+                    location={location.value}
+                    trees={treeData.value.trees}
+                    speciesById={treeData.value.speciesById}
                 />
             </div>
         </main>
@@ -61,6 +59,20 @@ function LocationDetailPending() {
         <main className="container space-y-4 py-8">
             <Skeleton className="h-12 w-64" />
             <Skeleton className="h-[500px] w-full" />
+        </main>
+    );
+}
+
+function LocationDetailError({ error }: { error: unknown }) {
+    const wire = getWireError(error);
+
+    return (
+        <main className="container space-y-4 py-8">
+            <p className="text-destructive">
+                {wire
+                    ? wireErrorMessage(wire)
+                    : "Standort konnte nicht geladen werden."}
+            </p>
         </main>
     );
 }

@@ -1,11 +1,9 @@
 import type { WireError } from "@cataster/validators";
 import { isWireError } from "@cataster/validators";
 
-import { decodeWireErrorFromUnknown } from "./confect";
-
 export function getWireError(error: unknown): WireError | null {
     if (isWireError(error)) return error;
-    return decodeWireErrorFromUnknown(error);
+    return null;
 }
 
 export function wireErrorMessage(error: WireError): string {

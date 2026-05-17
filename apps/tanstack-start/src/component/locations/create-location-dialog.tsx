@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { IconMapPin, IconPlus, IconSearch } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import refs from "@cataster/backend/confect/_generated/refs";
@@ -25,12 +24,7 @@ import { Label } from "@cataster/ui/components/base/label";
 import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
 import { useAbility } from "~/lib/abilities";
-import {
-    useConfectAction,
-    useConfectActionFn,
-    useConfectMutationFn,
-} from "~/lib/confect";
-import { toastConfectError } from "~/lib/error-toast";
+import { useConfectAction, useConfectMutation } from "~/lib/confect";
 
 interface OsmResult {
     osmId: number;
@@ -45,7 +39,7 @@ interface OsmResult {
  * Lets the user search OpenStreetMap for an area, pick a result, and turn it
  * into a `locations` row. Behind the scenes that's two backend calls: an OSM
  * action (`searchAreas` / `fetchBoundary`) followed by the `locations.create`
- * mutation. Errors from either step surface through `toastConfectError`.
+ * mutation. Shared typed errors are toasted by the Confect wrappers.
  */
 export function CreateLocationDialog() {
     const [open, setOpen] = useState(false);
@@ -56,54 +50,62 @@ export function CreateLocationDialog() {
     );
     const [name, setName] = useState("");
 
-    const fetchBoundary = useConfectActionFn(refs.public.osm.fetchBoundary);
-    const createLocation = useConfectMutationFn(refs.public.locations.create);
+    const fetchBoundary = useConfectAction(refs.public.osm.fetchBoundary);
+    const createLocation = useConfectMutation(refs.public.locations.create);
 
     const search = useConfectAction(refs.public.osm.searchAreas, {
         onSuccess: () => {
             setSelectedResult(null);
         },
-        onError: (error) => {
-            toastConfectError("Fehler bei der Suche", error);
-        },
     });
 
-    const create = useMutation({
-        mutationFn: async (input: { result: OsmResult; name: string }) => {
-            const boundary = await fetchBoundary({
-                osmId: input.result.osmId,
-                osmType: input.result.osmType,
-            });
-            return createLocation({
-                name: input.name,
-                osmId: input.result.osmId,
-                osmType: input.result.osmType,
-                polygon: boundary.polygon,
-                centroid: boundary.centroid,
-            });
-        },
-        onSuccess: () => {
-            toast.success("Standort erstellt");
-            setOpen(false);
+    const createLocationFromOsm = async (input: {
+        result: OsmResult;
+        name: string;
+    }) => {
+        const boundary = await fetchBoundary.mutateAsync({
+            osmId: input.result.osmId,
+            osmType: input.result.osmType,
+        });
+        await createLocation.mutateAsync({
+            name: input.name,
+            osmId: input.result.osmId,
+            osmType: input.result.osmType,
+            polygon: boundary.polygon,
+            centroid: boundary.centroid,
+        });
+
+        toast.success("Standort erstellt");
+        setOpen(false);
+        setSearchQuery("");
+        setSelectedResult(null);
+        setName("");
+    };
+
+    const handleCreate = () => {
+        if (!selectedResult || !name.trim()) return;
+        void createLocationFromOsm({
+            result: selectedResult,
+            name: name.trim(),
+        }).catch(() => {
+            // Shared typed errors are already toasted by the Confect wrappers.
+        });
+    };
+
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (!nextOpen) {
             setSearchQuery("");
             setSelectedResult(null);
             setName("");
-        },
-        onError: (error) => {
-            toastConfectError("Fehler beim Erstellen", error);
-        },
-    });
+        }
+        setOpen(nextOpen);
+    };
 
     const handleSelect = (result: OsmResult) => {
         setSelectedResult(result);
         const shortName =
             result.displayName.split(",")[0]?.trim() ?? result.displayName;
         setName(shortName);
-    };
-
-    const handleCreate = () => {
-        if (!selectedResult || !name.trim()) return;
-        create.mutate({ result: selectedResult, name: name.trim() });
     };
 
     const handleSearch = () => {
@@ -114,7 +116,7 @@ export function CreateLocationDialog() {
     if (!ability.can("create", "Location")) return null;
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger render={<Button />}>
                 <IconPlus />
                 Standort
@@ -201,7 +203,10 @@ export function CreateLocationDialog() {
                         <Button
                             onClick={handleCreate}
                             disabled={!name.trim()}
-                            isLoading={create.isPending}
+                            isLoading={
+                                fetchBoundary.isPending ||
+                                createLocation.isPending
+                            }
                             className="w-full"
                         >
                             Standort erstellen

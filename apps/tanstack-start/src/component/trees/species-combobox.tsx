@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { QueryResult, useQuery } from "@confect/react";
 import { IconPlus } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import type { SpeciesId } from "@cataster/backend/types";
@@ -31,8 +31,7 @@ import {
 import { Label } from "@cataster/ui/components/base/label";
 import { FormBase } from "@cataster/ui/components/form/components/base";
 
-import { confectQuery, useConfectMutation } from "~/lib/confect";
-import { toastConfectError } from "~/lib/error-toast";
+import { useConfectMutation } from "~/lib/confect";
 
 interface SpeciesComboboxProps {
     disabled?: boolean;
@@ -41,15 +40,16 @@ interface SpeciesComboboxProps {
     onValueChange: (id: SpeciesId) => void;
 }
 
-const speciesListQuery = confectQuery(refs.public.species.listActive, {});
-
 export function SpeciesCombobox({
     value,
     onValueChange,
     disabled,
     invalid,
 }: SpeciesComboboxProps) {
-    const { data: species } = useQuery(speciesListQuery);
+    const speciesQuery = useQuery(refs.public.species.listActive, {});
+    const species = QueryResult.isSuccess(speciesQuery)
+        ? speciesQuery.value
+        : [];
     const [open, setOpen] = useState(false);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
 
@@ -64,7 +64,7 @@ export function SpeciesCombobox({
                     open={open}
                     onOpenChange={setOpen}
                     itemToStringLabel={(s) =>
-                        species?.find((sp) => sp._id === s)?.deName ??
+                        species.find((sp) => sp._id === s)?.deName ??
                         "Nicht gefunden"
                     }
                     disabled={disabled}
@@ -75,7 +75,7 @@ export function SpeciesCombobox({
                     />
                     <ComboboxContent>
                         <ComboboxList>
-                            {species?.map((sp) => (
+                            {species.map((sp) => (
                                 <ComboboxItem
                                     key={sp._id}
                                     value={sp._id}
@@ -142,9 +142,6 @@ function AddSpeciesDialog({
             reset();
             onOpenChange(false);
             toast.success("Baumart erstellt");
-        },
-        onError: (error) => {
-            toastConfectError("Fehler beim Erstellen der Baumart", error);
         },
     });
 

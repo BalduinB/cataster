@@ -3,13 +3,11 @@ import { Schema } from "effect";
 import { toast } from "sonner";
 
 import type { LocationId, TreeDoc } from "@cataster/backend/types";
-import type { SpeciesId } from "@cataster/validators";
 import refs from "@cataster/backend/confect/_generated/refs";
 import { getEditedFields, isDirty } from "@cataster/ui/components/form/helper";
 import { useAppForm } from "@cataster/ui/components/form/hooks";
 
 import { useConfectMutation } from "~/lib/confect";
-import { toastConfectError } from "~/lib/error-toast";
 import { TreeFormFields, TreeFormSchema } from "./tree-fields";
 
 export const DEFAULT_CONTROL_TIMEZONE = "Europe/Berlin";
@@ -35,9 +33,6 @@ export function TreeCreateForm({
         onSuccess: () => {
             toast.success("Baum erstellt");
             onSuccess();
-        },
-        onError: (error) => {
-            toastConfectError("Fehler beim Speichern", error);
         },
     });
 
@@ -99,9 +94,6 @@ export function TreeEditForm({
         onSuccess: () => {
             toast.success("Baum aktualisiert");
             onSuccess();
-        },
-        onError: (error) => {
-            toastConfectError("Fehler beim Speichern", error);
         },
     });
 

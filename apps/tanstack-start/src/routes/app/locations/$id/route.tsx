@@ -1,6 +1,6 @@
 import type { AnyRouteMatch } from "@tanstack/react-router";
+import { QueryResult, useQuery } from "@confect/react";
 import { IconMapPinSearch, IconRefresh } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Schema } from "effect";
 
@@ -9,7 +9,6 @@ import { Button } from "@cataster/ui/components/base/button";
 import { LocationId } from "@cataster/validators";
 
 import { LocationPicker } from "~/component/locations/picker";
-import { confectQuery } from "~/lib/confect";
 import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
 import { PARAM_PLACEHOLDER } from "~/router";
 
@@ -61,14 +60,18 @@ function LocationsLayout() {
 
 function LocationBreadcrumb({ match }: { match: AnyRouteMatch }) {
     const id = (match.params as { id: string }).id as LocationId;
-    // Non-suspense read against the same query key the loader pre-populates,
-    // so we never block the layout while the location detail is loading.
-    const { data: location } = useQuery({
-        ...confectQuery(refs.public.locations.get, { id }),
-        enabled: id !== PARAM_PLACEHOLDER,
-    });
+    const location = useQuery(
+        refs.public.locations.get,
+        id === PARAM_PLACEHOLDER ? "skip" : { id },
+    );
+
     if (id === PARAM_PLACEHOLDER) {
         return <IconMapPinSearch className="size-4" />;
     }
-    return location?.name ?? "Standort";
+
+    return QueryResult.match(location, {
+        onLoading: () => "Standort",
+        onFailure: () => "Standort",
+        onSuccess: (location) => location.name,
+    });
 }

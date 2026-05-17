@@ -1,13 +1,11 @@
 /// <reference types="vite/client" />
 import type { AnyRouteMatch } from "@tanstack/react-router";
 import type * as React from "react";
-import { ConvexQueryClient } from "@convex-dev/react-query";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
     createRouter as createTanStackRouter,
     Link,
 } from "@tanstack/react-router";
-import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 import { buttonVariants } from "@cataster/ui/components/base/button";
@@ -23,29 +21,20 @@ export function getRouter() {
     const convex = new ConvexReactClient(CONVEX_URL, {
         unsavedChangesWarning: false,
     });
-    const convexQueryClient = new ConvexQueryClient(convex);
-
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                queryKeyHashFn: convexQueryClient.hashFn(),
-                queryFn: convexQueryClient.queryFn(),
-            },
-        },
-    });
-    convexQueryClient.connect(queryClient);
+    const queryClient = new QueryClient();
 
     const router = createTanStackRouter({
         routeTree,
         defaultPreload: "intent",
-        context: { queryClient, convexClient: convex, convexQueryClient },
+        context: { convexClient: convex },
         scrollRestoration: true,
         defaultNotFoundComponent: NotFound,
         Wrap: ({ children }) => (
-            <ConvexProvider client={convex}>{children}</ConvexProvider>
+            <QueryClientProvider client={queryClient}>
+                <ConvexProvider client={convex}>{children}</ConvexProvider>
+            </QueryClientProvider>
         ),
     });
-    setupRouterSsrQueryIntegration({ router, queryClient });
 
     return router;
 }
