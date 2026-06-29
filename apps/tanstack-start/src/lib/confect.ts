@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import type { WireError } from "@cataster/validators";
 import { isWireError } from "@cataster/validators";
 
-import { wireErrorMessage } from "./confect-error-ui";
+import { mutationErrorMessage } from "./errors";
 
 type ConfectStatus = "idle" | "pending" | "success" | "error";
 
@@ -104,7 +104,7 @@ function useConfectInvoke<R extends Ref.Any>(
 
             if (isWireError(nextError)) {
                 if (options.toastWireErrors !== false)
-                    toast.error(wireErrorMessage(nextError));
+                    toast.error(mutationErrorMessage(nextError));
             } else {
                 setError(nextError as FunctionSpecificError<R>);
                 await options.onError?.(
@@ -122,6 +122,7 @@ function useConfectInvoke<R extends Ref.Any>(
         async (args: Ref.Args<R>) => {
             setStatus("pending");
             setError(undefined);
+            setRawError(undefined);
             setData(undefined);
 
             let result;
@@ -165,6 +166,7 @@ function useConfectInvoke<R extends Ref.Any>(
         setStatus("idle");
         setData(undefined);
         setError(undefined);
+        setRawError(undefined);
     }, []);
 
     return {

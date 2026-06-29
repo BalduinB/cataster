@@ -21,6 +21,21 @@ import { requireUser } from "./requireUser";
  * read by `orgId` from the returned context. This helper exists for role
  * gating; defense-in-depth is provided by both layers running.
  */
+const actionLabelMap: Record<Action, string> = {
+    read: "lesen",
+    create: "erstellen",
+    update: "aktualisieren",
+    delete: "löschen",
+    manage: "verwalten",
+};
+
+const subjectLabelMap: Record<Extract<Subject, string>, string> = {
+    Location: "Standort",
+    Tree: "Baum",
+    Species: "Baumart",
+    HiddenSpecies: "versteckte Baumart",
+    Org: "Orkanisation",
+};
 export const requireAbility = (
     ...args: Parameters<AppAbility["can"]>
 ): Effect.Effect<UserContext, UnauthorizedError | ForbiddenError, Auth> =>
@@ -28,9 +43,17 @@ export const requireAbility = (
         const user = yield* requireUser;
         const ability = getUserPermissions(user);
         if (!ability.can(...args)) {
+            const subject = args[1];
+            let subjectName;
+            if (typeof subject === "string") {
+                subjectName = subject;
+            } else {
+                subjectName = (subject as any).__caslSubjectType__;
+            }
+
             return yield* Effect.fail(
                 new ForbiddenError({
-                    message: "Insufficient permissions",
+                    message: `Du kannst ${subjectLabelMap[subjectName as keyof typeof subjectLabelMap] ?? "[Unbekanntes Thema]"} nicht ${actionLabelMap[args[0]]}.`,
                 }),
             );
         }

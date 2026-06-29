@@ -20,7 +20,9 @@ const list = FunctionImpl.make(api, "locations", "list", () =>
 const get = FunctionImpl.make(api, "locations", "get", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("read", "Location");
-        return yield* LocationService.getById(id);
+        const loc = yield* LocationService.getById(id);
+        yield* requireAbility("read", subject("Location", loc));
+        return loc;
     }).pipe(Effect.provide(ServicesLive)),
 );
 

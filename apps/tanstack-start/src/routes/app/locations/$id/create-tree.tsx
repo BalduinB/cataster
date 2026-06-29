@@ -21,7 +21,7 @@ import { LocationPolygon } from "~/component/map/location-polygon";
 import { MapView } from "~/component/map/map-view";
 import { draftIcon, TreeMarker } from "~/component/map/tree-marker";
 import { TreeCreateForm } from "~/component/trees/tree-form";
-import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
+import { ErrorComponent } from "~/lib/errors";
 
 export const Route = createFileRoute("/app/locations/$id/create-tree")({
     staticData: {
@@ -292,15 +292,12 @@ function CreateTreePending() {
 }
 
 function CreateTreeError({ error }: { error: unknown }) {
-    const wire = getWireError(error);
-
     return (
         <main className="container space-y-4 py-8">
-            <p className="text-destructive">
-                {wire
-                    ? wireErrorMessage(wire)
-                    : "Baumformular konnte nicht geladen werden."}
-            </p>
+            <ErrorComponent
+                error={error}
+                fallback="Baumformular konnte nicht geladen werden."
+            />
         </main>
     );
 }

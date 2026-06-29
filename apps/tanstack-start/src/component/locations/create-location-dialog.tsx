@@ -25,6 +25,7 @@ import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
 import { useAbility } from "~/lib/abilities";
 import { useConfectAction, useConfectMutation } from "~/lib/confect";
+import { ErrorComponent } from "~/lib/errors";
 
 interface OsmResult {
     osmId: number;
@@ -156,7 +157,10 @@ export function CreateLocationDialog() {
                 )}
                 {search.isError && (
                     <div className="space-y-2">
-                        <p className="text-red-500">Fehler beim Suchen</p>
+                        <ErrorComponent
+                            error={search.rawError}
+                            fallback="Fehler beim Suchen"
+                        />
                     </div>
                 )}
 

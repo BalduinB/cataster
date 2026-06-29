@@ -9,7 +9,7 @@ import { Button } from "@cataster/ui/components/base/button";
 import { LocationId } from "@cataster/validators";
 
 import { LocationPicker } from "~/component/locations/picker";
-import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
+import { ErrorComponent } from "~/lib/errors";
 import { PARAM_PLACEHOLDER } from "~/router";
 
 export const Route = createFileRoute("/app/locations/$id")({
@@ -35,13 +35,13 @@ function LocationRouteError({
     error: Error;
     reset: () => void;
 }) {
-    const wire = getWireError(error);
-
     return (
         <div className="container space-y-4 py-8">
-            <p className="text-muted-foreground">
-                {wire ? wireErrorMessage(wire) : error.message}
-            </p>
+            <ErrorComponent
+                error={error}
+                fallback={error.message}
+                className="text-muted-foreground"
+            />
             <Button onClick={reset} variant="secondary">
                 <IconRefresh data-icon="inline-start" />
                 Erneut versuchen

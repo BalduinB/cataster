@@ -8,7 +8,7 @@ import { LocationHeader } from "~/component/locations/location-header";
 import { LocationMapView } from "~/component/locations/location-map";
 import { LocationStats } from "~/component/locations/location-stats";
 import { TreePanel } from "~/component/trees/tree-panel";
-import { getWireError, wireErrorMessage } from "~/lib/confect-error-ui";
+import { ErrorComponent } from "~/lib/errors";
 
 export const Route = createFileRoute("/app/locations/$id/")({
     component: LocationDetailRoute,
@@ -64,15 +64,12 @@ function LocationDetailPending() {
 }
 
 function LocationDetailError({ error }: { error: unknown }) {
-    const wire = getWireError(error);
-
     return (
         <main className="container space-y-4 py-8">
-            <p className="text-destructive">
-                {wire
-                    ? wireErrorMessage(wire)
-                    : "Standort konnte nicht geladen werden."}
-            </p>
+            <ErrorComponent
+                error={error}
+                fallback="Standort konnte nicht geladen werden."
+            />
         </main>
     );
 }

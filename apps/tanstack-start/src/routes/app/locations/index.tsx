@@ -6,6 +6,7 @@ import { Skeleton } from "@cataster/ui/components/base/skeleton";
 
 import { CreateLocationDialog } from "~/component/locations/create-location-dialog";
 import { LocationList } from "~/component/locations/location-list";
+import { ErrorComponent } from "~/lib/errors";
 
 export const Route = createFileRoute("/app/locations/")({
     component: LocationsRouteComponent,
@@ -17,11 +18,12 @@ function LocationsRouteComponent() {
 
     return QueryResult.match(locations, {
         onLoading: () => <LocationsPending />,
-        onFailure: () => (
+        onFailure: (error) => (
             <main className="container space-y-6 py-8">
-                <p className="text-destructive">
-                    Standorte konnten nicht geladen werden.
-                </p>
+                <ErrorComponent
+                    error={error}
+                    fallback="Standorte konnten nicht geladen werden."
+                />
             </main>
         ),
         onSuccess: (locations) => (
