@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { QueryResult, useQuery } from "@confect/react";
 import { IconMapPin } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 
-import type { LocationId } from "@cataster/backend/types";
 import refs from "@cataster/backend/confect/_generated/refs";
 import {
     Combobox,
@@ -28,16 +26,19 @@ import {
 } from "@cataster/ui/components/base/item";
 import { Spinner } from "@cataster/ui/components/base/spinner";
 
-import { confectQuery } from "~/lib/confect";
 import { PARAM_PLACEHOLDER } from "~/router";
-
-const locationsQuery = confectQuery(refs.public.locations.list, {});
 
 export function LocationPicker() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { data: locations, isPending } = useQuery(locationsQuery);
-    type Location = NonNullable<typeof locations>[number];
+    const locationsQuery = useQuery(refs.public.locations.list, {});
+    const { locations, isPending } = QueryResult.match(locationsQuery, {
+        onLoading: () => ({ locations: [], isPending: true }),
+        onFailure: () => ({ locations: [], isPending: false }),
+        onSuccess: (locations) => ({ locations, isPending: false }),
+    });
+    type Location = (typeof locations)[number];
+
     return (
         <main className="container py-8">
             <Empty className="p-4">
@@ -90,7 +91,7 @@ export function LocationPicker() {
                                 </Item>
                             )}
                             <ComboboxList>
-                                {(location) => (
+                                {(location: Location) => (
                                     <>
                                         <ComboboxItem
                                             key={location._id}
@@ -112,10 +113,6 @@ export function LocationPicker() {
                                         />
                                     </>
                                 )}
-                                {/* 
-                                {locations?.map((location) => (
-                                    
-                                ))} */}
                             </ComboboxList>
                         </ComboboxContent>
                     </Combobox>

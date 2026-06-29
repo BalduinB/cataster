@@ -1,24 +1,22 @@
 import { Effect, Layer } from "effect";
 
-import {
-    ConflictError,
-    type LatLng,
-    NotFoundError,
-    type OrgId,
-} from "@cataster/validators";
+import type { LatLng, OrgId } from "@cataster/validators";
+import { ConflictError, NotFoundError } from "@cataster/validators";
 
 import type { LocationDoc, LocationId } from "../../types";
 import {
+    Auth,
     DatabaseReader,
     DatabaseWriter,
 } from "../../confect/_generated/services";
+import { requireUser } from "../../lib/auth/requireUser";
+import { LocationRepository } from "../data/LocationRepository";
+import { TreeRepository } from "../data/TreeRepository";
 import { isPointInLocationPolygon } from "../geospatial/GSLib";
-import { dieOnInternal } from "../internal";
 
 export type { LocationDoc, LocationId };
 
 type CreateInput = {
-    readonly orgId: OrgId;
     readonly name: string;
     readonly osmId: number;
     readonly osmType: string;
@@ -26,87 +24,53 @@ type CreateInput = {
     readonly centroid: LatLng;
 };
 
-/**
- * Domain service for the `locations` aggregate. Multi-tenant: every read is
- * scoped by `orgId` from the calling handler's `requireUser` result, and
- * every write stamps `orgId` so a row can never belong to two tenants. A
- * `getById` for a foreign-org row returns `NotFound` rather than leaking
- * existence.
- */
 export class LocationService extends Effect.Tag(
     "@cataster/services/LocationService",
 )<
     LocationService,
     {
-        readonly list: (
-            orgId: OrgId,
-        ) => Effect.Effect<ReadonlyArray<LocationDoc>, never, DatabaseReader>;
+        readonly list: () => Effect.Effect<
+            ReadonlyArray<LocationDoc>,
+            never,
+            DatabaseReader | Auth
+        >;
         readonly getById: (
-            orgId: OrgId,
             id: LocationId,
-        ) => Effect.Effect<LocationDoc, NotFoundError, DatabaseReader>;
+        ) => Effect.Effect<LocationDoc, NotFoundError, DatabaseReader | Auth>;
         readonly assertContainsPoint: (
-            orgId: OrgId,
             id: LocationId,
             point: LatLng,
-        ) => Effect.Effect<void, NotFoundError | ConflictError, DatabaseReader>;
+        ) => Effect.Effect<
+            void,
+            NotFoundError | ConflictError,
+            DatabaseReader | Auth
+        >;
         readonly create: (
             input: CreateInput,
-        ) => Effect.Effect<LocationId, never, DatabaseWriter>;
+        ) => Effect.Effect<LocationId, never, DatabaseWriter | Auth>;
         readonly rename: (
-            orgId: OrgId,
             id: LocationId,
             name: string,
         ) => Effect.Effect<
             void,
             NotFoundError,
-            DatabaseReader | DatabaseWriter
+            DatabaseReader | DatabaseWriter | Auth
         >;
         readonly remove: (
-            orgId: OrgId,
             id: LocationId,
         ) => Effect.Effect<
             void,
             NotFoundError,
-            DatabaseReader | DatabaseWriter
+            DatabaseReader | DatabaseWriter | Auth
         >;
     }
 >() {}
 
 export const LocationServiceLive = Layer.sync(LocationService, () => {
-    const list: LocationService["Type"]["list"] = (orgId) =>
+    const resolveById = (id: LocationId, orgId: OrgId) =>
         Effect.gen(function* () {
-            const db = yield* DatabaseReader;
-            return yield* dieOnInternal(
-                db
-                    .table("locations")
-                    .index("by_orgId", (q) => q.eq("orgId", orgId), "desc")
-                    .collect(),
-            );
-        });
-
-    /**
-     * Resolves a location by id and asserts it belongs to `orgId`. Foreign-org
-     * rows are reported as `NotFound` (not `Forbidden`) so we don't leak that
-     * the row exists in some other tenant.
-     */
-    const getById: LocationService["Type"]["getById"] = (orgId, id) =>
-        Effect.gen(function* () {
-            const db = yield* DatabaseReader;
-            const doc = yield* db
-                .table("locations")
-                .get(id)
-                .pipe(
-                    Effect.catchTag("GetByIdFailure", () =>
-                        Effect.fail(
-                            new NotFoundError({
-                                message: "Standort nicht gefunden",
-                            }),
-                        ),
-                    ),
-                    dieOnInternal,
-                );
-            if (doc.orgId !== orgId) {
+            const doc = yield* LocationRepository.getById(id);
+            if (doc === null || doc.orgId !== orgId) {
                 return yield* Effect.fail(
                     new NotFoundError({ message: "Standort nicht gefunden" }),
                 );
@@ -114,10 +78,23 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
             return doc;
         });
 
+    const list: LocationService["Type"]["list"] = () =>
+        Effect.gen(function* () {
+            const { orgId } = yield* Effect.orDie(requireUser);
+            return yield* LocationRepository.listByOrg(orgId);
+        });
+
+    const getById: LocationService["Type"]["getById"] = (id) =>
+        Effect.gen(function* () {
+            const { orgId } = yield* Effect.orDie(requireUser);
+            return yield* resolveById(id, orgId);
+        });
+
     const assertContainsPoint: LocationService["Type"]["assertContainsPoint"] =
-        (orgId, id, point) =>
+        (id, point) =>
             Effect.gen(function* () {
-                const location = yield* getById(orgId, id);
+                const { orgId } = yield* Effect.orDie(requireUser);
+                const location = yield* resolveById(id, orgId);
                 if (!isPointInLocationPolygon(point, location.polygon)) {
                     return yield* Effect.fail(
                         new ConflictError({
@@ -130,58 +107,41 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
 
     const create: LocationService["Type"]["create"] = (input) =>
         Effect.gen(function* () {
-            const db = yield* DatabaseWriter;
-            return yield* dieOnInternal(
-                db.table("locations").insert({
-                    orgId: input.orgId,
-                    name: input.name,
-                    osmId: input.osmId,
-                    osmType: input.osmType,
-                    polygon: input.polygon.map((ring) =>
-                        ring.map((p) => ({ lat: p.lat, lng: p.lng })),
-                    ),
-                    centroid: {
-                        lat: input.centroid.lat,
-                        lng: input.centroid.lng,
-                    },
-                    updatedAt: Date.now(),
-                }),
-            );
+            const { orgId } = yield* Effect.orDie(requireUser);
+            return yield* LocationRepository.insert({
+                orgId,
+                name: input.name,
+                osmId: input.osmId,
+                osmType: input.osmType,
+                polygon: input.polygon,
+                centroid: input.centroid,
+                updatedAt: Date.now(),
+            });
         });
 
-    const rename: LocationService["Type"]["rename"] = (orgId, id, name) =>
+    const rename: LocationService["Type"]["rename"] = (id, name) =>
         Effect.gen(function* () {
-            yield* getById(orgId, id);
-            const writer = yield* DatabaseWriter;
-            yield* dieOnInternal(
-                writer
-                    .table("locations")
-                    .patch(id, { name, updatedAt: Date.now() }),
-            );
+            const { orgId } = yield* Effect.orDie(requireUser);
+            yield* resolveById(id, orgId);
+            yield* LocationRepository.patch(id, {
+                name,
+                updatedAt: Date.now(),
+            });
         });
 
-    const remove: LocationService["Type"]["remove"] = (orgId, id) =>
+    const remove: LocationService["Type"]["remove"] = (id) =>
         Effect.gen(function* () {
-            yield* getById(orgId, id);
-            const reader = yield* DatabaseReader;
-            const writer = yield* DatabaseWriter;
+            const { orgId } = yield* Effect.orDie(requireUser);
+            yield* resolveById(id, orgId);
 
-            const trees = yield* dieOnInternal(
-                reader
-                    .table("trees")
-                    .index("by_orgId_and_locationId", (q) =>
-                        q.eq("orgId", orgId).eq("locationId", id),
-                    )
-                    .collect(),
-            );
-
+            const trees = yield* TreeRepository.listByOrgAndLocation(orgId, id);
             yield* Effect.forEach(
                 trees,
-                (tree) => writer.table("trees").delete(tree._id),
+                (tree) => TreeRepository.remove(tree._id),
                 { discard: true },
             );
 
-            yield* writer.table("locations").delete(id);
+            yield* LocationRepository.remove(id);
         });
 
     return { list, getById, assertContainsPoint, create, rename, remove };

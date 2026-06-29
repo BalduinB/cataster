@@ -23,7 +23,7 @@ export const species = Table.make(
     "species",
     Schema.Struct({
         /** `null` = system species (shared catalog); a Clerk org id = org-owned. */
-        orgId: Schema.optional(Schema.NullOr(OrgId)),
+        orgId: Schema.NullOr(OrgId),
         deName: Schema.String,
         botanicalName: Schema.String,
         isActive: Schema.Boolean,

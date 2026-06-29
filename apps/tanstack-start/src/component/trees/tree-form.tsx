@@ -1,16 +1,13 @@
 import type { ReactNode } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { Schema } from "effect";
 import { toast } from "sonner";
 
 import type { LocationId, TreeDoc } from "@cataster/backend/types";
-import type { SpeciesId } from "@cataster/validators";
 import refs from "@cataster/backend/confect/_generated/refs";
 import { getEditedFields, isDirty } from "@cataster/ui/components/form/helper";
 import { useAppForm } from "@cataster/ui/components/form/hooks";
 
-import { useConfectMutationFn } from "~/lib/confect";
-import { toastConfectError } from "~/lib/error-toast";
+import { useConfectMutation } from "~/lib/confect";
 import { TreeFormFields, TreeFormSchema } from "./tree-fields";
 
 export const DEFAULT_CONTROL_TIMEZONE = "Europe/Berlin";
@@ -32,30 +29,10 @@ export function TreeCreateForm({
     onSuccess,
     renderFooter,
 }: TreeCreateFormProps) {
-    const addTree = useConfectMutationFn(refs.public.trees.create);
-    const submitMutation = useMutation({
-        mutationFn: (value: TreeFormSchema) =>
-            addTree({
-                locationId,
-                plateNumber: value.plateNumber,
-                speciesId: value.speciesId,
-                circumference: value.circumference,
-                height: value.height,
-                crownDiameter: Number(value.crownDiameter),
-                vitality: value.vitality,
-                notes: value.notes,
-                controlIntervalRRule: value.controlIntervalRRule,
-                controlTimezone: value.controlTimezone,
-                additionalControlAt: null,
-                latitude: treePosition.lat,
-                longitude: treePosition.lng,
-            }),
+    const submitMutation = useConfectMutation(refs.public.trees.create, {
         onSuccess: () => {
             toast.success("Baum erstellt");
             onSuccess();
-        },
-        onError: (error) => {
-            toastConfectError("Fehler beim Speichern", error);
         },
     });
 
@@ -72,7 +49,22 @@ export function TreeCreateForm({
         validators: {
             onSubmit: Schema.standardSchemaV1(TreeFormSchema),
         },
-        onSubmit: async ({ value }) => await submitMutation.mutateAsync(value),
+        onSubmit: async ({ value }) =>
+            await submitMutation.mutateAsync({
+                locationId,
+                plateNumber: value.plateNumber,
+                speciesId: value.speciesId,
+                circumference: value.circumference,
+                height: value.height,
+                crownDiameter: Number(value.crownDiameter),
+                vitality: value.vitality,
+                notes: value.notes,
+                controlIntervalRRule: value.controlIntervalRRule,
+                controlTimezone: value.controlTimezone,
+                additionalControlAt: null,
+                latitude: treePosition.lat,
+                longitude: treePosition.lng,
+            }),
     });
 
     return (
@@ -98,16 +90,10 @@ export function TreeEditForm({
     onSuccess,
     renderFooter,
 }: TreeEditFormProps) {
-    const updateTree = useConfectMutationFn(refs.public.trees.update);
-
-    const submitMutation = useMutation({
-        mutationFn: updateTree,
+    const submitMutation = useConfectMutation(refs.public.trees.update, {
         onSuccess: () => {
             toast.success("Baum aktualisiert");
             onSuccess();
-        },
-        onError: (error) => {
-            toastConfectError("Fehler beim Speichern", error);
         },
     });
 
