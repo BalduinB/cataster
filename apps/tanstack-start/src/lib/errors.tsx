@@ -141,16 +141,6 @@ export function errorMessage<Error extends TaggedError = TaggedError>(
     );
 }
 
-export function mutationErrorMessage<Error extends TaggedError = TaggedError>(
-    error: unknown,
-    options?: {
-        readonly custom?: ErrorMessageCustom<Error>;
-        readonly fallback?: ErrorFallback<string>;
-    },
-): string {
-    return errorMessage(error, options);
-}
-
 export function ErrorComponent<Error extends TaggedError = TaggedError>({
     error,
     custom,

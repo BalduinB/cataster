@@ -158,7 +158,7 @@ export function CreateLocationDialog() {
                 {search.isError && (
                     <div className="space-y-2">
                         <ErrorComponent
-                            error={search.rawError}
+                            error={search.error}
                             fallback="Fehler beim Suchen"
                         />
                     </div>

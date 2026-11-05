@@ -1,207 +1,56 @@
 /**
- * Small UI-state wrappers around `@confect/react`'s native mutation/action
- * hooks. Shared wire errors are toasted here; function-specific typed errors
- * are passed to `onError`.
+ * Adapts `@confect/react`'s mutation/action invokers to TanStack Query's
+ * `useMutation`, which owns the UI state (pending, error, data, callbacks).
+ * Shared wire errors are toasted globally by the `MutationCache` in
+ * `router.tsx`.
  */
-import type { Ref } from "@confect/core";
-import { useCallback, useState } from "react";
-import {
-    useAction as useConfectReactAction,
-    useMutation as useConfectReactMutation,
-} from "@confect/react";
+import type { UseMutationOptions } from "@tanstack/react-query";
+import { Ref } from "@confect/core";
+import { useAction, useMutation } from "@confect/react";
+import { useMutation as useTanstackMutation } from "@tanstack/react-query";
 import { Result } from "effect";
-import { toast } from "sonner";
 
-import type { WireError } from "@cataster/validators";
-import { isWireError } from "@cataster/validators";
-
-import { mutationErrorMessage } from "./errors";
-
-type ConfectStatus = "idle" | "pending" | "success" | "error";
-
-type ConfectInvoke<R extends Ref.Any> = (
-    args: Ref.Args<R>,
-) => Promise<Ref.Returns<R> | Result.Result<Ref.Returns<R>, Ref.Error<R>>>;
-
-type FunctionSpecificError<R extends Ref.Any> = Exclude<
-    Ref.Error<R>,
-    WireError
+type ConfectMutationOptions<R extends Ref.Any> = Omit<
+    UseMutationOptions<Ref.Returns<R>, Ref.Error<R> | Error, Ref.Args<R>>,
+    "mutationFn"
 >;
 
-interface UseConfectInvokeOptions<R extends Ref.Any> {
-    onSuccess?: (
-        data: Ref.Returns<R>,
-        args: Ref.Args<R>,
-    ) => void | Promise<void>;
-    onError?: (
-        error: FunctionSpecificError<R>,
-        args: Ref.Args<R>,
-    ) => void | Promise<void>;
-    onSettled?: (
-        data: Ref.Returns<R> | undefined,
-        error: unknown,
-        args: Ref.Args<R>,
-    ) => void | Promise<void>;
-    toastWireErrors?: boolean;
-}
-
-type UseConfectInvokeResult<R extends Ref.Any> = {
-    mutate: (args: Ref.Args<R>) => void;
-    mutateAsync: (args: Ref.Args<R>) => Promise<Ref.Returns<R>>;
-    reset: () => void;
-} & (
-    | {
-          status: "idle";
-          isIdle: true;
-          isPending: false;
-          isSuccess: false;
-          isError: false;
-          data: undefined;
-          error: undefined;
-      }
-    | {
-          status: "success";
-          isIdle: false;
-          isPending: false;
-          isSuccess: true;
-          isError: false;
-          data: Ref.Returns<R>;
-      }
-    | {
-          status: "error";
-          isIdle: false;
-          isPending: false;
-          isSuccess: false;
-          isError: true;
-          rawError: unknown;
-          error: FunctionSpecificError<R> | undefined;
-          data: undefined;
-      }
-    | {
-          isIdle: false;
-          isPending: true;
-          isSuccess: false;
-          isError: false;
-          status: "pending";
-          data: undefined;
-          error: undefined;
-      }
-);
-
-function useConfectInvoke<R extends Ref.Any>(
-    invoke: ConfectInvoke<R>,
-    options: UseConfectInvokeOptions<R> = {},
-): UseConfectInvokeResult<R> {
-    const [status, setStatus] = useState<ConfectStatus>("idle");
-    const [data, setData] = useState<Ref.Returns<R>>();
-    const [error, setError] = useState<FunctionSpecificError<R>>();
-    const [rawError, setRawError] = useState<unknown>();
-
-    const handleError = useCallback(
-        async (nextError: unknown, args: Ref.Args<R>) => {
-            setRawError(nextError);
-            setStatus("error");
-
-            if (isWireError(nextError)) {
-                if (options.toastWireErrors !== false)
-                    toast.error(mutationErrorMessage(nextError));
-            } else {
-                setError(nextError as FunctionSpecificError<R>);
-                await options.onError?.(
-                    nextError as FunctionSpecificError<R>,
-                    args,
-                );
-            }
-
-            await options.onSettled?.(undefined, nextError, args);
-        },
-        [options],
-    );
-
-    const mutateAsync = useCallback(
-        async (args: Ref.Args<R>) => {
-            setStatus("pending");
-            setError(undefined);
-            setRawError(undefined);
-            setData(undefined);
-
-            let result;
-            try {
-                result = await invoke(args);
-            } catch (nextError) {
-                await handleError(nextError, args);
-                throw nextError;
-            }
-
-            if (!Result.isResult(result)) {
-                // functions without an error schema resolve to the bare value
-                result = Result.succeed(result);
-            }
-            return Result.match(result, {
-                onFailure: async (nextError) => {
-                    await handleError(nextError, args);
-                    throw nextError;
-                },
-                onSuccess: async (nextData) => {
-                    setData(nextData);
-                    setStatus("success");
-                    await options.onSuccess?.(nextData, args);
-                    await options.onSettled?.(nextData, undefined, args);
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                    return nextData;
-                },
-            });
-        },
-        [handleError, invoke, options],
-    );
-
-    const mutate = useCallback(
-        (args: Ref.Args<R>) => {
-            void mutateAsync(args).catch(() => undefined);
-        },
-        [mutateAsync],
-    );
-
-    const reset = useCallback(() => {
-        setStatus("idle");
-        setData(undefined);
-        setError(undefined);
-        setRawError(undefined);
-    }, []);
-
-    return {
-        mutate,
-        mutateAsync,
-        reset,
-        status,
-        data,
-        error,
-        rawError,
-        isIdle: status === "idle",
-        isPending: status === "pending",
-        isSuccess: status === "success",
-        isError: status === "error",
-    } as UseConfectInvokeResult<R>;
-}
+type Invoke<R extends Ref.Any> = (args: Ref.Args<R>) => Promise<unknown>;
 
 /**
- * Confect mutation with small TanStack-like UI state.
+ * Confect resolves functions with an error schema to a `Result`; TanStack
+ * expects a rejected promise, so the failure is rethrown.
  */
+const unwrap = async <R extends Ref.Any>(
+    ref: R,
+    pending: Promise<unknown>,
+): Promise<Ref.Returns<R>> => {
+    const value = await pending;
+    return Ref.hasErrorSchema(ref)
+        ? Result.getOrThrow(
+              value as Result.Result<Ref.Returns<R>, Ref.Error<R>>,
+          )
+        : (value as Ref.Returns<R>);
+};
+
 export function useConfectMutation<R extends Ref.AnyPublicMutation>(
     ref: R,
-    options?: UseConfectInvokeOptions<R>,
-): UseConfectInvokeResult<R> {
-    const invoke = useConfectReactMutation(ref);
-    return useConfectInvoke(invoke, options);
+    options?: ConfectMutationOptions<R>,
+) {
+    const invoke = useMutation(ref) as unknown as Invoke<R>;
+    return useTanstackMutation({
+        ...options,
+        mutationFn: (args) => unwrap(ref, invoke(args)),
+    });
 }
 
-/**
- * Confect action with small TanStack-like UI state.
- */
 export function useConfectAction<R extends Ref.AnyPublicAction>(
     ref: R,
-    options?: UseConfectInvokeOptions<R>,
-): UseConfectInvokeResult<R> {
-    const invoke = useConfectReactAction(ref);
-    return useConfectInvoke(invoke, options);
+    options?: ConfectMutationOptions<R>,
+) {
+    const invoke = useAction(ref) as unknown as Invoke<R>;
+    return useTanstackMutation({
+        ...options,
+        mutationFn: (args) => unwrap(ref, invoke(args)),
+    });
 }

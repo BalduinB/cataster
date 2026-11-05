@@ -1,15 +1,22 @@
 /// <reference types="vite/client" />
 import type { AnyRouteMatch } from "@tanstack/react-router";
 import type * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+    MutationCache,
+    QueryClient,
+    QueryClientProvider,
+} from "@tanstack/react-query";
 import {
     createRouter as createTanStackRouter,
     Link,
 } from "@tanstack/react-router";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { toast } from "sonner";
 
 import { buttonVariants } from "@cataster/ui/components/base/button";
+import { isWireError } from "@cataster/validators";
 
+import { wireErrorMessage } from "./lib/errors";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
@@ -21,7 +28,15 @@ export function getRouter() {
     const convex = new ConvexReactClient(CONVEX_URL, {
         unsavedChangesWarning: false,
     });
-    const queryClient = new QueryClient();
+    const queryClient = new QueryClient({
+        mutationCache: new MutationCache({
+            // Shared wire errors (auth, not found, ...) get a toast everywhere;
+            // function-specific errors are left to each mutation.
+            onError: (error) => {
+                if (isWireError(error)) toast.error(wireErrorMessage(error));
+            },
+        }),
+    });
 
     const router = createTanStackRouter({
         routeTree,

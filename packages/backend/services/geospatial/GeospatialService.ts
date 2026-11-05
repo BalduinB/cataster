@@ -1,3 +1,4 @@
+import { GeospatialIndex } from "@convex-dev/geospatial";
 import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -46,9 +47,6 @@ export class GeospatialService extends Context.Service<
 export const GeospatialServiceLive = Layer.effect(
     GeospatialService,
     Effect.gen(function* () {
-        const { GeospatialIndex } = yield* Effect.promise(
-            () => import("@convex-dev/geospatial"),
-        );
         const index = new GeospatialIndex(components.geospatial);
 
         const insert: GeospatialService["Service"]["insert"] = (key, point) =>
