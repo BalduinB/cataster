@@ -12,9 +12,10 @@ import locations from "./locations.spec";
 const list = FunctionImpl.make(databaseSchema, locations, "list", () =>
     Effect.gen(function* () {
         const user = yield* requireAbility("read", "Location");
-        const locationList = yield* LocationService.list();
-        return yield* Effect.filter(locationList, (location) =>
-            Effect.succeed(canReadLocation(user, location)),
+        const locationService = yield* LocationService;
+        const locationList = yield* locationService.list();
+        return locationList.filter((location) =>
+            canReadLocation(user, location),
         );
     }).pipe(Effect.provide(ServicesLive)),
 );
@@ -22,7 +23,8 @@ const list = FunctionImpl.make(databaseSchema, locations, "list", () =>
 const get = FunctionImpl.make(databaseSchema, locations, "get", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("read", "Location");
-        const loc = yield* LocationService.getById(id);
+        const locationService = yield* LocationService;
+        const loc = yield* locationService.getById(id);
         yield* requireAbility("read", subject("Location", loc));
         return loc;
     }).pipe(Effect.provide(ServicesLive)),
@@ -31,7 +33,8 @@ const get = FunctionImpl.make(databaseSchema, locations, "get", ({ id }) =>
 const create = FunctionImpl.make(databaseSchema, locations, "create", (args) =>
     Effect.gen(function* () {
         yield* requireAbility("create", "Location");
-        return yield* LocationService.create(args);
+        const locationService = yield* LocationService;
+        return yield* locationService.create(args);
     }).pipe(Effect.provide(ServicesLive)),
 );
 
@@ -41,9 +44,10 @@ const update = FunctionImpl.make(
     "update",
     ({ id, name }) =>
         Effect.gen(function* () {
-            const location = yield* LocationService.getById(id);
+            const locationService = yield* LocationService;
+            const location = yield* locationService.getById(id);
             yield* requireAbility("update", subject("Location", location));
-            yield* LocationService.rename(id, name);
+            yield* locationService.rename(id, name);
             return null;
         }).pipe(Effect.provide(ServicesLive)),
 );
@@ -54,9 +58,10 @@ const remove = FunctionImpl.make(
     "remove",
     ({ id }) =>
         Effect.gen(function* () {
-            const location = yield* LocationService.getById(id);
+            const locationService = yield* LocationService;
+            const location = yield* locationService.getById(id);
             yield* requireAbility("delete", subject("Location", location));
-            yield* LocationService.remove(id);
+            yield* locationService.remove(id);
             return null;
         }).pipe(Effect.provide(ServicesLive)),
 );

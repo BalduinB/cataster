@@ -4,9 +4,8 @@ packages:
     - tooling/*
 
 catalog:
-    "@effect/platform": ^0.94.5
-    "@effect/platform-node": ^0.104.1
-    "@effect/vitest": ^0.29.0
+    "@effect/platform-node": ~4.1.2
+    "@effect/vitest": ~4.1.2
     "@eslint/js": ^9.38.0
     "@tailwindcss/postcss": ^4.1.16
     "@tailwindcss/vite": ^4.1.16
@@ -15,15 +14,15 @@ catalog:
     "@types/node": ^22.18.12
     "@vitejs/plugin-react": 5.1.0
     concurrently: ^9.2.1
-    convex: ^1.36.1
-    convex-test: 0.0.38
-    effect: ^3.21.2
+    convex: ^1.49.0
+    convex-test: 0.0.67
+    effect: ~4.1.2
     eslint: ^9.38.0
     prettier: ^3.6.2
     tailwindcss: ^4.1.16
     typescript: ^5.9.3
     vite: 7.1.12
-    vitest: ^3.2.4
+    vitest: ^5.1.0
     zod: ^4.1.12
 
 catalogs:
@@ -33,11 +32,11 @@ catalogs:
         react: 19.1.4
         react-dom: 19.1.4
     "confect":
-        "@confect/cli": ^9.2.3
-        "@confect/core": ^9.2.3
-        "@confect/react": ^9.2.3
-        "@confect/server": ^9.2.3
-        "@confect/test": ^9.2.3
+        "@confect/cli": ^10.5.0
+        "@confect/core": ^10.5.0
+        "@confect/react": ^10.5.0
+        "@confect/server": ^10.5.0
+        "@confect/test": ^10.5.0
 
 linkWorkspacePackages: true
 

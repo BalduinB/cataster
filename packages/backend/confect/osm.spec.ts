@@ -11,14 +11,14 @@ import {
 
 const searchAreas = FunctionSpec.publicAction({
     name: "searchAreas",
-    args: () => OsmSearchArgs,
+    args: () => OsmSearchArgs.fields,
     returns: () => Schema.Array(OsmSearchResult),
     error: () => OsmActionErrorUnion,
 });
 
 const fetchBoundary = FunctionSpec.publicAction({
     name: "fetchBoundary",
-    args: () => OsmFetchBoundaryArgs,
+    args: () => OsmFetchBoundaryArgs.fields,
     returns: () => OsmBoundary,
     error: () => OsmActionErrorUnion,
 });

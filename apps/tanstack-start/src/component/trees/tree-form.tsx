@@ -47,7 +47,7 @@ export function TreeCreateForm({
             longitude: treePosition.lng,
         } as TreeFormSchema,
         validators: {
-            onSubmit: Schema.standardSchemaV1(TreeFormSchema),
+            onSubmit: Schema.toStandardSchemaV1(TreeFormSchema),
         },
         onSubmit: async ({ value }) =>
             await submitMutation.mutateAsync({
@@ -113,7 +113,7 @@ export function TreeEditForm({
             latitude: tree.latitude,
         } as TreeFormSchema,
         validators: {
-            onSubmit: Schema.standardSchemaV1(TreeFormSchema),
+            onSubmit: Schema.toStandardSchemaV1(TreeFormSchema),
         },
         onSubmit: async ({ formApi }) => {
             if (!isDirty(formApi))

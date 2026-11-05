@@ -42,4 +42,8 @@ const isInternalError = <E>(e: E): e is Extract<E, InternalError> =>
 export const dieOnInternal = <A, E, R>(
     self: Effect.Effect<A, E, R>,
 ): Effect.Effect<A, Exclude<E, Extract<E, InternalError>>, R> =>
-    Effect.catchIf(self, isInternalError, (e) => Effect.die(e));
+    /* `catchIf`'s conditional return type cannot resolve while `E` is still
+     * generic, so restate the (sound) narrowed error channel explicitly. */
+    Effect.catchIf(self, isInternalError, (e) =>
+        Effect.die(e),
+    ) as Effect.Effect<A, Exclude<E, Extract<E, InternalError>>, R>;

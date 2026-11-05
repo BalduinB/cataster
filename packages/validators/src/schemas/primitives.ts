@@ -15,7 +15,7 @@ export type LatLng = Schema.Schema.Type<typeof LatLng>;
  * union so the form picker, the wire payload, and the database column all
  * agree on the allowed values.
  */
-export const Vitality = Schema.Literal(0, 1, 2, 3, 4);
+export const Vitality = Schema.Literals([0, 1, 2, 3, 4]);
 export type Vitality = Schema.Schema.Type<typeof Vitality>;
 
 /**

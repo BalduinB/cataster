@@ -1,4 +1,5 @@
 import type { Schema } from "effect";
+import { Struct } from "effect";
 
 import { FieldGroup, FieldSet } from "@cataster/ui/components/base/field";
 import { SelectItem } from "@cataster/ui/components/base/select";
@@ -9,7 +10,9 @@ import { TreeCreateArgs } from "@cataster/validators";
 import { TREE_VITALITY_OPTIONS } from "~/lib/tree-constants";
 import { SpeciesCombobox } from "./species-combobox";
 
-export const TreeFormSchema = TreeCreateArgs.omit("locationId");
+export const TreeFormSchema = TreeCreateArgs.mapFields(
+    Struct.omit(["locationId"]),
+);
 export type TreeFormSchema = Schema.Schema.Type<typeof TreeFormSchema>;
 export const TreeFormFields = withForm({
     defaultValues: {} as TreeFormSchema,

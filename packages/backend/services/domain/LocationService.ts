@@ -1,4 +1,4 @@
-import { Effect, Layer } from "effect";
+import { Context, Effect, Layer } from "effect";
 
 import type { LatLng, OrgId } from "@cataster/validators";
 import { ConflictError, NotFoundError } from "@cataster/validators";
@@ -24,9 +24,7 @@ type CreateInput = {
     readonly centroid: LatLng;
 };
 
-export class LocationService extends Effect.Tag(
-    "@cataster/services/LocationService",
-)<
+export class LocationService extends Context.Service<
     LocationService,
     {
         readonly list: () => Effect.Effect<
@@ -64,7 +62,7 @@ export class LocationService extends Effect.Tag(
             DatabaseReader | DatabaseWriter | Auth
         >;
     }
->() {}
+>()("@cataster/services/LocationService") {}
 
 export const LocationServiceLive = Layer.sync(LocationService, () => {
     const resolveById = (id: LocationId, orgId: OrgId) =>
@@ -78,19 +76,19 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
             return doc;
         });
 
-    const list: LocationService["Type"]["list"] = () =>
+    const list: LocationService["Service"]["list"] = () =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             return yield* LocationRepository.listByOrg(orgId);
         });
 
-    const getById: LocationService["Type"]["getById"] = (id) =>
+    const getById: LocationService["Service"]["getById"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             return yield* resolveById(id, orgId);
         });
 
-    const assertContainsPoint: LocationService["Type"]["assertContainsPoint"] =
+    const assertContainsPoint: LocationService["Service"]["assertContainsPoint"] =
         (id, point) =>
             Effect.gen(function* () {
                 const { orgId } = yield* Effect.orDie(requireUser);
@@ -105,7 +103,7 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
                 }
             });
 
-    const create: LocationService["Type"]["create"] = (input) =>
+    const create: LocationService["Service"]["create"] = (input) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             return yield* LocationRepository.insert({
@@ -119,7 +117,7 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
             });
         });
 
-    const rename: LocationService["Type"]["rename"] = (id, name) =>
+    const rename: LocationService["Service"]["rename"] = (id, name) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             yield* resolveById(id, orgId);
@@ -129,7 +127,7 @@ export const LocationServiceLive = Layer.sync(LocationService, () => {
             });
         });
 
-    const remove: LocationService["Type"]["remove"] = (id) =>
+    const remove: LocationService["Service"]["remove"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             yield* resolveById(id, orgId);

@@ -1,3 +1,4 @@
+import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 
@@ -21,9 +22,7 @@ type Point = { readonly latitude: number; readonly longitude: number };
  * Convex-only dependencies are loaded inside the layer factory so Confect
  * codegen can bundle impl modules without evaluating geospatial client code.
  */
-export class GeospatialService extends Effect.Tag(
-    "@cataster/services/GeospatialService",
-)<
+export class GeospatialService extends Context.Service<
     GeospatialService,
     {
         readonly containsPoint: (
@@ -42,7 +41,7 @@ export class GeospatialService extends Effect.Tag(
             point: Point,
         ) => Effect.Effect<void, never, MutationCtx>;
     }
->() {}
+>()("@cataster/services/GeospatialService") {}
 
 export const GeospatialServiceLive = Layer.effect(
     GeospatialService,
@@ -52,7 +51,7 @@ export const GeospatialServiceLive = Layer.effect(
         );
         const index = new GeospatialIndex(components.geospatial);
 
-        const insert: GeospatialService["Type"]["insert"] = (key, point) =>
+        const insert: GeospatialService["Service"]["insert"] = (key, point) =>
             Effect.gen(function* () {
                 const ctx = yield* MutationCtx;
                 yield* Effect.tryPromise({
@@ -65,7 +64,7 @@ export const GeospatialServiceLive = Layer.effect(
          * Geospatial entries may not exist yet (e.g. a tree imported before the
          * index was added), so a missing key on remove is not an error.
          */
-        const remove: GeospatialService["Type"]["remove"] = (key) =>
+        const remove: GeospatialService["Service"]["remove"] = (key) =>
             Effect.gen(function* () {
                 const ctx = yield* MutationCtx;
                 yield* Effect.tryPromise({
@@ -74,7 +73,7 @@ export const GeospatialServiceLive = Layer.effect(
                 }).pipe(Effect.ignore);
             });
 
-        const move: GeospatialService["Type"]["move"] = (key, point) =>
+        const move: GeospatialService["Service"]["move"] = (key, point) =>
             Effect.gen(function* () {
                 yield* remove(key);
                 yield* insert(key, point);

@@ -18,7 +18,9 @@ export const Route = createFileRoute("/app/locations/$id")({
     },
     params: {
         parse: (raw) =>
-            Schema.validateSync(Schema.Struct({ id: LocationId }))(raw),
+            Schema.decodeUnknownSync(
+                Schema.toType(Schema.Struct({ id: LocationId })),
+            )(raw),
     },
     errorComponent: LocationRouteError,
     onError: (error) => {

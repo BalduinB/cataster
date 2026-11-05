@@ -9,7 +9,7 @@ import {
     useAction as useConfectReactAction,
     useMutation as useConfectReactMutation,
 } from "@confect/react";
-import { Either } from "effect";
+import { Result } from "effect";
 import { toast } from "sonner";
 
 import type { WireError } from "@cataster/validators";
@@ -21,7 +21,7 @@ type ConfectStatus = "idle" | "pending" | "success" | "error";
 
 type ConfectInvoke<R extends Ref.Any> = (
     args: Ref.Args<R>,
-) => Promise<Ref.Returns<R> | Either.Either<Ref.Returns<R>, Ref.Error<R>>>;
+) => Promise<Ref.Returns<R> | Result.Result<Ref.Returns<R>, Ref.Error<R>>>;
 
 type FunctionSpecificError<R extends Ref.Any> = Exclude<
     Ref.Error<R>,
@@ -133,16 +133,16 @@ function useConfectInvoke<R extends Ref.Any>(
                 throw nextError;
             }
 
-            if (!Either.isEither(result)) {
-                // map no error schema to right
-                result = Either.right(result);
+            if (!Result.isResult(result)) {
+                // functions without an error schema resolve to the bare value
+                result = Result.succeed(result);
             }
-            return Either.match(result, {
-                onLeft: async (nextError) => {
+            return Result.match(result, {
+                onFailure: async (nextError) => {
                     await handleError(nextError, args);
                     throw nextError;
                 },
-                onRight: async (nextData) => {
+                onSuccess: async (nextData) => {
                     setData(nextData);
                     setStatus("success");
                     await options.onSuccess?.(nextData, args);

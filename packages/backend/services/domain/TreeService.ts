@@ -1,5 +1,5 @@
 import { differenceInDays } from "date-fns";
-import { Array, Effect, Layer, Order } from "effect";
+import { Array, Context, Effect, Layer, Order } from "effect";
 
 import { ConflictError, NotFoundError } from "@cataster/validators";
 
@@ -55,7 +55,7 @@ type UpdateInput = {
     readonly longitude?: number;
 };
 
-export class TreeService extends Effect.Tag("@cataster/services/TreeService")<
+export class TreeService extends Context.Service<
     TreeService,
     {
         readonly getById: (
@@ -112,10 +112,10 @@ export class TreeService extends Effect.Tag("@cataster/services/TreeService")<
             DatabaseReader
         >;
     }
->() {}
+>()("@cataster/services/TreeService") {}
 
 export const TreeServiceLive = Layer.sync(TreeService, () => {
-    const getById: TreeService["Type"]["getById"] = (id) =>
+    const getById: TreeService["Service"]["getById"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const doc = yield* TreeRepository.getById(id);
@@ -123,7 +123,7 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
             return doc;
         });
 
-    const listByLocation: TreeService["Type"]["listByLocation"] = (
+    const listByLocation: TreeService["Service"]["listByLocation"] = (
         locationId,
     ) =>
         Effect.gen(function* () {
@@ -138,11 +138,11 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
                     !tree.nextControlAt
                         ? Infinity
                         : differenceInDays(tree.nextControlAt, new Date()),
-                Order.number,
+                Order.Number,
             );
         });
 
-    const assertPlateNumberUnique: TreeService["Type"]["assertPlateNumberUnique"] =
+    const assertPlateNumberUnique: TreeService["Service"]["assertPlateNumberUnique"] =
         (locationId, plateNumber, currentTreeId) =>
             Effect.gen(function* () {
                 if (!plateNumber) return;
@@ -165,7 +165,7 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
                 }
             });
 
-    const create: TreeService["Type"]["create"] = (input) =>
+    const create: TreeService["Service"]["create"] = (input) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
 
@@ -210,7 +210,8 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
                 updatedAt: Date.now(),
             });
 
-            yield* GeospatialService.insert(treeId, {
+            const geospatial = yield* GeospatialService;
+            yield* geospatial.insert(treeId, {
                 latitude: input.latitude,
                 longitude: input.longitude,
             });
@@ -218,7 +219,7 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
             return treeId;
         });
 
-    const update: TreeService["Type"]["update"] = ({ id, ...data }) =>
+    const update: TreeService["Service"]["update"] = ({ id, ...data }) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
 
@@ -301,11 +302,12 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
             });
 
             if (positionChanged) {
-                yield* GeospatialService.move(id, { latitude, longitude });
+                const geospatial = yield* GeospatialService;
+                yield* geospatial.move(id, { latitude, longitude });
             }
         });
 
-    const remove: TreeService["Type"]["remove"] = (id) =>
+    const remove: TreeService["Service"]["remove"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const existing = yield* TreeRepository.getById(id);
@@ -315,11 +317,12 @@ export const TreeServiceLive = Layer.sync(TreeService, () => {
                 );
             }
 
-            yield* GeospatialService.remove(id);
+            const geospatial = yield* GeospatialService;
+            yield* geospatial.remove(id);
             yield* TreeRepository.remove(id);
         });
 
-    const streamAll: TreeService["Type"]["streamAll"] = () =>
+    const streamAll: TreeService["Service"]["streamAll"] = () =>
         TreeRepository.listAll();
 
     return {

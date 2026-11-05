@@ -20,12 +20,12 @@ export class ConflictError extends Schema.TaggedError<ConflictError>()(
     { message: Schema.String },
 ) {}
 
-export const WireErrorUnion = Schema.Union(
+export const WireErrorUnion = Schema.Union([
     UnauthorizedError,
     ForbiddenError,
     NotFoundError,
     ConflictError,
-);
+]);
 export const wireTags = new Set<string>([
     "Unauthorized",
     "Forbidden",
@@ -41,9 +41,15 @@ export const isWireError = (error: unknown): error is WireError => {
 };
 
 export type WireError = Schema.Schema.Type<typeof WireErrorUnion>;
-export type WireErrorEncoded = Schema.Schema.Encoded<typeof WireErrorUnion>;
-export const AuthErrorUnion = Schema.Union(UnauthorizedError, ForbiddenError);
+export type WireErrorEncoded = Schema.Codec.Encoded<typeof WireErrorUnion>;
+export const AuthErrorUnion = Schema.Union([UnauthorizedError, ForbiddenError]);
 
-export const ReadErrorUnion = Schema.Union(AuthErrorUnion, NotFoundError);
+export const ReadErrorUnion = Schema.Union([
+    ...AuthErrorUnion.members,
+    NotFoundError,
+]);
 
-export const WriteErrorUnion = Schema.Union(ReadErrorUnion, ConflictError);
+export const WriteErrorUnion = Schema.Union([
+    ...ReadErrorUnion.members,
+    ConflictError,
+]);

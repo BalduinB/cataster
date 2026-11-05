@@ -23,9 +23,12 @@ const listByLocation = FunctionImpl.make(
     ({ locationId }) =>
         Effect.gen(function* () {
             yield* requireAbility("read", "Tree");
-            yield* LocationService.getById(locationId);
-            const treeList = yield* TreeService.listByLocation(locationId);
-            const speciesById = yield* SpeciesService.loadByIds(
+            const locationService = yield* LocationService;
+            const treeService = yield* TreeService;
+            const speciesService = yield* SpeciesService;
+            yield* locationService.getById(locationId);
+            const treeList = yield* treeService.listByLocation(locationId);
+            const speciesById = yield* speciesService.loadByIds(
                 treeList.map((t) => t.speciesId),
             );
             return { trees: treeList, speciesById };
@@ -35,7 +38,8 @@ const listByLocation = FunctionImpl.make(
 const get = FunctionImpl.make(databaseSchema, trees, "get", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("read", "Tree");
-        const tree = yield* TreeService.getById(id);
+        const treeService = yield* TreeService;
+        const tree = yield* treeService.getById(id);
         if (!tree) {
             return yield* Effect.fail(
                 new NotFoundError({ message: "Baum nicht gefunden" }),
@@ -48,12 +52,15 @@ const get = FunctionImpl.make(databaseSchema, trees, "get", ({ id }) =>
 const create = FunctionImpl.make(databaseSchema, trees, "create", (args) =>
     Effect.gen(function* () {
         yield* requireAbility("create", "Tree");
-        yield* SpeciesService.getForOrg(args.speciesId);
-        yield* LocationService.assertContainsPoint(args.locationId, {
+        const locationService = yield* LocationService;
+        const treeService = yield* TreeService;
+        const speciesService = yield* SpeciesService;
+        yield* speciesService.getForOrg(args.speciesId);
+        yield* locationService.assertContainsPoint(args.locationId, {
             lat: args.latitude,
             lng: args.longitude,
         });
-        return yield* TreeService.create(args);
+        return yield* treeService.create(args);
     }).pipe(Effect.provide(ServicesLive)),
 );
 
@@ -64,21 +71,24 @@ const update = FunctionImpl.make(
     ({ id, ...data }) =>
         Effect.gen(function* () {
             yield* requireAbility("update", "Tree");
+            const locationService = yield* LocationService;
+            const treeService = yield* TreeService;
+            const speciesService = yield* SpeciesService;
             if (data.speciesId) {
-                yield* SpeciesService.getForOrg(data.speciesId);
+                yield* speciesService.getForOrg(data.speciesId);
             }
             if (data.latitude !== undefined || data.longitude !== undefined) {
-                const existing = yield* TreeService.getById(id);
+                const existing = yield* treeService.getById(id);
                 if (existing) {
                     const lat = data.latitude ?? existing.latitude;
                     const lng = data.longitude ?? existing.longitude;
-                    yield* LocationService.assertContainsPoint(
+                    yield* locationService.assertContainsPoint(
                         existing.locationId,
                         { lat, lng },
                     );
                 }
             }
-            yield* TreeService.update({ id, ...data });
+            yield* treeService.update({ id, ...data });
             return null;
         }).pipe(Effect.provide(ServicesLive)),
 );
@@ -86,7 +96,8 @@ const update = FunctionImpl.make(
 const remove = FunctionImpl.make(databaseSchema, trees, "remove", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("delete", "Tree");
-        yield* TreeService.remove(id);
+        const treeService = yield* TreeService;
+        yield* treeService.remove(id);
         return null;
     }).pipe(Effect.provide(ServicesLive)),
 );
@@ -97,7 +108,8 @@ const recomputeNextControlDates = FunctionImpl.make(
     "recomputeNextControlDates",
     () =>
         Effect.gen(function* () {
-            const allTrees = yield* TreeService.streamAll();
+            const treeService = yield* TreeService;
+            const allTrees = yield* treeService.streamAll();
             const now = Date.now();
 
             yield* Effect.forEach(

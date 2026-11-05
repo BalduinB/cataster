@@ -15,51 +15,47 @@ import treesTable from "./_generated/tables/trees";
 
 const listByLocation = FunctionSpec.publicQuery({
     name: "listByLocation",
-    args: () => Schema.Struct({ locationId: Id("locations") }),
+    args: () => ({ locationId: Id("locations") }),
     returns: () =>
         Schema.Struct({
             trees: Schema.Array(treesTable.Doc),
-            speciesById: Schema.Record({
-                key: Id("species"),
-                value: speciesTable.Doc,
-            }),
+            speciesById: Schema.Record(Id("species"), speciesTable.Doc),
         }),
     error: () => ReadErrorUnion,
 });
 
 const get = FunctionSpec.publicQuery({
     name: "get",
-    args: () => Schema.Struct({ id: Id("trees") }),
+    args: () => ({ id: Id("trees") }),
     returns: () => treesTable.Doc,
     error: () => ReadErrorUnion,
 });
 
 const create = FunctionSpec.publicMutation({
     name: "create",
-    args: () => TreeCreateArgs,
+    args: () => TreeCreateArgs.fields,
     returns: () => Id("trees"),
     error: () => WriteErrorUnion,
 });
 
 const update = FunctionSpec.publicMutation({
     name: "update",
-    args: () => TreeUpdateArgs,
+    args: () => TreeUpdateArgs.fields,
     returns: () => Schema.Null,
     error: () => WriteErrorUnion,
 });
 
 const remove = FunctionSpec.publicMutation({
     name: "remove",
-    args: () => Schema.Struct({ id: Id("trees") }),
+    args: () => ({ id: Id("trees") }),
     returns: () => Schema.Null,
     error: () => WriteErrorUnion,
 });
 
 const recomputeNextControlDates = FunctionSpec.internalMutation({
     name: "recomputeNextControlDates",
-    args: () => Schema.Struct({}),
     returns: () => Schema.Null,
-    error: () => Schema.Union(ConflictError),
+    error: () => ConflictError,
 });
 
 export default GroupSpec.make()

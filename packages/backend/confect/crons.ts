@@ -3,7 +3,7 @@ import { Cron } from "effect";
 
 import refs from "./_generated/refs";
 
-const dailyAtTwoAm = Cron.unsafeParse("0 2 * * *");
+const dailyAtTwoAm = Cron.parseUnsafe("0 2 * * *");
 
 /**
  * Runs every minute to keep system species (`species.orgId === null`) in
@@ -15,7 +15,7 @@ const dailyAtTwoAm = Cron.unsafeParse("0 2 * * *");
  * Removing entries from `DEFAULT_SPECIES` does **not** delete the
  * corresponding rows; system catalog deletions are an explicit operation.
  */
-const hourly = Cron.unsafeParse("0 * * * *");
+const hourly = Cron.parseUnsafe("0 * * * *");
 
 const dailyCrons = CronJobs.make().add(
     CronJob.make(

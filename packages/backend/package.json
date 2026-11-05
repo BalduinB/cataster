@@ -37,7 +37,6 @@
         "@confect/core": "catalog:confect",
         "@confect/server": "catalog:confect",
         "@convex-dev/geospatial": "^0.2.1",
-        "@effect/platform": "catalog:",
         "@effect/platform-node": "catalog:",
         "@turf/boolean-point-in-polygon": "^7.3.4",
         "@turf/helpers": "^7.3.4",

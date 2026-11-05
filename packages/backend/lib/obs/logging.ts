@@ -15,12 +15,13 @@ const fmt =
     process.env.LOG_FORMAT ??
     (process.env.NODE_ENV === "production" ? "json" : "pretty");
 
-export const LoggerLive =
+export const LoggerLive = Logger.layer([
     fmt === "json"
-        ? Logger.json
+        ? Logger.consoleJson
         : fmt === "logfmt"
-          ? Logger.logFmt
-          : Logger.pretty;
+          ? Logger.consoleLogFmt
+          : Logger.consolePretty(),
+]);
 
 /**
  * Boundary for a single use-case (one Convex function call). Emits exactly
@@ -44,7 +45,7 @@ export const wideEvent =
     <A, E, R>(self: Effect.Effect<A, E, R>) =>
         self.pipe(
             Effect.tap(() => Effect.logInfo(`${name}.ok`)),
-            Effect.tapErrorCause((cause) =>
+            Effect.tapCause((cause) =>
                 Effect.logError(`${name}.fail`).pipe(
                     Effect.annotateLogs("error", Cause.pretty(cause)),
                 ),

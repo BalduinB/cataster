@@ -1,6 +1,4 @@
-import { Effect, Layer, Logger, Schema } from "effect";
-import { Service } from "effect/Effect";
-import { prettyLogger } from "effect/Logger";
+import { Context, Effect, Layer, Schema } from "effect";
 
 import { ConflictError, NotFoundError } from "@cataster/validators";
 
@@ -48,11 +46,11 @@ export class OsmApiError extends Schema.TaggedError<OsmApiError>()(
  *
  * - Network failures land as `OsmApiError` instead of unrecoverable defects.
  * - Response payloads are decoded through `OsmSchemas`, so any shape change
- *   surfaces as a typed `ParseError`.
+ *   surfaces as a typed `SchemaError`.
  * - `fetchBoundary` distinguishes "missing geometry" (`NotFoundError`) from
  *   "upstream broken" (`OsmApiError`).
  */
-export class OsmService extends Effect.Tag("@cataster/services/OsmService")<
+export class OsmService extends Context.Service<
     OsmService,
     {
         readonly searchAreas: (
@@ -63,7 +61,7 @@ export class OsmService extends Effect.Tag("@cataster/services/OsmService")<
             readonly osmType: string;
         }) => Effect.Effect<OsmBoundary, ConflictError | NotFoundError>;
     }
->() {}
+>()("@cataster/services/OsmService") {}
 
 const fetchJson = (
     endpoint: string,
@@ -109,7 +107,7 @@ const surfaceUpstream = <A, R>(
     );
 
 export const OsmServiceLive = Layer.sync(OsmService, () => {
-    const searchAreas: OsmService["Type"]["searchAreas"] = (query) =>
+    const searchAreas: OsmService["Service"]["searchAreas"] = (query) =>
         surfaceUpstream(
             Effect.gen(function* () {
                 const params = new URLSearchParams({
@@ -128,7 +126,7 @@ export const OsmServiceLive = Layer.sync(OsmService, () => {
                     },
                 );
 
-                const results = yield* Schema.decodeUnknown(NominatimResults)(
+                const results = yield* Schema.decodeUnknownEffect(NominatimResults)(
                     json,
                 ).pipe(
                     Effect.mapError(
@@ -158,7 +156,7 @@ export const OsmServiceLive = Layer.sync(OsmService, () => {
             }),
         );
 
-    const fetchBoundary: OsmService["Type"]["fetchBoundary"] = ({
+    const fetchBoundary: OsmService["Service"]["fetchBoundary"] = ({
         osmId,
         osmType,
     }) =>
@@ -182,7 +180,7 @@ export const OsmServiceLive = Layer.sync(OsmService, () => {
             );
 
             const data = yield* surfaceUpstream(
-                Schema.decodeUnknown(OverpassResponse)(json).pipe(
+                Schema.decodeUnknownEffect(OverpassResponse)(json).pipe(
                     Effect.mapError(
                         (parseError) =>
                             new OsmApiError({

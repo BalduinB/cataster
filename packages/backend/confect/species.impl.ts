@@ -13,7 +13,8 @@ const listActive = FunctionImpl.make(
     () =>
         Effect.gen(function* () {
             yield* requireAbility("read", "Species");
-            return yield* SpeciesService.listForOrg();
+            const speciesService = yield* SpeciesService;
+            return yield* speciesService.listForOrg();
         }).pipe(Effect.provide(ServicesLive)),
 );
 
@@ -24,8 +25,9 @@ const create = FunctionImpl.make(
     ({ deName, botanicalName }) =>
         Effect.gen(function* () {
             yield* requireAbility("create", "Species");
-            const existing = yield* SpeciesService.listForOrg();
-            return yield* SpeciesService.upsertForOrg({
+            const speciesService = yield* SpeciesService;
+            const existing = yield* speciesService.listForOrg();
+            return yield* speciesService.upsertForOrg({
                 deName,
                 botanicalName,
                 sortOrder: existing.length,
@@ -36,7 +38,8 @@ const create = FunctionImpl.make(
 const remove = FunctionImpl.make(databaseSchema, species, "remove", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("delete", "Species");
-        yield* SpeciesService.removeForOrg(id);
+        const speciesService = yield* SpeciesService;
+        yield* speciesService.removeForOrg(id);
         return null;
     }).pipe(Effect.provide(ServicesLive)),
 );
@@ -48,7 +51,8 @@ const hideSystem = FunctionImpl.make(
     ({ id }) =>
         Effect.gen(function* () {
             yield* requireAbility("manage", "HiddenSpecies");
-            yield* SpeciesService.hideSystemForOrg(id);
+            const speciesService = yield* SpeciesService;
+            yield* speciesService.hideSystemForOrg(id);
             return null;
         }).pipe(Effect.provide(ServicesLive)),
 );
@@ -60,7 +64,8 @@ const unhideSystem = FunctionImpl.make(
     ({ id }) =>
         Effect.gen(function* () {
             yield* requireAbility("manage", "HiddenSpecies");
-            yield* SpeciesService.unhideSystemForOrg(id);
+            const speciesService = yield* SpeciesService;
+            yield* speciesService.unhideSystemForOrg(id);
             return null;
         }).pipe(Effect.provide(ServicesLive)),
 );
@@ -69,7 +74,10 @@ const seedDefaults = FunctionImpl.make(
     databaseSchema,
     species,
     "seedDefaults",
-    () => SpeciesService.seedDefaults().pipe(Effect.provide(ServicesLive)),
+    () =>
+        SpeciesService.use((speciesService) =>
+            speciesService.seedDefaults(),
+        ).pipe(Effect.provide(ServicesLive)),
 );
 
 export default GroupImpl.make(databaseSchema, species).pipe(

@@ -13,35 +13,34 @@ import speciesTable from "./_generated/tables/species";
 
 const listActive = FunctionSpec.publicQuery({
     name: "listActive",
-    args: () => Schema.Struct({}),
     returns: () => Schema.Array(speciesTable.Doc),
     error: () => AuthErrorUnion,
 });
 
 const create = FunctionSpec.publicMutation({
     name: "create",
-    args: () => SpeciesCreateArgs,
+    args: () => SpeciesCreateArgs.fields,
     returns: () => Id("species"),
     error: () => WriteErrorUnion,
 });
 
 const remove = FunctionSpec.publicMutation({
     name: "remove",
-    args: () => Schema.Struct({ id: Id("species") }),
+    args: () => ({ id: Id("species") }),
     returns: () => Schema.Null,
     error: () => WriteErrorUnion,
 });
 
 const hideSystem = FunctionSpec.publicMutation({
     name: "hideSystem",
-    args: () => Schema.Struct({ id: Id("species") }),
+    args: () => ({ id: Id("species") }),
     returns: () => Schema.Null,
     error: () => WriteErrorUnion,
 });
 
 const unhideSystem = FunctionSpec.publicMutation({
     name: "unhideSystem",
-    args: () => Schema.Struct({ id: Id("species") }),
+    args: () => ({ id: Id("species") }),
     returns: () => Schema.Null,
     error: () => WriteErrorUnion,
 });
@@ -53,9 +52,8 @@ const unhideSystem = FunctionSpec.publicMutation({
  */
 const seedDefaults = FunctionSpec.internalMutation({
     name: "seedDefaults",
-    args: () => Schema.Struct({}),
     returns: () => Schema.Array(Id("species")),
-    error: () => Schema.Union(ConflictError),
+    error: () => ConflictError,
 });
 
 export default GroupSpec.make()

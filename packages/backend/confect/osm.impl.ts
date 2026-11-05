@@ -11,7 +11,9 @@ const searchAreas = FunctionImpl.make(
     osm,
     "searchAreas",
     ({ query }) =>
-        OsmService.searchAreas(query).pipe(Effect.provide(ServicesLive)),
+        OsmService.use((osmService) => osmService.searchAreas(query)).pipe(
+            Effect.provide(ServicesLive),
+        ),
 );
 
 const fetchBoundary = FunctionImpl.make(
@@ -19,7 +21,9 @@ const fetchBoundary = FunctionImpl.make(
     osm,
     "fetchBoundary",
     (input) =>
-        OsmService.fetchBoundary(input).pipe(Effect.provide(ServicesLive)),
+        OsmService.use((osmService) => osmService.fetchBoundary(input)).pipe(
+            Effect.provide(ServicesLive),
+        ),
 );
 
 export default GroupImpl.make(databaseSchema, osm).pipe(

@@ -1,4 +1,4 @@
-import { Effect, Layer, Record } from "effect";
+import { Context, Effect, Layer, Record } from "effect";
 
 import type { OrgId } from "@cataster/validators";
 import { ConflictError, NotFoundError } from "@cataster/validators";
@@ -32,9 +32,7 @@ type UpsertSystemInput = {
     readonly sortOrder: number;
 };
 
-export class SpeciesService extends Effect.Tag(
-    "@cataster/services/SpeciesService",
-)<
+export class SpeciesService extends Context.Service<
     SpeciesService,
     {
         readonly listForOrg: () => Effect.Effect<
@@ -82,7 +80,7 @@ export class SpeciesService extends Effect.Tag(
             DatabaseReader | DatabaseWriter
         >;
     }
->() {}
+>()("@cataster/services/SpeciesService") {}
 
 export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
     const collectHiddenIds = (orgId: OrgId) =>
@@ -154,7 +152,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             });
         });
 
-    const listForOrg: SpeciesService["Type"]["listForOrg"] = () =>
+    const listForOrg: SpeciesService["Service"]["listForOrg"] = () =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const hidden = yield* collectHiddenIds(orgId);
@@ -166,13 +164,13 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             return [...visibleSystem, ...ownOrg];
         });
 
-    const getForOrg: SpeciesService["Type"]["getForOrg"] = (id) =>
+    const getForOrg: SpeciesService["Service"]["getForOrg"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             return yield* resolveForOrg(id, orgId);
         });
 
-    const loadByIds: SpeciesService["Type"]["loadByIds"] = (ids) =>
+    const loadByIds: SpeciesService["Service"]["loadByIds"] = (ids) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const uniqueIds = Array.from(new Set(ids));
@@ -195,7 +193,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             );
         });
 
-    const upsertForOrg: SpeciesService["Type"]["upsertForOrg"] = (input) =>
+    const upsertForOrg: SpeciesService["Service"]["upsertForOrg"] = (input) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             return yield* upsertScoped(orgId, {
@@ -205,7 +203,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             });
         });
 
-    const removeForOrg: SpeciesService["Type"]["removeForOrg"] = (id) =>
+    const removeForOrg: SpeciesService["Service"]["removeForOrg"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const doc = yield* resolveForOrg(id, orgId);
@@ -220,7 +218,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             yield* SpeciesRepository.remove(id);
         });
 
-    const hideSystemForOrg: SpeciesService["Type"]["hideSystemForOrg"] = (id) =>
+    const hideSystemForOrg: SpeciesService["Service"]["hideSystemForOrg"] = (id) =>
         Effect.gen(function* () {
             const { orgId } = yield* Effect.orDie(requireUser);
             const doc = yield* resolveForOrg(id, orgId);
@@ -245,7 +243,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             });
         });
 
-    const unhideSystemForOrg: SpeciesService["Type"]["unhideSystemForOrg"] = (
+    const unhideSystemForOrg: SpeciesService["Service"]["unhideSystemForOrg"] = (
         id,
     ) =>
         Effect.gen(function* () {
@@ -259,7 +257,7 @@ export const SpeciesServiceLive = Layer.sync(SpeciesService, () => {
             }
         });
 
-    const seedDefaults: SpeciesService["Type"]["seedDefaults"] = () =>
+    const seedDefaults: SpeciesService["Service"]["seedDefaults"] = () =>
         Effect.gen(function* () {
             const ids: Array<SpeciesId> = [];
             for (const [sortOrder, sp] of DEFAULT_SPECIES.entries()) {

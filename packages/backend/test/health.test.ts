@@ -14,6 +14,6 @@ describe("health", () => {
 
       assertEquals(result.ok, true);
       assertTrue(result.now > 0);
-        }).pipe(Effect.provide(TestConfect.layer())),
+        }).pipe(Effect.provide(TestConfect.layer)),
     );
 });

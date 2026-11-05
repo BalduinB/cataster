@@ -15,7 +15,7 @@ export { OrgId };
 export const UserContext = Schema.Struct({
     userId: Schema.String,
     orgId: OrgId,
-    role: Schema.Literal("admin", "member"),
+    role: Schema.Literals(["admin", "member"]),
 });
 export type UserContext = Schema.Schema.Type<typeof UserContext>;
 
@@ -63,8 +63,8 @@ export const requireUser = Effect.gen(function* () {
         ),
     );
 
-    const parsed = yield* Schema.decodeUnknown(ClerkIdentity)(identity).pipe(
-        Effect.catchTag("ParseError", () =>
+    const parsed = yield* Schema.decodeUnknownEffect(ClerkIdentity)(identity).pipe(
+        Effect.catchTag("SchemaError", () =>
             Effect.fail(
                 new UnauthorizedError({
                     message: "Malformed identity payload",
@@ -89,7 +89,7 @@ export const requireUser = Effect.gen(function* () {
 
     return {
         userId: parsed.subject,
-        orgId: OrgId.make(orgIdRaw),
+        orgId: orgIdRaw,
         role,
     } satisfies UserContext;
 });
