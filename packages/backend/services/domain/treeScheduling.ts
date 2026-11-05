@@ -1,7 +1,9 @@
 import { Effect } from "effect";
-import { rrulestr } from "rrule";
+import rrule from "rrule";
 
 import { ConflictError } from "@cataster/validators";
+
+const { rrulestr } = rrule;
 
 export const DEFAULT_CONTROL_TIMEZONE = "Europe/Berlin";
 

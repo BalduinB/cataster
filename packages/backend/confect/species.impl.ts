@@ -1,19 +1,25 @@
 import { FunctionImpl, GroupImpl } from "@confect/server";
-import { Effect, Layer } from "effect";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 
 import { requireAbility, ServicesLive, SpeciesService } from "../services";
-import api from "./_generated/api";
+import databaseSchema from "./_generated/schema";
+import species from "./species.spec";
 
-const listActive = FunctionImpl.make(api, "species", "listActive", () =>
-    Effect.gen(function* () {
-        yield* requireAbility("read", "Species");
-        return yield* SpeciesService.listForOrg();
-    }).pipe(Effect.provide(ServicesLive)),
+const listActive = FunctionImpl.make(
+    databaseSchema,
+    species,
+    "listActive",
+    () =>
+        Effect.gen(function* () {
+            yield* requireAbility("read", "Species");
+            return yield* SpeciesService.listForOrg();
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const create = FunctionImpl.make(
-    api,
-    "species",
+    databaseSchema,
+    species,
     "create",
     ({ deName, botanicalName }) =>
         Effect.gen(function* () {
@@ -27,7 +33,7 @@ const create = FunctionImpl.make(
         }).pipe(Effect.provide(ServicesLive)),
 );
 
-const remove = FunctionImpl.make(api, "species", "remove", ({ id }) =>
+const remove = FunctionImpl.make(databaseSchema, species, "remove", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("delete", "Species");
         yield* SpeciesService.removeForOrg(id);
@@ -36,8 +42,8 @@ const remove = FunctionImpl.make(api, "species", "remove", ({ id }) =>
 );
 
 const hideSystem = FunctionImpl.make(
-    api,
-    "species",
+    databaseSchema,
+    species,
     "hideSystem",
     ({ id }) =>
         Effect.gen(function* () {
@@ -48,8 +54,8 @@ const hideSystem = FunctionImpl.make(
 );
 
 const unhideSystem = FunctionImpl.make(
-    api,
-    "species",
+    databaseSchema,
+    species,
     "unhideSystem",
     ({ id }) =>
         Effect.gen(function* () {
@@ -59,15 +65,19 @@ const unhideSystem = FunctionImpl.make(
         }).pipe(Effect.provide(ServicesLive)),
 );
 
-const seedDefaults = FunctionImpl.make(api, "species", "seedDefaults", () =>
-    SpeciesService.seedDefaults().pipe(Effect.provide(ServicesLive)),
+const seedDefaults = FunctionImpl.make(
+    databaseSchema,
+    species,
+    "seedDefaults",
+    () => SpeciesService.seedDefaults().pipe(Effect.provide(ServicesLive)),
 );
 
-export const species = GroupImpl.make(api, "species").pipe(
+export default GroupImpl.make(databaseSchema, species).pipe(
     Layer.provide(listActive),
     Layer.provide(create),
     Layer.provide(remove),
     Layer.provide(hideSystem),
     Layer.provide(unhideSystem),
     Layer.provide(seedDefaults),
+    GroupImpl.finalize,
 );

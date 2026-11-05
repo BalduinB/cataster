@@ -36,20 +36,19 @@ describe("isPointInLocationPolygon", () => {
 
     it.effect("returns false for empty polygon", () =>
         Effect.gen(function* () {
-            const result = isPointInLocationPolygon(
-                { lat: 0.5, lng: 0.5 },
-                [],
-            );
+            const result = isPointInLocationPolygon({ lat: 0.5, lng: 0.5 }, []);
             assertEquals(result, false);
         }),
     );
 
     it.effect("returns false for polygon with too few points", () =>
         Effect.gen(function* () {
-            const result = isPointInLocationPolygon(
-                { lat: 0.5, lng: 0.5 },
-                [[{ lat: 0, lng: 0 }, { lat: 1, lng: 1 }]],
-            );
+            const result = isPointInLocationPolygon({ lat: 0.5, lng: 0.5 }, [
+                [
+                    { lat: 0, lng: 0 },
+                    { lat: 1, lng: 1 },
+                ],
+            ]);
             assertEquals(result, false);
         }),
     );

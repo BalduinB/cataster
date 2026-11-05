@@ -18,19 +18,19 @@ const dailyAtTwoAm = Cron.unsafeParse("0 2 * * *");
 const hourly = Cron.unsafeParse("0 * * * *");
 
 const dailyCrons = CronJobs.make().add(
-  CronJob.make(
-    "recompute next tree controls",
-    dailyAtTwoAm,
-    refs.internal.trees.recomputeNextControlDates,
-    {},
-  ),
+    CronJob.make(
+        "recompute next tree controls",
+        dailyAtTwoAm,
+        refs.internal.trees.recomputeNextControlDates,
+        {},
+    ),
 );
 
 export default dailyCrons.add(
-  CronJob.make(
-    "seed system species",
-    hourly,
-    refs.internal.species.seedDefaults,
-    {},
-  ),
+    CronJob.make(
+        "seed system species",
+        hourly,
+        refs.internal.species.seedDefaults,
+        {},
+    ),
 );

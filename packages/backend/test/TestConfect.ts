@@ -1,6 +1,7 @@
 import { TestConfect as TestConfect_ } from "@confect/test";
 
-import confectSchema from "../confect/schema";
+import convexSchema from "../confect/_generated/convexSchema";
+import confectSchema from "../confect/_generated/schema";
 
 /**
  * Confect's testing harness, scoped to this package's database schema.
@@ -15,6 +16,7 @@ import confectSchema from "../confect/schema";
 export const TestConfect = TestConfect_.TestConfect<typeof confectSchema>();
 
 export const layer = TestConfect_.layer(
-  confectSchema,
-  import.meta.glob("../convex/**/!(*.*.*)*.*s"),
+    confectSchema,
+    convexSchema,
+    import.meta.glob("../convex/**/!(*.*.*)*.*s"),
 );

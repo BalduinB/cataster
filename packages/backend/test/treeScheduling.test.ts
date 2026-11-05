@@ -120,28 +120,32 @@ describe("treeScheduling", () => {
     });
 
     describe("computeNextControlAt", () => {
-        it.effect("returns null when no control interval and no additional date", () =>
-            Effect.gen(function* () {
-                const result = yield* computeNextControlAt({
-                    controlIntervalRRule: null,
-                    additionalControlAt: null,
-                    baseDate: Date.now(),
-                });
-                assertEquals(result, null);
-            }),
+        it.effect(
+            "returns null when no control interval and no additional date",
+            () =>
+                Effect.gen(function* () {
+                    const result = yield* computeNextControlAt({
+                        controlIntervalRRule: null,
+                        additionalControlAt: null,
+                        baseDate: Date.now(),
+                    });
+                    assertEquals(result, null);
+                }),
         );
 
-        it.effect("returns additional control date when it is in the future", () =>
-            Effect.gen(function* () {
-                const future = Date.now() + 86400000;
-                const result = yield* computeNextControlAt({
-                    controlIntervalRRule: null,
-                    additionalControlAt: future,
-                    baseDate: Date.now(),
-                    now: Date.now(),
-                });
-                assertEquals(result, future);
-            }),
+        it.effect(
+            "returns additional control date when it is in the future",
+            () =>
+                Effect.gen(function* () {
+                    const future = Date.now() + 86400000;
+                    const result = yield* computeNextControlAt({
+                        controlIntervalRRule: null,
+                        additionalControlAt: future,
+                        baseDate: Date.now(),
+                        now: Date.now(),
+                    });
+                    assertEquals(result, future);
+                }),
         );
 
         it.effect("ignores additional control date in the past", () =>

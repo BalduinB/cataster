@@ -1,5 +1,6 @@
 import { FunctionImpl, GroupImpl } from "@confect/server";
-import { Effect, Layer } from "effect";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 
 import { NotFoundError } from "@cataster/validators";
 
@@ -12,25 +13,26 @@ import {
     TreeRepository,
     TreeService,
 } from "../services";
-import api from "./_generated/api";
+import databaseSchema from "./_generated/schema";
+import trees from "./trees.spec";
 
 const listByLocation = FunctionImpl.make(
-    api,
-    "trees",
+    databaseSchema,
+    trees,
     "listByLocation",
     ({ locationId }) =>
         Effect.gen(function* () {
             yield* requireAbility("read", "Tree");
             yield* LocationService.getById(locationId);
-            const trees = yield* TreeService.listByLocation(locationId);
+            const treeList = yield* TreeService.listByLocation(locationId);
             const speciesById = yield* SpeciesService.loadByIds(
-                trees.map((t) => t.speciesId),
+                treeList.map((t) => t.speciesId),
             );
-            return { trees, speciesById };
+            return { trees: treeList, speciesById };
         }).pipe(Effect.provide(ServicesLive)),
 );
 
-const get = FunctionImpl.make(api, "trees", "get", ({ id }) =>
+const get = FunctionImpl.make(databaseSchema, trees, "get", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("read", "Tree");
         const tree = yield* TreeService.getById(id);
@@ -43,7 +45,7 @@ const get = FunctionImpl.make(api, "trees", "get", ({ id }) =>
     }).pipe(Effect.provide(ServicesLive)),
 );
 
-const create = FunctionImpl.make(api, "trees", "create", (args) =>
+const create = FunctionImpl.make(databaseSchema, trees, "create", (args) =>
     Effect.gen(function* () {
         yield* requireAbility("create", "Tree");
         yield* SpeciesService.getForOrg(args.speciesId);
@@ -55,29 +57,33 @@ const create = FunctionImpl.make(api, "trees", "create", (args) =>
     }).pipe(Effect.provide(ServicesLive)),
 );
 
-const update = FunctionImpl.make(api, "trees", "update", ({ id, ...data }) =>
-    Effect.gen(function* () {
-        yield* requireAbility("update", "Tree");
-        if (data.speciesId) {
-            yield* SpeciesService.getForOrg(data.speciesId);
-        }
-        if (data.latitude !== undefined || data.longitude !== undefined) {
-            const existing = yield* TreeService.getById(id);
-            if (existing) {
-                const lat = data.latitude ?? existing.latitude;
-                const lng = data.longitude ?? existing.longitude;
-                yield* LocationService.assertContainsPoint(
-                    existing.locationId,
-                    { lat, lng },
-                );
+const update = FunctionImpl.make(
+    databaseSchema,
+    trees,
+    "update",
+    ({ id, ...data }) =>
+        Effect.gen(function* () {
+            yield* requireAbility("update", "Tree");
+            if (data.speciesId) {
+                yield* SpeciesService.getForOrg(data.speciesId);
             }
-        }
-        yield* TreeService.update({ id, ...data });
-        return null;
-    }).pipe(Effect.provide(ServicesLive)),
+            if (data.latitude !== undefined || data.longitude !== undefined) {
+                const existing = yield* TreeService.getById(id);
+                if (existing) {
+                    const lat = data.latitude ?? existing.latitude;
+                    const lng = data.longitude ?? existing.longitude;
+                    yield* LocationService.assertContainsPoint(
+                        existing.locationId,
+                        { lat, lng },
+                    );
+                }
+            }
+            yield* TreeService.update({ id, ...data });
+            return null;
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
-const remove = FunctionImpl.make(api, "trees", "remove", ({ id }) =>
+const remove = FunctionImpl.make(databaseSchema, trees, "remove", ({ id }) =>
     Effect.gen(function* () {
         yield* requireAbility("delete", "Tree");
         yield* TreeService.remove(id);
@@ -86,16 +92,16 @@ const remove = FunctionImpl.make(api, "trees", "remove", ({ id }) =>
 );
 
 const recomputeNextControlDates = FunctionImpl.make(
-    api,
-    "trees",
+    databaseSchema,
+    trees,
     "recomputeNextControlDates",
     () =>
         Effect.gen(function* () {
-            const trees = yield* TreeService.streamAll();
+            const allTrees = yield* TreeService.streamAll();
             const now = Date.now();
 
             yield* Effect.forEach(
-                trees,
+                allTrees,
                 (tree) =>
                     Effect.gen(function* () {
                         const nextControlAt = yield* computeNextControlAt({
@@ -120,11 +126,12 @@ const recomputeNextControlDates = FunctionImpl.make(
         }).pipe(Effect.provide(ServicesLive)),
 );
 
-export const trees = GroupImpl.make(api, "trees").pipe(
+export default GroupImpl.make(databaseSchema, trees).pipe(
     Layer.provide(listByLocation),
     Layer.provide(get),
     Layer.provide(create),
     Layer.provide(update),
     Layer.provide(remove),
     Layer.provide(recomputeNextControlDates),
+    GroupImpl.finalize,
 );

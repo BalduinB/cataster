@@ -56,13 +56,11 @@ export const TreeRepository = {
             return yield* dieOnInternal(
                 db
                     .table("trees")
-                    .index(
-                        "by_orgId_and_locationId_and_plateNumber",
-                        (q) =>
-                            q
-                                .eq("orgId", orgId)
-                                .eq("locationId", locationId)
-                                .eq("plateNumber", plateNumber),
+                    .index("by_orgId_and_locationId_and_plateNumber", (q) =>
+                        q
+                            .eq("orgId", orgId)
+                            .eq("locationId", locationId)
+                            .eq("plateNumber", plateNumber),
                     )
                     .first(),
             );
@@ -76,9 +74,7 @@ export const TreeRepository = {
             );
         }),
 
-    insert: (
-        data: TreeInsert,
-    ): Effect.Effect<TreeId, never, DatabaseWriter> =>
+    insert: (data: TreeInsert): Effect.Effect<TreeId, never, DatabaseWriter> =>
         Effect.gen(function* () {
             const db = yield* DatabaseWriter;
             return yield* dieOnInternal(

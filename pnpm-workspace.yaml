@@ -4,11 +4,6 @@ packages:
     - tooling/*
 
 catalog:
-    "@confect/cli": ^7.0.0
-    "@confect/core": ^7.0.0
-    "@confect/react": ^7.0.0
-    "@confect/server": ^7.0.0
-    "@confect/test": ^7.0.0
     "@effect/platform": ^0.94.5
     "@effect/platform-node": ^0.104.1
     "@effect/vitest": ^0.29.0
@@ -37,6 +32,12 @@ catalogs:
         "@types/react-dom": ~19.1.0
         react: 19.1.4
         react-dom: 19.1.4
+    "confect":
+        "@confect/cli": ^9.2.3
+        "@confect/core": ^9.2.3
+        "@confect/react": ^9.2.3
+        "@confect/server": ^9.2.3
+        "@confect/test": ^9.2.3
 
 linkWorkspacePackages: true
 

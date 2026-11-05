@@ -14,37 +14,37 @@ export type { LatLng } from "@cataster/validators";
 export type LocationPolygon = ReadonlyArray<ReadonlyArray<LatLng>>;
 
 function toRingCoordinates(
-  ring: ReadonlyArray<LatLng>,
+    ring: ReadonlyArray<LatLng>,
 ): Array<[number, number]> {
-  if (ring.length < 3) return [];
+    if (ring.length < 3) return [];
 
-  const coordinates = ring.map((p) => [p.lng, p.lat] as [number, number]);
-  const first = coordinates[0]!;
-  const last = coordinates[coordinates.length - 1]!;
+    const coordinates = ring.map((p) => [p.lng, p.lat] as [number, number]);
+    const first = coordinates[0]!;
+    const last = coordinates[coordinates.length - 1]!;
 
-  if (first[0] !== last[0] || first[1] !== last[1]) {
-    coordinates.push(first);
-  }
+    if (first[0] !== last[0] || first[1] !== last[1]) {
+        coordinates.push(first);
+    }
 
-  return coordinates;
+    return coordinates;
 }
 
 export function isPointInLocationPolygon(
-  treePoint: LatLng,
-  locationPolygon: LocationPolygon,
+    treePoint: LatLng,
+    locationPolygon: LocationPolygon,
 ): boolean {
-  const validRings = locationPolygon
-    .map(toRingCoordinates)
-    .filter((ring) => ring.length >= 4);
-  if (validRings.length === 0) return false;
+    const validRings = locationPolygon
+        .map(toRingCoordinates)
+        .filter((ring) => ring.length >= 4);
+    if (validRings.length === 0) return false;
 
-  const tree = point([treePoint.lng, treePoint.lat]);
-  if (validRings.length === 1) {
-    return booleanPointInPolygon(tree, polygon(validRings));
-  }
+    const tree = point([treePoint.lng, treePoint.lat]);
+    if (validRings.length === 1) {
+        return booleanPointInPolygon(tree, polygon(validRings));
+    }
 
-  return booleanPointInPolygon(
-    tree,
-    multiPolygon(validRings.map((ring) => [ring])),
-  );
+    return booleanPointInPolygon(
+        tree,
+        multiPolygon(validRings.map((ring) => [ring])),
+    );
 }

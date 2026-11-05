@@ -8,18 +8,18 @@
  * Convex `Doc<>` types when displaying data returned from a Confect query.
  */
 
-import type { Schema } from "effect";
+import type * as Schema from "effect/Schema";
 
-import {
-  hiddenSpecies as hiddenSpeciesTable,
-  locations as locationsTable,
-  species as speciesTable,
-  trees as treesTable,
-} from "./confect/schema";
+import type hiddenSpeciesTable from "./confect/_generated/tables/hiddenSpecies";
+import type locationsTable from "./confect/_generated/tables/locations";
+import type speciesTable from "./confect/_generated/tables/species";
+import type treesTable from "./confect/_generated/tables/trees";
 
 export type LocationDoc = Schema.Schema.Type<typeof locationsTable.Doc>;
 export type SpeciesDoc = Schema.Schema.Type<typeof speciesTable.Doc>;
-export type HiddenSpeciesDoc = Schema.Schema.Type<typeof hiddenSpeciesTable.Doc>;
+export type HiddenSpeciesDoc = Schema.Schema.Type<
+    typeof hiddenSpeciesTable.Doc
+>;
 export type TreeDoc = Schema.Schema.Type<typeof treesTable.Doc>;
 
 export type LocationId = LocationDoc["_id"];
