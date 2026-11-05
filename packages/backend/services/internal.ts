@@ -16,30 +16,34 @@ import { Effect, Predicate } from "effect";
  * the specific tag *before* `dieOnInternal`.
  */
 const INTERNAL_TAGS: ReadonlySet<string> = new Set([
-  "GetByIdFailure",
-  "GetByIndexFailure",
-  "DocumentDecodeError",
-  "DocumentEncodeError",
+    "GetByIdFailure",
+    "GetByIndexFailure",
+    "DocumentDecodeError",
+    "DocumentEncodeError",
 ]);
 
 type InternalTag =
-  | "GetByIdFailure"
-  | "GetByIndexFailure"
-  | "DocumentDecodeError"
-  | "DocumentEncodeError";
+    | "GetByIdFailure"
+    | "GetByIndexFailure"
+    | "DocumentDecodeError"
+    | "DocumentEncodeError";
 
 type InternalError = { readonly _tag: InternalTag };
 
 const isInternalError = <E>(e: E): e is Extract<E, InternalError> =>
-  Predicate.hasProperty(e, "_tag") &&
-  typeof (e as { _tag: unknown })._tag === "string" &&
-  INTERNAL_TAGS.has((e as { _tag: string })._tag);
+    Predicate.hasProperty(e, "_tag") &&
+    typeof (e as { _tag: unknown })._tag === "string" &&
+    INTERNAL_TAGS.has((e as { _tag: string })._tag);
 
 /**
  * Turn Confect's never-should-happen errors into unrecoverable defects so
- * the handler error channel only contains domain (`WireError`) failures.
+ * the handler error channel only contains declared client-facing failures.
  */
 export const dieOnInternal = <A, E, R>(
-  self: Effect.Effect<A, E, R>,
+    self: Effect.Effect<A, E, R>,
 ): Effect.Effect<A, Exclude<E, Extract<E, InternalError>>, R> =>
-  Effect.catchIf(self, isInternalError, (e) => Effect.die(e));
+    /* `catchIf`'s conditional return type cannot resolve while `E` is still
+     * generic, so restate the (sound) narrowed error channel explicitly. */
+    Effect.catchIf(self, isInternalError, (e) =>
+        Effect.die(e),
+    ) as Effect.Effect<A, Exclude<E, Extract<E, InternalError>>, R>;

@@ -1,80 +1,91 @@
 import { FunctionImpl, GroupImpl } from "@confect/server";
-import { Effect, Layer } from "effect";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 
 import { requireAbility, ServicesLive, SpeciesService } from "../services";
-import api from "./_generated/api";
-import { surfaceErrors } from "./wire";
+import databaseSchema from "./_generated/schema";
+import species from "./species.spec";
 
-const listActive = FunctionImpl.make(api, "species", "listActive", () =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("read", "Species");
-    return yield* SpeciesService.listForOrg(orgId);
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const listActive = FunctionImpl.make(
+    databaseSchema,
+    species,
+    "listActive",
+    () =>
+        Effect.gen(function* () {
+            yield* requireAbility("read", "Species");
+            const speciesService = yield* SpeciesService;
+            return yield* speciesService.listForOrg();
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const create = FunctionImpl.make(
-  api,
-  "species",
-  "create",
-  ({ deName, botanicalName }) =>
+    databaseSchema,
+    species,
+    "create",
+    ({ deName, botanicalName }) =>
+        Effect.gen(function* () {
+            yield* requireAbility("create", "Species");
+            const speciesService = yield* SpeciesService;
+            const existing = yield* speciesService.listForOrg();
+            return yield* speciesService.upsertForOrg({
+                deName,
+                botanicalName,
+                sortOrder: existing.length,
+            });
+        }).pipe(Effect.provide(ServicesLive)),
+);
+
+const remove = FunctionImpl.make(databaseSchema, species, "remove", ({ id }) =>
     Effect.gen(function* () {
-      const { orgId } = yield* requireAbility("create", "Species");
-      const existing = yield* SpeciesService.listForOrg(orgId);
-      return yield* SpeciesService.upsertForOrg({
-        orgId,
-        deName,
-        botanicalName,
-        sortOrder: existing.length,
-      });
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+        yield* requireAbility("delete", "Species");
+        const speciesService = yield* SpeciesService;
+        yield* speciesService.removeForOrg(id);
+        return null;
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
-const remove = FunctionImpl.make(api, "species", "remove", ({ id }) =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("delete", "Species");
-    yield* SpeciesService.removeForOrg(orgId, id);
-    return null;
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
-);
-
-const hideSystem = FunctionImpl.make(api, "species", "hideSystem", ({ id }) =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("manage", "HiddenSpecies");
-    yield* SpeciesService.hideSystemForOrg(orgId, id);
-    return null;
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const hideSystem = FunctionImpl.make(
+    databaseSchema,
+    species,
+    "hideSystem",
+    ({ id }) =>
+        Effect.gen(function* () {
+            yield* requireAbility("manage", "HiddenSpecies");
+            const speciesService = yield* SpeciesService;
+            yield* speciesService.hideSystemForOrg(id);
+            return null;
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
 const unhideSystem = FunctionImpl.make(
-  api,
-  "species",
-  "unhideSystem",
-  ({ id }) =>
-    Effect.gen(function* () {
-      const { orgId } = yield* requireAbility("manage", "HiddenSpecies");
-      yield* SpeciesService.unhideSystemForOrg(orgId, id);
-      return null;
-    }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+    databaseSchema,
+    species,
+    "unhideSystem",
+    ({ id }) =>
+        Effect.gen(function* () {
+            yield* requireAbility("manage", "HiddenSpecies");
+            const speciesService = yield* SpeciesService;
+            yield* speciesService.unhideSystemForOrg(id);
+            return null;
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
-/**
- * Internal: seeds system species. Caller is the deploy-time init cron — see
- * `confect/crons.ts`. Not gated by `requireUser` because it runs as a system
- * mutation; the spec marks it `internalMutation` so the client API surface
- * never exposes it.
- */
-const seedDefaults = FunctionImpl.make(api, "species", "seedDefaults", () =>
-  SpeciesService.seedDefaults().pipe(
-    Effect.provide(ServicesLive),
-    surfaceErrors,
-  ),
+const seedDefaults = FunctionImpl.make(
+    databaseSchema,
+    species,
+    "seedDefaults",
+    () =>
+        SpeciesService.use((speciesService) =>
+            speciesService.seedDefaults(),
+        ).pipe(Effect.provide(ServicesLive)),
 );
 
-export const species = GroupImpl.make(api, "species").pipe(
-  Layer.provide(listActive),
-  Layer.provide(create),
-  Layer.provide(remove),
-  Layer.provide(hideSystem),
-  Layer.provide(unhideSystem),
-  Layer.provide(seedDefaults),
+export default GroupImpl.make(databaseSchema, species).pipe(
+    Layer.provide(listActive),
+    Layer.provide(create),
+    Layer.provide(remove),
+    Layer.provide(hideSystem),
+    Layer.provide(unhideSystem),
+    Layer.provide(seedDefaults),
+    GroupImpl.finalize,
 );

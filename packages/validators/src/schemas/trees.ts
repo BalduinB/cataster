@@ -25,23 +25,17 @@ export type TreeCreateArgs = Schema.Schema.Type<typeof TreeCreateArgs>;
 
 export const TreeUpdateArgs = Schema.Struct({
     id: GenericId.GenericId("trees"),
-    plateNumber: Schema.optionalWith(Schema.NullOr(Schema.String), {
-        exact: true,
-    }),
-    speciesId: Schema.optionalWith(SpeciesId, { exact: true }),
-    circumference: Schema.optionalWith(Schema.Number, { exact: true }),
-    height: Schema.optionalWith(Schema.Number, { exact: true }),
-    crownDiameter: Schema.optionalWith(Schema.Number, { exact: true }),
-    vitality: Schema.optionalWith(Vitality, { exact: true }),
-    notes: Schema.optionalWith(Schema.NullOr(Schema.String), { exact: true }),
-    controlIntervalRRule: Schema.optionalWith(Schema.NullOr(Schema.String), {
-        exact: true,
-    }),
-    controlTimezone: Schema.optionalWith(Schema.String, { exact: true }),
-    additionalControlAt: Schema.optionalWith(Schema.NullOr(Schema.Number), {
-        exact: true,
-    }),
-    latitude: Schema.optionalWith(Schema.Number, { exact: true }),
-    longitude: Schema.optionalWith(Schema.Number, { exact: true }),
+    plateNumber: Schema.optionalKey(Schema.NullOr(Schema.String)),
+    speciesId: Schema.optionalKey(SpeciesId),
+    circumference: Schema.optionalKey(Schema.Number),
+    height: Schema.optionalKey(Schema.Number),
+    crownDiameter: Schema.optionalKey(Schema.Number),
+    vitality: Schema.optionalKey(Vitality),
+    notes: Schema.optionalKey(Schema.NullOr(Schema.String)),
+    controlIntervalRRule: Schema.optionalKey(Schema.NullOr(Schema.String)),
+    controlTimezone: Schema.optionalKey(Schema.String),
+    additionalControlAt: Schema.optionalKey(Schema.NullOr(Schema.Number)),
+    latitude: Schema.optionalKey(Schema.Number),
+    longitude: Schema.optionalKey(Schema.Number),
 });
 export type TreeUpdateArgs = Schema.Schema.Type<typeof TreeUpdateArgs>;

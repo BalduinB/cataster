@@ -1,53 +1,76 @@
 import { FunctionImpl, GroupImpl } from "@confect/server";
-import { Effect, Layer } from "effect";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
+
+import { subject } from "@cataster/abilities";
+import { canReadLocation } from "@cataster/abilities/domains/location";
 
 import { LocationService, requireAbility, ServicesLive } from "../services";
-import api from "./_generated/api";
-import { surfaceErrors } from "./wire";
+import databaseSchema from "./_generated/schema";
+import locations from "./locations.spec";
 
-const list = FunctionImpl.make(api, "locations", "list", () =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("read", "Location");
-    return yield* LocationService.list(orgId);
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const list = FunctionImpl.make(databaseSchema, locations, "list", () =>
+    Effect.gen(function* () {
+        const user = yield* requireAbility("read", "Location");
+        const locationService = yield* LocationService;
+        const locationList = yield* locationService.list();
+        return locationList.filter((location) =>
+            canReadLocation(user, location),
+        );
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
-const get = FunctionImpl.make(api, "locations", "get", ({ id }) =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("read", "Location");
-    return yield* LocationService.getById(orgId, id).pipe(
-      Effect.catchTag("NotFound", () => Effect.succeed(null)),
-    );
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const get = FunctionImpl.make(databaseSchema, locations, "get", ({ id }) =>
+    Effect.gen(function* () {
+        yield* requireAbility("read", "Location");
+        const locationService = yield* LocationService;
+        const loc = yield* locationService.getById(id);
+        yield* requireAbility("read", subject("Location", loc));
+        return loc;
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
-const create = FunctionImpl.make(api, "locations", "create", (args) =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("create", "Location");
-    return yield* LocationService.create({ ...args, orgId });
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const create = FunctionImpl.make(databaseSchema, locations, "create", (args) =>
+    Effect.gen(function* () {
+        yield* requireAbility("create", "Location");
+        const locationService = yield* LocationService;
+        return yield* locationService.create(args);
+    }).pipe(Effect.provide(ServicesLive)),
 );
 
-const update = FunctionImpl.make(api, "locations", "update", ({ id, name }) =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("update", "Location");
-    yield* LocationService.rename(orgId, id, name);
-    return null;
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const update = FunctionImpl.make(
+    databaseSchema,
+    locations,
+    "update",
+    ({ id, name }) =>
+        Effect.gen(function* () {
+            const locationService = yield* LocationService;
+            const location = yield* locationService.getById(id);
+            yield* requireAbility("update", subject("Location", location));
+            yield* locationService.rename(id, name);
+            return null;
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
-const remove = FunctionImpl.make(api, "locations", "remove", ({ id }) =>
-  Effect.gen(function* () {
-    const { orgId } = yield* requireAbility("delete", "Location");
-    yield* LocationService.remove(orgId, id);
-    return null;
-  }).pipe(Effect.provide(ServicesLive), surfaceErrors),
+const remove = FunctionImpl.make(
+    databaseSchema,
+    locations,
+    "remove",
+    ({ id }) =>
+        Effect.gen(function* () {
+            const locationService = yield* LocationService;
+            const location = yield* locationService.getById(id);
+            yield* requireAbility("delete", subject("Location", location));
+            yield* locationService.remove(id);
+            return null;
+        }).pipe(Effect.provide(ServicesLive)),
 );
 
-export const locations = GroupImpl.make(api, "locations").pipe(
-  Layer.provide(list),
-  Layer.provide(get),
-  Layer.provide(create),
-  Layer.provide(update),
-  Layer.provide(remove),
+export default GroupImpl.make(databaseSchema, locations).pipe(
+    Layer.provide(list),
+    Layer.provide(get),
+    Layer.provide(create),
+    Layer.provide(update),
+    Layer.provide(remove),
+    GroupImpl.finalize,
 );

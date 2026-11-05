@@ -1,10 +1,19 @@
 import { FunctionImpl, GroupImpl } from "@confect/server";
-import { Effect, Layer } from "effect";
+import * as Clock from "effect/Clock";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 
-import api from "./_generated/api";
+import databaseSchema from "./_generated/schema";
+import health from "./health.spec";
 
-const ping = FunctionImpl.make(api, "health", "ping", () =>
-  Effect.succeed({ ok: true as const, now: Date.now() }),
+const ping = FunctionImpl.make(databaseSchema, health, "ping", () =>
+    Effect.map(Clock.currentTimeMillis, (now) => ({
+        ok: true as const,
+        now,
+    })),
 );
 
-export const health = GroupImpl.make(api, "health").pipe(Layer.provide(ping));
+export default GroupImpl.make(databaseSchema, health).pipe(
+    Layer.provide(ping),
+    GroupImpl.finalize,
+);

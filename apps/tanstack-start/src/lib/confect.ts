@@ -1,118 +1,56 @@
 /**
- * Thin adapter from Confect refs (`@confect/core`) to the existing
- * `@convex-dev/react-query` + TanStack Query SSR setup.
- *
- * - `confectQuery(ref, args)` produces options compatible with
- *   `useSuspenseQuery` and `queryClient.ensureQueryData(...)`. It re-uses the
- *   global Convex default `queryFn` (set in `router.tsx`), and decodes the raw
- *   wire result through the ref's Effect Schema using `select`.
- * - `useConfectMutationFn(ref)` returns a `mutationFn` you can plug into
- *   `useMutation({ mutationFn, ... })`. Args are encoded; the result is
- *   decoded; errors propagate untouched.
- * - `decodeConfectError(error)` reconstructs a typed `WireError` from a
- *   `ConvexError` thrown by the backend's `surfaceErrors` helper. Returns
- *   `null` for any other error.
+ * Adapts `@confect/react`'s mutation/action invokers to TanStack Query's
+ * `useMutation`, which owns the UI state (pending, error, data, callbacks).
+ * Shared wire errors are toasted globally by the `MutationCache` in
+ * `router.tsx`.
  */
-
+import type { UseMutationOptions } from "@tanstack/react-query";
 import { Ref } from "@confect/core";
-import { useConvexMutation } from "@convex-dev/react-query";
-import { useAction } from "convex/react";
-import { ConvexError } from "convex/values";
-import { Either, Schema } from "effect";
+import { useAction, useMutation } from "@confect/react";
+import { useMutation as useTanstackMutation } from "@tanstack/react-query";
+import { Result } from "effect";
 
-import type { WireError } from "@cataster/validators";
-import { WireErrorUnion } from "@cataster/validators";
+type ConfectMutationOptions<R extends Ref.Any> = Omit<
+    UseMutationOptions<Ref.Returns<R>, Ref.Error<R> | Error, Ref.Args<R>>,
+    "mutationFn"
+>;
 
-const decodeWireError = Schema.decodeUnknownEither(WireErrorUnion);
-
-export function confectQuery<R extends Ref.AnyPublicQuery>(
-    ref: R,
-    args: Ref.Args<R>,
-) {
-    // Store the function *name* (not the FunctionReference object) in the
-    // queryKey. Convex FunctionReferences carry their identity on a Symbol-keyed
-    // property, which is silently dropped by `JSON.stringify` during SSR
-    // dehydration. After hydration the queryKey would otherwise contain `{}`,
-    // and `ConvexQueryClient.subscribeInner` would call `watchQuery({})` →
-    // `getFunctionAddress` would throw "[object Object] is not a
-    // functionReference". A string survives serialization and is accepted by
-    // both `watchQuery` and the Convex hashFn.
-    const funcName = Ref.getConvexFunctionName(ref);
-    const encodedArgs = Ref.encodeArgsSync(ref, args) as Record<
-        string,
-        unknown
-    >;
-
-    return {
-        queryKey: ["convexQuery", funcName, encodedArgs] as const,
-        select: (raw: unknown): Ref.Returns<R> =>
-            // `decodeReturnsSync`'s declared return is `Ref.Returns<R>`, but inside
-            // a generic body that erases to `any`. The cast is safe because the
-            // schema decoder validates at runtime.
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            Ref.decodeReturnsSync(ref, raw),
-        staleTime: Infinity,
-    };
-}
-
-export function useConfectMutationFn<R extends Ref.AnyPublicMutation>(
-    ref: R,
-): (args: Ref.Args<R>) => Promise<Ref.Returns<R>> {
-    const funcRef = Ref.getFunctionReference(ref);
-
-    const inner = useConvexMutation(funcRef);
-
-    return async (args) => {
-        const encoded = Ref.encodeArgsSync(ref, args) as Record<
-            string,
-            unknown
-        >;
-
-        const raw = await (
-            inner as (a: Record<string, unknown>) => Promise<unknown>
-        )(encoded);
-
-        // See note in `confectQuery` on why the unsafe-return is acceptable here.
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return Ref.decodeReturnsSync(ref, raw);
-    };
-}
+type Invoke<R extends Ref.Any> = (args: Ref.Args<R>) => Promise<unknown>;
 
 /**
- * Mirror of `useConfectMutationFn` for `publicAction` refs (e.g. OSM lookups).
- *
- * Convex actions don't get a TanStack Query subscription, so we use the
- * imperative `useAction` hook from `convex/react` and shape its caller into
- * a `mutationFn`-compatible function. The wrapper handles arg encoding and
- * return decoding the same way the mutation flavour does.
+ * Confect resolves functions with an error schema to a `Result`; TanStack
+ * expects a rejected promise, so the failure is rethrown.
  */
-export function useConfectActionFn<R extends Ref.AnyPublicAction>(
+const unwrap = async <R extends Ref.Any>(
     ref: R,
-): (args: Ref.Args<R>) => Promise<Ref.Returns<R>> {
-    const funcRef = Ref.getFunctionReference(ref);
+    pending: Promise<unknown>,
+): Promise<Ref.Returns<R>> => {
+    const value = await pending;
+    return Ref.hasErrorSchema(ref)
+        ? Result.getOrThrow(
+              value as Result.Result<Ref.Returns<R>, Ref.Error<R>>,
+          )
+        : (value as Ref.Returns<R>);
+};
 
-    const inner = useAction(funcRef);
-
-    return async (args) => {
-        const encoded = Ref.encodeArgsSync(ref, args) as Record<
-            string,
-            unknown
-        >;
-
-        const raw = await (
-            inner as (a: Record<string, unknown>) => Promise<unknown>
-        )(encoded);
-
-        // See note in `confectQuery` on why the unsafe-return is acceptable here.
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return Ref.decodeReturnsSync(ref, raw);
-    };
+export function useConfectMutation<R extends Ref.AnyPublicMutation>(
+    ref: R,
+    options?: ConfectMutationOptions<R>,
+) {
+    const invoke = useMutation(ref) as unknown as Invoke<R>;
+    return useTanstackMutation({
+        ...options,
+        mutationFn: (args) => unwrap(ref, invoke(args)),
+    });
 }
 
-export function decodeConfectError(error: unknown): WireError | null {
-    if (!(error instanceof ConvexError)) return null;
-
-    const result = decodeWireError(error.data);
-
-    return Either.isRight(result) ? result.right : null;
+export function useConfectAction<R extends Ref.AnyPublicAction>(
+    ref: R,
+    options?: ConfectMutationOptions<R>,
+) {
+    const invoke = useAction(ref) as unknown as Invoke<R>;
+    return useTanstackMutation({
+        ...options,
+        mutationFn: (args) => unwrap(ref, invoke(args)),
+    });
 }

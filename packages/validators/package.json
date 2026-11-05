@@ -16,7 +16,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@confect/core": "catalog:",
+        "@confect/core": "catalog:confect",
         "convex": "catalog:",
         "effect": "catalog:"
     },

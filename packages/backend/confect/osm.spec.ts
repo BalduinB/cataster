@@ -1,7 +1,8 @@
 import { FunctionSpec, GroupSpec } from "@confect/core";
-import { Schema } from "effect";
+import * as Schema from "effect/Schema";
 
 import {
+    OsmActionErrorUnion,
     OsmBoundary,
     OsmFetchBoundaryArgs,
     OsmSearchArgs,
@@ -10,16 +11,18 @@ import {
 
 const searchAreas = FunctionSpec.publicAction({
     name: "searchAreas",
-    args: OsmSearchArgs,
-    returns: Schema.Array(OsmSearchResult),
+    args: () => OsmSearchArgs.fields,
+    returns: () => Schema.Array(OsmSearchResult),
+    error: () => OsmActionErrorUnion,
 });
 
 const fetchBoundary = FunctionSpec.publicAction({
     name: "fetchBoundary",
-    args: OsmFetchBoundaryArgs,
-    returns: OsmBoundary,
+    args: () => OsmFetchBoundaryArgs.fields,
+    returns: () => OsmBoundary,
+    error: () => OsmActionErrorUnion,
 });
 
-export const osm = GroupSpec.make("osm")
+export default GroupSpec.make()
     .addFunction(searchAreas)
     .addFunction(fetchBoundary);

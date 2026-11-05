@@ -7,12 +7,12 @@
  * Vite app — only its tests run under Vitest, which polyfills this method.
  */
 interface ImportMeta {
-  glob(
-    pattern: string | string[],
-    options?: { eager?: false },
-  ): Record<string, () => Promise<Record<string, unknown>>>;
-  glob(
-    pattern: string | string[],
-    options: { eager: true },
-  ): Record<string, Record<string, unknown>>;
+    glob(
+        pattern: string | string[],
+        options?: { eager?: false },
+    ): Record<string, () => Promise<Record<string, unknown>>>;
+    glob(
+        pattern: string | string[],
+        options: { eager: true },
+    ): Record<string, Record<string, unknown>>;
 }

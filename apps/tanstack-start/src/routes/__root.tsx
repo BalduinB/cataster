@@ -1,10 +1,7 @@
 /// <reference types="vite/client" />
-import type { ConvexQueryClient } from "@convex-dev/react-query";
-import type { QueryClient } from "@tanstack/react-query";
 import type { ConvexReactClient } from "convex/react";
 import type * as React from "react";
 import { ClerkProvider, useAuth } from "@clerk/tanstack-react-start";
-import { auth } from "@clerk/tanstack-react-start/server";
 import {
     createRootRouteWithContext,
     HeadContent,
@@ -12,7 +9,6 @@ import {
     Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { createServerFn } from "@tanstack/react-start";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 
 import { Toaster } from "@cataster/ui/components/base/sonner";
@@ -23,16 +19,8 @@ import { env } from "~/env";
 import { AbilityProvider } from "~/lib/abilities";
 import appCss from "~/styles.css?url";
 
-const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
-    const { userId, getToken } = await auth();
-    const token = await getToken();
-    return { userId, token };
-});
-
 export const Route = createRootRouteWithContext<{
-    queryClient: QueryClient;
     convexClient: ConvexReactClient;
-    convexQueryClient: ConvexQueryClient;
 }>()({
     head: () => ({
         meta: [
@@ -44,16 +32,6 @@ export const Route = createRootRouteWithContext<{
         ],
         links: [{ rel: "stylesheet", href: appCss }],
     }),
-    beforeLoad: async (ctx) => {
-        // Only run during SSR — ConvexProviderWithClerk handles client-side tokens.
-        if (typeof window !== "undefined") return;
-        const { userId, token } = await fetchClerkAuth();
-        if (token) {
-            ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
-        }
-
-        return { userId, token };
-    },
     component: RootComponent,
 });
 

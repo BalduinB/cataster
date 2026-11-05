@@ -1,0 +1,12 @@
+{
+    "extends": "@cataster/tsconfig/base.json",
+    "compilerOptions": {
+        "lib": ["ES2022", "dom", "dom.iterable"],
+        "jsx": "preserve",
+        "paths": {
+            "~/*": ["./*"]
+        }
+    },
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules"]
+}

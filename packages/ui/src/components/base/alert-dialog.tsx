@@ -85,13 +85,16 @@ function AlertDialogHeader({
 
 function AlertDialogFooter({
     className,
+    variant = "default",
     ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { variant?: "default" | "muted" }) {
     return (
         <div
+            data-variant={variant}
             data-slot="alert-dialog-footer"
             className={cn(
                 "flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
+                "data-[variant=muted]:bg-muted data-[variant=muted]:-mx-6 data-[variant=muted]:-mb-6 data-[variant=muted]:rounded-b-4xl",
                 className,
             )}
             {...props}
@@ -162,7 +165,7 @@ function AlertDialogAction({
 
 function AlertDialogCancel({
     className,
-    variant = "outline",
+    variant = "ghost",
     size = "default",
     ...props
 }: AlertDialogPrimitive.Close.Props &

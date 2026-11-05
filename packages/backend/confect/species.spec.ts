@@ -1,38 +1,48 @@
-import { FunctionSpec, GenericId, GroupSpec } from "@confect/core";
-import { Schema } from "effect";
+import { FunctionSpec, GroupSpec } from "@confect/core";
+import * as Schema from "effect/Schema";
 
-import { SpeciesCreateArgs } from "@cataster/validators";
+import {
+    AuthErrorUnion,
+    ConflictError,
+    SpeciesCreateArgs,
+    WriteErrorUnion,
+} from "@cataster/validators";
 
-import { species as speciesTable } from "./schema";
+import { Id } from "./_generated/id";
+import speciesTable from "./_generated/tables/species";
 
 const listActive = FunctionSpec.publicQuery({
-  name: "listActive",
-  args: Schema.Struct({}),
-  returns: Schema.Array(speciesTable.Doc),
+    name: "listActive",
+    returns: () => Schema.Array(speciesTable.Doc),
+    error: () => AuthErrorUnion,
 });
 
 const create = FunctionSpec.publicMutation({
-  name: "create",
-  args: SpeciesCreateArgs,
-  returns: GenericId.GenericId("species"),
+    name: "create",
+    args: () => SpeciesCreateArgs.fields,
+    returns: () => Id("species"),
+    error: () => WriteErrorUnion,
 });
 
 const remove = FunctionSpec.publicMutation({
-  name: "remove",
-  args: Schema.Struct({ id: GenericId.GenericId("species") }),
-  returns: Schema.Null,
+    name: "remove",
+    args: () => ({ id: Id("species") }),
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
 const hideSystem = FunctionSpec.publicMutation({
-  name: "hideSystem",
-  args: Schema.Struct({ id: GenericId.GenericId("species") }),
-  returns: Schema.Null,
+    name: "hideSystem",
+    args: () => ({ id: Id("species") }),
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
 const unhideSystem = FunctionSpec.publicMutation({
-  name: "unhideSystem",
-  args: Schema.Struct({ id: GenericId.GenericId("species") }),
-  returns: Schema.Null,
+    name: "unhideSystem",
+    args: () => ({ id: Id("species") }),
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
 /**
@@ -41,15 +51,15 @@ const unhideSystem = FunctionSpec.publicMutation({
  * as system rows (`orgId = null`); idempotent across deploys.
  */
 const seedDefaults = FunctionSpec.internalMutation({
-  name: "seedDefaults",
-  args: Schema.Struct({}),
-  returns: Schema.Array(GenericId.GenericId("species")),
+    name: "seedDefaults",
+    returns: () => Schema.Array(Id("species")),
+    error: () => ConflictError,
 });
 
-export const species = GroupSpec.make("species")
-  .addFunction(listActive)
-  .addFunction(create)
-  .addFunction(remove)
-  .addFunction(hideSystem)
-  .addFunction(unhideSystem)
-  .addFunction(seedDefaults);
+export default GroupSpec.make()
+    .addFunction(listActive)
+    .addFunction(create)
+    .addFunction(remove)
+    .addFunction(hideSystem)
+    .addFunction(unhideSystem)
+    .addFunction(seedDefaults);

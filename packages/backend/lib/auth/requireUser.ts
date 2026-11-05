@@ -15,7 +15,7 @@ export { OrgId };
 export const UserContext = Schema.Struct({
     userId: Schema.String,
     orgId: OrgId,
-    role: Schema.Literal("admin", "member"),
+    role: Schema.Literals(["admin", "member"]),
 });
 export type UserContext = Schema.Schema.Type<typeof UserContext>;
 
@@ -30,15 +30,12 @@ export type UserContext = Schema.Schema.Type<typeof UserContext>;
  * concept inside the app and the canonical "basic_member" string only matters
  * for the Clerk Frontend API.
  */
-const ClerkOrgClaim = Schema.Struct({
-    id: Schema.String,
-    rol: Schema.String,
-});
+const ClerkOrgClaim = Schema.Struct({ id: OrgId, rol: Schema.String });
 
 const ClerkIdentity = Schema.Struct({
     subject: Schema.String,
     o: Schema.optional(ClerkOrgClaim),
-    orgId: Schema.optional(Schema.String),
+    orgId: Schema.optional(OrgId),
 });
 
 const normalizeRole = (rol: string): "admin" | "member" | null => {
@@ -66,8 +63,8 @@ export const requireUser = Effect.gen(function* () {
         ),
     );
 
-    const parsed = yield* Schema.decodeUnknown(ClerkIdentity)(identity).pipe(
-        Effect.catchTag("ParseError", () =>
+    const parsed = yield* Schema.decodeUnknownEffect(ClerkIdentity)(identity).pipe(
+        Effect.catchTag("SchemaError", () =>
             Effect.fail(
                 new UnauthorizedError({
                     message: "Malformed identity payload",
@@ -92,7 +89,7 @@ export const requireUser = Effect.gen(function* () {
 
     return {
         userId: parsed.subject,
-        orgId: OrgId.make(orgIdRaw),
+        orgId: orgIdRaw,
         role,
     } satisfies UserContext;
 });

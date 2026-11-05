@@ -1,19 +1,12 @@
 import { Show, SignInButton, UserButton } from "@clerk/tanstack-react-start";
-import { useQuery } from "@tanstack/react-query";
+import { QueryResult, useQuery } from "@confect/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import refs from "@cataster/backend/confect/_generated/refs";
 import { Button, buttonVariants } from "@cataster/ui/components/base/button";
 
-import { confectQuery } from "~/lib/confect";
-
-const healthQuery = confectQuery(refs.public.health.ping, {});
-
 export const Route = createFileRoute("/(www)/")({
     component: RouteComponent,
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(healthQuery);
-    },
 });
 
 function RouteComponent() {
@@ -55,23 +48,19 @@ function AuthShowcase() {
 }
 
 function HealthIndicator() {
-    const { data, isPending } = useQuery(healthQuery);
+    const health = useQuery(refs.public.health.ping, {});
 
-    if (isPending) {
-        return <HealthSkeleton />;
-    }
-    if (!data) {
-        return <HealthSkeleton />;
-    }
-
-    return (
-        <p className="text-muted-foreground text-lg">
-            Connected — server time:{" "}
-            <span className="text-foreground font-mono">
-                {new Date(data.now).toISOString()}
-            </span>
-        </p>
-    );
+    return QueryResult.match(health, {
+        onLoading: () => <HealthSkeleton />,
+        onSuccess: (data) => (
+            <p className="text-muted-foreground text-lg">
+                Connected — server time:{" "}
+                <span className="text-foreground font-mono">
+                    {new Date(data.now).toISOString()}
+                </span>
+            </p>
+        ),
+    });
 }
 
 function HealthSkeleton() {

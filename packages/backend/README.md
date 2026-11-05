@@ -19,7 +19,7 @@ packages/backend/
 │   ├── schema.ts            # DatabaseSchema (no tables yet)
 │   ├── spec.ts              # top-level Spec
 │   ├── tsconfig.json
-│   └── wire.ts              # `surfaceErrors` (Effect → ConvexError)
+│   └── (spec `error` schemas + Confect v7 typed ConvexError transport)
 ├── convex/                  # ← gitignored except for the two files below
 │   ├── convex.config.ts     # Convex app definition (hand-written)
 │   └── tsconfig.json        # Convex's TS config (hand-written)
@@ -64,7 +64,7 @@ pnpm --filter @cataster/backend setup
 3. Register it: add the spec to `spec.ts` and the impl to `impl.ts`.
 4. Errors that should reach the client must be one of the tagged errors in
    `@cataster/validators` (`UnauthorizedError`, `NotFoundError`, …). Pipe
-   handlers through `surfaceErrors` from `wire.ts` at their boundary.
+   handlers declare matching `error` schemas on their `FunctionSpec` (Confect v7).
    Function-local errors must be caught and either recovered from or mapped
    to a wire error before reaching that boundary — TypeScript will refuse to
    compile otherwise.

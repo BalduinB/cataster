@@ -1,13 +1,12 @@
 import { GeospatialIndex } from "@convex-dev/geospatial";
-import { Effect, Layer } from "effect";
+import * as Context from "effect/Context";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 
-import { components } from "../../convex/_generated/api";
+import type { LatLng, LocationPolygon } from "./GSLib";
 import { MutationCtx } from "../../confect/_generated/services";
-import {
-  isPointInLocationPolygon,
-  type LatLng,
-  type LocationPolygon,
-} from "./GSLib";
+import { components } from "../../convex/_generated/api.js";
+import { isPointInLocationPolygon } from "./GSLib";
 
 type Point = { readonly latitude: number; readonly longitude: number };
 
@@ -20,60 +19,69 @@ type Point = { readonly latitude: number; readonly longitude: number };
  * mutation-specific deps, which means it composes into both query and
  * mutation handlers (the read-only `containsPoint` helper is callable from
  * either context).
+ *
+ * Convex-only dependencies are loaded inside the layer factory so Confect
+ * codegen can bundle impl modules without evaluating geospatial client code.
  */
-export class GeospatialService extends Effect.Tag(
-  "@cataster/services/GeospatialService",
-)<
-  GeospatialService,
-  {
-    readonly containsPoint: (point: LatLng, polygon: LocationPolygon) => boolean;
-    readonly insert: (
-      key: string,
-      point: Point,
-    ) => Effect.Effect<void, never, MutationCtx>;
-    readonly remove: (key: string) => Effect.Effect<void, never, MutationCtx>;
-    readonly move: (
-      key: string,
-      point: Point,
-    ) => Effect.Effect<void, never, MutationCtx>;
-  }
->() {}
+export class GeospatialService extends Context.Service<
+    GeospatialService,
+    {
+        readonly containsPoint: (
+            point: LatLng,
+            polygon: LocationPolygon,
+        ) => boolean;
+        readonly insert: (
+            key: string,
+            point: Point,
+        ) => Effect.Effect<void, never, MutationCtx>;
+        readonly remove: (
+            key: string,
+        ) => Effect.Effect<void, never, MutationCtx>;
+        readonly move: (
+            key: string,
+            point: Point,
+        ) => Effect.Effect<void, never, MutationCtx>;
+    }
+>()("@cataster/services/GeospatialService") {}
 
-export const GeospatialServiceLive = Layer.sync(GeospatialService, () => {
-  const index = new GeospatialIndex(components.geospatial);
-
-  const insert: GeospatialService["Type"]["insert"] = (key, point) =>
+export const GeospatialServiceLive = Layer.effect(
+    GeospatialService,
     Effect.gen(function* () {
-      const ctx = yield* MutationCtx;
-      yield* Effect.tryPromise({
-        try: () => index.insert(ctx, key, point, {}),
-        catch: (e) => e,
-      }).pipe(Effect.orDie);
-    });
+        const index = new GeospatialIndex(components.geospatial);
 
-  /**
-   * Geospatial entries may not exist yet (e.g. a tree imported before the
-   * index was added), so a missing key on remove is not an error.
-   */
-  const remove: GeospatialService["Type"]["remove"] = (key) =>
-    Effect.gen(function* () {
-      const ctx = yield* MutationCtx;
-      yield* Effect.tryPromise({
-        try: () => index.remove(ctx, key),
-        catch: (e) => e,
-      }).pipe(Effect.ignore);
-    });
+        const insert: GeospatialService["Service"]["insert"] = (key, point) =>
+            Effect.gen(function* () {
+                const ctx = yield* MutationCtx;
+                yield* Effect.tryPromise({
+                    try: () => index.insert(ctx, key, point, {}),
+                    catch: (e) => e,
+                }).pipe(Effect.orDie);
+            });
 
-  const move: GeospatialService["Type"]["move"] = (key, point) =>
-    Effect.gen(function* () {
-      yield* remove(key);
-      yield* insert(key, point);
-    });
+        /**
+         * Geospatial entries may not exist yet (e.g. a tree imported before the
+         * index was added), so a missing key on remove is not an error.
+         */
+        const remove: GeospatialService["Service"]["remove"] = (key) =>
+            Effect.gen(function* () {
+                const ctx = yield* MutationCtx;
+                yield* Effect.tryPromise({
+                    try: () => index.remove(ctx, key),
+                    catch: (e) => e,
+                }).pipe(Effect.ignore);
+            });
 
-  return {
-    containsPoint: isPointInLocationPolygon,
-    insert,
-    remove,
-    move,
-  };
-});
+        const move: GeospatialService["Service"]["move"] = (key, point) =>
+            Effect.gen(function* () {
+                yield* remove(key);
+                yield* insert(key, point);
+            });
+
+        return {
+            containsPoint: isPointInLocationPolygon,
+            insert,
+            remove,
+            move,
+        };
+    }),
+);

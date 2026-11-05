@@ -1,53 +1,64 @@
-import { FunctionSpec, GenericId, GroupSpec } from "@confect/core";
-import { Schema } from "effect";
+import { FunctionSpec, GroupSpec } from "@confect/core";
+import * as Schema from "effect/Schema";
 
-import { TreeCreateArgs, TreeUpdateArgs } from "@cataster/validators";
+import {
+    ConflictError,
+    ReadErrorUnion,
+    TreeCreateArgs,
+    TreeUpdateArgs,
+    WriteErrorUnion,
+} from "@cataster/validators";
 
-import { species as speciesTable, trees as treesTable } from "./schema";
+import { Id } from "./_generated/id";
+import speciesTable from "./_generated/tables/species";
+import treesTable from "./_generated/tables/trees";
 
 const listByLocation = FunctionSpec.publicQuery({
     name: "listByLocation",
-    args: Schema.Struct({ locationId: GenericId.GenericId("locations") }),
-    returns: Schema.Struct({
-        trees: Schema.Array(treesTable.Doc),
-        speciesById: Schema.Record({
-            key: GenericId.GenericId("species"),
-            value: speciesTable.Doc,
+    args: () => ({ locationId: Id("locations") }),
+    returns: () =>
+        Schema.Struct({
+            trees: Schema.Array(treesTable.Doc),
+            speciesById: Schema.Record(Id("species"), speciesTable.Doc),
         }),
-    }),
+    error: () => ReadErrorUnion,
 });
 
 const get = FunctionSpec.publicQuery({
     name: "get",
-    args: Schema.Struct({ id: GenericId.GenericId("trees") }),
-    returns: Schema.NullOr(treesTable.Doc),
+    args: () => ({ id: Id("trees") }),
+    returns: () => treesTable.Doc,
+    error: () => ReadErrorUnion,
 });
 
 const create = FunctionSpec.publicMutation({
     name: "create",
-    args: TreeCreateArgs,
-    returns: GenericId.GenericId("trees"),
+    args: () => TreeCreateArgs.fields,
+    returns: () => Id("trees"),
+    error: () => WriteErrorUnion,
 });
 
 const update = FunctionSpec.publicMutation({
     name: "update",
-    args: TreeUpdateArgs,
-    returns: Schema.Null,
+    args: () => TreeUpdateArgs.fields,
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
 const remove = FunctionSpec.publicMutation({
     name: "remove",
-    args: Schema.Struct({ id: GenericId.GenericId("trees") }),
-    returns: Schema.Null,
+    args: () => ({ id: Id("trees") }),
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
 const recomputeNextControlDates = FunctionSpec.internalMutation({
     name: "recomputeNextControlDates",
-    args: Schema.Struct({}),
-    returns: Schema.Null,
+    returns: () => Schema.Null,
+    error: () => ConflictError,
 });
 
-export const trees = GroupSpec.make("trees")
+export default GroupSpec.make()
     .addFunction(listByLocation)
     .addFunction(get)
     .addFunction(create)

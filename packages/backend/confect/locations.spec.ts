@@ -1,43 +1,54 @@
-import { FunctionSpec, GenericId, GroupSpec } from "@confect/core";
-import { Schema } from "effect";
+import { FunctionSpec, GroupSpec } from "@confect/core";
+import * as Schema from "effect/Schema";
 
-import { LocationCreateArgs, LocationRenameArgs } from "@cataster/validators";
+import {
+    AuthErrorUnion,
+    LocationCreateArgs,
+    LocationRenameArgs,
+    ReadErrorUnion,
+    WriteErrorUnion,
+} from "@cataster/validators";
 
-import { locations as locationsTable } from "./schema";
+import { Id } from "./_generated/id";
+import locationsTable from "./_generated/tables/locations";
 
 const list = FunctionSpec.publicQuery({
-  name: "list",
-  args: Schema.Struct({}),
-  returns: Schema.Array(locationsTable.Doc),
+    name: "list",
+    returns: () => Schema.Array(locationsTable.Doc),
+    error: () => AuthErrorUnion,
 });
 
 const get = FunctionSpec.publicQuery({
-  name: "get",
-  args: Schema.Struct({ id: GenericId.GenericId("locations") }),
-  returns: Schema.NullOr(locationsTable.Doc),
+    name: "get",
+    args: () => ({ id: Id("locations") }),
+    returns: () => locationsTable.Doc,
+    error: () => ReadErrorUnion,
 });
 
 const create = FunctionSpec.publicMutation({
-  name: "create",
-  args: LocationCreateArgs,
-  returns: GenericId.GenericId("locations"),
+    name: "create",
+    args: () => LocationCreateArgs.fields,
+    returns: () => Id("locations"),
+    error: () => WriteErrorUnion,
 });
 
 const update = FunctionSpec.publicMutation({
-  name: "update",
-  args: LocationRenameArgs,
-  returns: Schema.Null,
+    name: "update",
+    args: () => LocationRenameArgs.fields,
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
 const remove = FunctionSpec.publicMutation({
-  name: "remove",
-  args: Schema.Struct({ id: GenericId.GenericId("locations") }),
-  returns: Schema.Null,
+    name: "remove",
+    args: () => ({ id: Id("locations") }),
+    returns: () => Schema.Null,
+    error: () => WriteErrorUnion,
 });
 
-export const locations = GroupSpec.make("locations")
-  .addFunction(list)
-  .addFunction(get)
-  .addFunction(create)
-  .addFunction(update)
-  .addFunction(remove);
+export default GroupSpec.make()
+    .addFunction(list)
+    .addFunction(get)
+    .addFunction(create)
+    .addFunction(update)
+    .addFunction(remove);
